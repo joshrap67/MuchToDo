@@ -1,6 +1,8 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/createTodo/effort_picker.dart';
+import 'package:much_todo/src/createTodo/people_card.dart';
 import 'package:much_todo/src/createTodo/priority_picker.dart';
 import 'package:much_todo/src/createTodo/room_card.dart';
 import 'package:much_todo/src/createTodo/tags_card.dart';
@@ -8,6 +10,7 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/links_card.dart';
+import 'package:much_todo/src/widgets/photos_card.dart';
 
 import '../domain/professional.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +32,8 @@ class _CreateTodoState extends State<CreateTodo> {
   double? _approximateCost;
   String? _note;
   List<String> _links = [];
-  List<String> _pictures = [];
+  List<Professional> _people = [];
+  List<XFile> _pictures = [];
   Professional? _professional; // allow professional to be created from here
   DateTime? _completeBy;
   Room? _selectedRoom;
@@ -78,6 +82,7 @@ class _CreateTodoState extends State<CreateTodo> {
                               hintText: 'Name of Todo',
                               labelText: 'Name *',
                             ),
+                            keyboardType: TextInputType.name,
                             onSaved: (String? val) {
                               setState(() {
                                 _name = val;
@@ -120,11 +125,17 @@ class _CreateTodoState extends State<CreateTodo> {
                         },
                       ),
                       TagsCard(tags: _tags),
+                      PeopleCard(people: _people),
                       LinksCard(
                           onChange: (links) {
                             _links = [...links];
                           },
                           links: _links),
+                      PhotosCard(
+                          onChange: (photos) {
+                            _pictures = [...photos];
+                          },
+                          photos: _pictures),
                       const Divider(),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
@@ -200,8 +211,12 @@ class _CreateTodoState extends State<CreateTodo> {
                           child: TextFormField(
                             controller: _noteController,
                             maxLines: null,
-                            // expands: true,
                             keyboardType: TextInputType.multiline,
+                            onChanged: (v) {
+                              setState(() {
+								  // to get the clear button to show. gotta be a better way...
+							  });
+                            },
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.note_alt),
                               border: const OutlineInputBorder(),

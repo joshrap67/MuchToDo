@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "895180784965",
+    "project_id": "muchtodo-42777",
+    "storage_bucket": "muchtodo-42777.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895180784965:android:b6109032242ee75dce2a2c",
+        "android_client_info": {
+          "package_name": "com.joshrap.much_todo.much_todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "895180784965-no3ri31smpvmojtkogvjqa7croml8kp7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuyv07ZuYa6BsuZb7lEaEhKuqR8ALs-4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "895180784965-n66lprsapvhoieq4la0vmr10h35s4bca.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "895180784965-2t3q2pbuv67d319j150b4od2t829l3b3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.joshrap.muchtodo.muchTodo.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

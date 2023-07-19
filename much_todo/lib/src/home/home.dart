@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/create_todo.dart';
 import 'package:much_todo/src/rooms/rooms_list.dart';
 import 'package:much_todo/src/settings/settings_controller.dart';
 import 'package:much_todo/src/settings/settings_view.dart';
@@ -64,6 +63,7 @@ class _HomeState extends State<Home> {
   	Door with to-do note pinned to it
   	House made of sticky notes
   	Stack of sticky notes with pin on top and a roof resting on the pin <BEST SO FAR>
+  	Single sticky note with pin in center and roof over it
    */
 
   Future<bool> handleBackButton() async {

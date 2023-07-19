@@ -35,7 +35,7 @@ class _TagsCardState extends State<TagsCard> {
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
               subtitle: _selectedTags.isEmpty
                   ? const Text('No tags selected')
-                  : Text('${_selectedTags.length} tags selected'),
+                  : Text('${_selectedTags.length} ${_selectedTags.length == 1 ? 'tag' : 'tags'} selected'),
               trailing: IconButton(onPressed: launchAddTag, icon: const Icon(Icons.add)),
             ),
             Wrap(
@@ -43,6 +43,7 @@ class _TagsCardState extends State<TagsCard> {
               runSpacing: 4.0, // gap between lines
               children: [
                 for (var i = 0; i < _selectedTags.length; i++)
+                  // todo allow for custom colors for each tag? problem would be text color
                   Chip(
                     label: Text(_selectedTags[i]),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

@@ -20,8 +20,8 @@ class _TodoListState extends State<TodoList> {
   void initState() {
     super.initState();
     for (var i = 0; i < 10; i++) {
-      _todos.add(Todo(const Uuid().v4(), 'Todo ${i + 1}', ['Tag 1', 'Tag 2'], i % 5, i % 5, null, null, null, [], [],
-          false, null, false, false, DateTime.now()));
+      _todos.add(Todo(const Uuid().v4(), 'Todo ${i + 1}', ['Electrical', 'Maintenance'], (i % 5) + 1, (i % 5) + 1, null, null,
+          null, ['https://experience.sap.com/wp-content/uploads/sites/58/2022/10/Sort-Filter-Overview-Form.png'], ['https://rb.gy/yk4ed', 'https://rb.gy/yk4ed'], [], false, false, DateTime.now()));
     }
   }
 

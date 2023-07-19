@@ -19,6 +19,12 @@ dependencies:
   uuid: ^3.0.6
   shared_preferences: ^2.2.0
   flutter_colorpicker: ^1.0.3
+  firebase_core: ^2.15.0
+  image_picker: ^1.0.1
+  percent_indicator: ^4.2.3
+  url_launcher: ^6.1.12
+  auto_size_text: ^3.0.0
+  photo_view: ^0.14.0
 
 dev_dependencies:
   flutter_test:

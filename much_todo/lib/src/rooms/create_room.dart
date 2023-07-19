@@ -5,7 +5,9 @@ import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateRoom extends StatefulWidget {
-  const CreateRoom({super.key});
+  final String? name;
+
+  const CreateRoom({super.key, this.name});
 
   @override
   State<CreateRoom> createState() => _CreateRoomState();
@@ -15,6 +17,14 @@ class _CreateRoomState extends State<CreateRoom> {
   final TextEditingController _nameController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.name != null) {
+      _nameController.text = widget.name!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

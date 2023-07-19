@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class LinksCard extends StatefulWidget {
   final ValueChanged<List<String>> onChange;
@@ -38,7 +39,7 @@ class _LinksCardState extends State<LinksCard> {
     for (var controller in _linkControllers) {
       controller.dispose();
     }
-	_scrollController.dispose();
+    _scrollController.dispose();
   }
 
   @override
@@ -52,7 +53,7 @@ class _LinksCardState extends State<LinksCard> {
             child: ExpansionTile(
               title: const Text('Links'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${_linkControllers.length} Links added'),
+              subtitle: Text('${_linkControllers.length} links added'),
               children: [
                 const Divider(),
                 Container(
@@ -65,13 +66,20 @@ class _LinksCardState extends State<LinksCard> {
                         itemCount: _linkControllers.length,
                         shrinkWrap: true,
                         itemBuilder: (ctx, index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextField(
-                              controller: _linkControllers[index],
-                              decoration: const InputDecoration(hintText: 'URL'),
-                              onChanged: onChange,
-                            ),
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 8.0),
+                                  child: TextField(
+                                    controller: _linkControllers[index],
+                                    decoration: const InputDecoration(hintText: 'URL'),
+                                    onChanged: onChange
+                                  ),
+                                ),
+                              ),
+                              IconButton(onPressed: () => removeLink(index), icon: const Icon(Icons.delete))
+                            ],
                           );
                         }),
                   ),
@@ -100,6 +108,14 @@ class _LinksCardState extends State<LinksCard> {
   void addLink() {
     setState(() {
       _linkControllers.add(TextEditingController());
+    });
+  }
+
+  void removeLink(int index) {
+    setState(() {
+      _linkControllers.removeAt(index);
+      widget.onChange(_linkControllers.map((c) => c.text).toList());
+      hideKeyboard();
     });
   }
 

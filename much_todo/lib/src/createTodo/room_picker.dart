@@ -109,7 +109,11 @@ class _RoomPickerState extends State<RoomPicker> {
     hideKeyboard();
     Room? createdRoom = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CreateRoom()),
+      MaterialPageRoute(
+        builder: (context) => CreateRoom(
+          name: _searchController.text,
+        ),
+      ),
     );
     if (createdRoom != null) {
       roomSelected(createdRoom);

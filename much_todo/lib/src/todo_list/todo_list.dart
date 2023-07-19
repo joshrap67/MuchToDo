@@ -20,8 +20,21 @@ class _TodoListState extends State<TodoList> {
   void initState() {
     super.initState();
     for (var i = 0; i < 10; i++) {
-      _todos.add(Todo(const Uuid().v4(), 'Todo ${i + 1}', ['Electrical', 'Maintenance'], (i % 5) + 1, (i % 5) + 1, null, null,
-          null, ['https://experience.sap.com/wp-content/uploads/sites/58/2022/10/Sort-Filter-Overview-Form.png'], ['https://rb.gy/yk4ed', 'https://rb.gy/yk4ed'], [], false, false, DateTime.now()));
+      _todos.add(Todo(
+          const Uuid().v4(),
+          'Todo ${i + 1}',
+          ['Electrical', 'Maintenance'],
+          (i % 5) + 1,
+          (i % 5) + 1,
+          null,
+          45.2,
+          'Items needed: hammer, paint, screwdriver, nails, wrench, painter\'s tape',
+          ['https://experience.sap.com/wp-content/uploads/sites/58/2022/10/Sort-Filter-Overview-Form.png'],
+          ['https://upload.wikimedia.org/wikipedia/commons/0/0c/American_Shorthair.jpg', 'https://rb.gy/yk4ed'],
+          [],
+          false,
+          false,
+          DateTime.now()));
     }
   }
 

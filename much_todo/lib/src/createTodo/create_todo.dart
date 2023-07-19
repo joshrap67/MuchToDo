@@ -55,6 +55,8 @@ class _CreateTodoState extends State<CreateTodo> {
     _rooms.add(Room('C', 'Kitchen', []));
   }
 
+  // todo in demo show how you can create multiple todos in one form. so like if you wanted to paint house you could do a tag of Paint2023 and have it applied to 10 rooms
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

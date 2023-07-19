@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
@@ -28,20 +29,42 @@ class _TodoDetailsState extends State<TodoDetails> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Text(
-              widget.todo.name,
-              style: const TextStyle(fontSize: 40),
-            ),
-            Text(
-              getDueByDate(),
-              style: const TextStyle(fontSize: 26),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
+            Card(
               child: Column(
                 children: [
-                  const Text('Priority'),
-                  LinearPercentIndicator(
+                  ListTile(
+                    title: AutoSizeText(widget.todo.name),
+                    subtitle: widget.todo.note != null ? Text(widget.todo.note!) : null,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
+                        child: widget.todo.completeBy != null
+                            ? Text(
+                                getDueByDate(),
+                                style: const TextStyle(fontSize: 11),
+                              )
+                            : const Text(''),
+                      ),
+                      TextButton(
+                        child: const Text('COMPLETE TO DO'),
+                        onPressed: () {
+                          /* ... */
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                const Text('Priority'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: LinearPercentIndicator(
                     lineHeight: 20.0,
                     leading: const Text("Lowest"),
                     trailing: const Text("Highest"),
@@ -54,11 +77,14 @@ class _TodoDetailsState extends State<TodoDetails> {
                     backgroundColor: const Color(0xffb8c7cb),
                     progressColor: Colors.red[300],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 12.0, 0, 0),
-                    child: Text('Effort'),
-                  ),
-                  LinearPercentIndicator(
+                ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 12.0, 0, 0),
+                  child: Text('Effort'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: LinearPercentIndicator(
                     lineHeight: 20.0,
                     leading: const Text("Lowest"),
                     trailing: const Text("Highest"),
@@ -71,16 +97,22 @@ class _TodoDetailsState extends State<TodoDetails> {
                     backgroundColor: const Color(0xffb8c7cb),
                     progressColor: Colors.green[400],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-                    child: RoomCardReadOnly(selectedRoom: getRoom()),
+                ),
+                const Padding(padding: EdgeInsets.fromLTRB(0, 12, 0, 0)),
+                if (widget.todo.approximateCost != null)
+                  Card(
+                    child: ListTile(
+                      title: Text('\$${widget.todo.approximateCost}'),
+                      subtitle: const Text('Approximate Cost'),
+                    ),
                   ),
-                  if (widget.todo.tags.isNotEmpty) TagsCardReadOnly(tags: widget.todo.tags),
-                  if (widget.todo.professionals.isNotEmpty) PeopleCardReadOnly(people: widget.todo.professionals),
-                  if (widget.todo.links.isNotEmpty) LinksCardReadOnly(links: widget.todo.links),
-                  if (widget.todo.pictures.isNotEmpty) PhotosCardReadOnly(photos: widget.todo.pictures),
-                ],
-              ),
+                RoomCardReadOnly(selectedRoom: getRoom()),
+                if (widget.todo.tags.isNotEmpty) TagsCardReadOnly(tags: widget.todo.tags),
+                if (widget.todo.professionals.isNotEmpty) PeopleCardReadOnly(people: widget.todo.professionals),
+                // todo click on them needs to show info
+                if (widget.todo.links.isNotEmpty) LinksCardReadOnly(links: widget.todo.links),
+                if (widget.todo.pictures.isNotEmpty) PhotosCardReadOnly(photos: widget.todo.pictures),
+              ],
             )
           ],
         ),

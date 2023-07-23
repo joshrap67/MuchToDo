@@ -53,7 +53,7 @@ class _TodoCardState extends State<TodoCard> {
 
   Icon getIcon() {
     if (widget.todo.priority == 1) {
-      return const Icon(Icons.looks_one);
+      return Icon(Icons.looks_one, color: Colors.red[100]);
     } else if (widget.todo.priority == 2) {
       return Icon(Icons.looks_two, color: Colors.red[200]);
     } else if (widget.todo.priority == 3) {

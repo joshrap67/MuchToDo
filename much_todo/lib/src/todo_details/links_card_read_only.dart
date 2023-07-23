@@ -40,7 +40,7 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
             child: ExpansionTile(
               title: const Text('Links'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${_links.length} links added'),
+              subtitle: Text('${_links.length} links'),
               children: [
                 const Divider(),
                 Container(

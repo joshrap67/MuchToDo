@@ -6,8 +6,9 @@ import '../utils/utils.dart';
 
 class PeopleCard extends StatefulWidget {
   final List<Professional> people;
+  final ValueChanged<List<Professional>> onChange;
 
-  const PeopleCard({super.key, required this.people});
+  const PeopleCard({super.key, required this.people, required this.onChange});
 
   @override
   State<PeopleCard> createState() => _PeopleCardState();
@@ -67,12 +68,15 @@ class _PeopleCardState extends State<PeopleCard> {
     hideKeyboard();
     setState(() {
       _selectedPeople = [...result.selectedPeople];
+      widget.onChange(_selectedPeople);
       _allPeople = [...result.allPeople];
     });
   }
 
   void onDeletePerson(String personName) {
-    _selectedPeople.removeWhere((element) => element.name == personName);
-    setState(() {});
+    setState(() {
+      _selectedPeople.removeWhere((element) => element.name == personName);
+      widget.onChange(_selectedPeople);
+    });
   }
 }

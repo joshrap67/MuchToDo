@@ -5,8 +5,9 @@ import '../utils/utils.dart';
 
 class TagsCard extends StatefulWidget {
   final List<String> tags;
+  final ValueChanged<List<String>> onChange;
 
-  const TagsCard({super.key, required this.tags});
+  const TagsCard({super.key, required this.tags, required this.onChange});
 
   @override
   State<TagsCard> createState() => _TagsCardState();
@@ -67,12 +68,15 @@ class _TagsCardState extends State<TagsCard> {
     hideKeyboard();
     setState(() {
       _selectedTags = [...result.selectedTags];
+      widget.onChange(_selectedTags);
       _allTags = [...result.allTags];
     });
   }
 
   void onDeleteTag(String tag) {
-    _selectedTags.removeWhere((element) => element == tag);
-    setState(() {});
+    setState(() {
+      _selectedTags.removeWhere((element) => element == tag);
+      widget.onChange(_selectedTags);
+    });
   }
 }

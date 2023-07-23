@@ -20,7 +20,7 @@ class TagsCardReadOnly extends StatelessWidget {
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
               subtitle: tags.isEmpty
                   ? const Text('No tags selected')
-                  : Text('${tags.length} ${tags.length == 1 ? 'tag' : 'tags'} selected'),
+                  : Text('${tags.length} ${tags.length == 1 ? 'tag' : 'tags'}'),
             ),
             Wrap(
               spacing: 8.0, // gap between adjacent chips

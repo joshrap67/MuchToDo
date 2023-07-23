@@ -21,7 +21,7 @@ class PhotosCardReadOnly extends StatelessWidget {
             child: ExpansionTile(
               title: const Text('Photos'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${photos.length} photos added'),
+              subtitle: Text('${photos.length} photos'),
               children: [
                 const Divider(),
                 Padding(

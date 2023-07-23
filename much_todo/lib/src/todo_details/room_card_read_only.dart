@@ -17,7 +17,7 @@ class RoomCardReadOnly extends StatelessWidget {
           ListTile(
             title: const Text('Room'),
             contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-            subtitle: selectedRoom == null ? const Text('No room selected') : Text(selectedRoom!.name),
+            subtitle: selectedRoom == null ? const Text('No room') : Text(selectedRoom!.name),
           ),
         ],
       ),

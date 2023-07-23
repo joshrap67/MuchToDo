@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/todo.dart';
+import 'package:much_todo/src/edit_todo/edit_todo.dart';
 import 'package:much_todo/src/todo_details/links_card_read_only.dart';
 import 'package:much_todo/src/todo_details/people_card_read_only.dart';
 import 'package:much_todo/src/todo_details/photos_card_read_only.dart';
 import 'package:much_todo/src/todo_details/room_card_read_only.dart';
 import 'package:much_todo/src/todo_details/tags_card_read_only.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+
+import '../utils/utils.dart';
 
 class TodoDetails extends StatefulWidget {
   final Todo todo;
@@ -19,12 +22,49 @@ class TodoDetails extends StatefulWidget {
   State<TodoDetails> createState() => _TodoDetailsState();
 }
 
+enum TodoOptions { edit, duplicate }
+
 class _TodoDetailsState extends State<TodoDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('To Do Details'),
+        title: const AutoSizeText('To Do Details'),
+        actions: [
+          IconButton(onPressed: promptDeleteTodo, icon: const Icon(Icons.delete)),
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'More',
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(15.0),
+              ),
+            ),
+            itemBuilder: (context) {
+              hideKeyboard();
+              return <PopupMenuEntry<TodoOptions>>[
+                PopupMenuItem<TodoOptions>(
+                  value: TodoOptions.edit,
+                  child: ListTile(
+                    title: const Text('Edit'),
+                    leading: const Icon(Icons.edit),
+                    contentPadding: const EdgeInsets.all(0),
+                    onTap: editTodo,
+                  ),
+                ),
+                const PopupMenuItem<TodoOptions>(
+                  value: TodoOptions.duplicate,
+                  child: ListTile(
+                    title: Text('Duplicate'),
+                    leading: Icon(Icons.copy),
+                    contentPadding: EdgeInsets.all(0),
+                  ),
+                ),
+              ];
+            },
+            onSelected: (TodoOptions result) => onOptionSelected(result),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -109,7 +149,6 @@ class _TodoDetailsState extends State<TodoDetails> {
                 RoomCardReadOnly(selectedRoom: getRoom()),
                 if (widget.todo.tags.isNotEmpty) TagsCardReadOnly(tags: widget.todo.tags),
                 if (widget.todo.professionals.isNotEmpty) PeopleCardReadOnly(people: widget.todo.professionals),
-                // todo click on them needs to show info
                 if (widget.todo.links.isNotEmpty) LinksCardReadOnly(links: widget.todo.links),
                 if (widget.todo.pictures.isNotEmpty) PhotosCardReadOnly(photos: widget.todo.pictures),
               ],
@@ -142,6 +181,43 @@ class _TodoDetailsState extends State<TodoDetails> {
 
   double getEffortPercentage() {
     return widget.todo.effort / 5;
+  }
+
+  onOptionSelected(TodoOptions result) {}
+
+  void promptDeleteTodo() {
+    showDialog<void>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('DELETE'),
+              )
+            ],
+            insetPadding: const EdgeInsets.all(8.0),
+            title: const Text('Delete To Do'),
+            content: const Text('Are you sure you wish to delete this To Do?'),
+          );
+        });
+  }
+
+  Future<void> editTodo() async {
+    Todo? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTodo(
+          todo: widget.todo,
+        ),
+      ),
+    );
   }
 
 // todo allow for notifications?

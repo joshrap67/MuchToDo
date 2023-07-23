@@ -4,10 +4,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/createTodo/effort_picker.dart';
 import 'package:much_todo/src/createTodo/people_card.dart';
 import 'package:much_todo/src/createTodo/priority_picker.dart';
-import 'package:much_todo/src/createTodo/room_card.dart';
 import 'package:much_todo/src/createTodo/tags_card.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/todo.dart';
+import 'package:much_todo/src/edit_todo/room_card.dart';
 import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
@@ -18,26 +18,24 @@ import 'package:uuid/uuid.dart';
 import '../domain/professional.dart';
 import 'package:intl/intl.dart';
 
-class CreateTodo extends StatefulWidget {
-  final String? roomId;
+class EditTodo extends StatefulWidget {
+  final Todo todo;
 
-  const CreateTodo({super.key, this.roomId});
+  const EditTodo({super.key, required this.todo});
 
   @override
-  State<CreateTodo> createState() => _CreateTodoState();
+  State<EditTodo> createState() => _EditTodoState();
 }
 
-class _CreateTodoState extends State<CreateTodo> {
-  static const int defaultPriority = 3;
-  static const int defaultEffort = 3;
-
+class _EditTodoState extends State<EditTodo> {
   bool shouldPop = false;
 
-  int _priority = defaultPriority;
-  int _effort = defaultEffort;
+  late int _priority;
+  late int _effort;
+
   List<String> _links = [];
   List<XFile> _pictures = [];
-  List<Room> _selectedRooms = [];
+  Room? _selectedRoom;
   List<Room> _allRooms = [];
   DateTime? _completeBy;
   List<Professional> _people = [];
@@ -55,6 +53,16 @@ class _CreateTodoState extends State<CreateTodo> {
     _allRooms.add(Room('A', 'Bedroom', []));
     _allRooms.add(Room('B', 'Bathroom', []));
     _allRooms.add(Room('C', 'Kitchen', []));
+
+    _nameController.text = widget.todo.name;
+    _priority = widget.todo.priority;
+    _effort = widget.todo.effort;
+    // _selectedRoom = widget.todo.roomId;
+    _tags = [...widget.todo.tags];
+    _people = [...widget.todo.professionals];
+    _links = [...widget.todo.links];
+    _approximateCostController.text = widget.todo.approximateCost != null ? widget.todo.approximateCost.toString() : '';
+    _noteController.text = widget.todo.note ?? '';
   }
 
   @override
@@ -70,7 +78,7 @@ class _CreateTodoState extends State<CreateTodo> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Create To Do'),
+          title: const Text('Edit To Do'),
         ),
         body: Form(
           key: _formKey,
@@ -120,11 +128,11 @@ class _CreateTodoState extends State<CreateTodo> {
                         ),
                         const Divider(),
                         RoomCard(
-                          selectedRooms: _selectedRooms,
+                          selectedRoom: _selectedRoom,
                           rooms: _allRooms,
-                          onRoomsChange: (room) {
+                          onRoomChange: (room) {
                             setState(() {
-                              _selectedRooms = room;
+                              _selectedRoom = room;
                             });
                           },
                           onAllRoomsChanged: (rooms) {
@@ -262,8 +270,8 @@ class _CreateTodoState extends State<CreateTodo> {
                 padding: const EdgeInsets.all(8.0),
                 child: LoadingButton(
                   onSubmit: onSubmit,
-                  label: getCreateButtonLabel(),
-                  icon: const Icon(Icons.add),
+                  label: 'SAVE',
+                  icon: const Icon(Icons.save),
                 ),
               ),
             ],
@@ -273,21 +281,13 @@ class _CreateTodoState extends State<CreateTodo> {
     );
   }
 
-  String getCreateButtonLabel() {
-    if (_selectedRooms.length > 1) {
-      return 'CREATE (${_selectedRooms.length})';
-    } else {
-      return 'CREATE';
-    }
-  }
-
   bool isModified() {
     return _nameController.text.isNotEmpty ||
-        _priority != defaultPriority ||
-        _effort != defaultEffort ||
+        _priority != widget.todo.priority ||
+        _effort != widget.todo.effort ||
         _approximateCostController.text.isNotEmpty ||
         _noteController.text.isNotEmpty ||
-        _selectedRooms.isNotEmpty ||
+        _selectedRoom?.id != widget.todo.roomId ||
         _tags.isNotEmpty ||
         _people.isNotEmpty ||
         _links.isNotEmpty ||
@@ -341,49 +341,24 @@ class _CreateTodoState extends State<CreateTodo> {
       hideKeyboard();
       double? approximateCost =
           double.tryParse(_approximateCostController.text.toString().replaceAll(RegExp(r'[$,]+'), ''));
-      List<Todo> createdTodos = [];
-      if (_selectedRooms.isEmpty) {
-        // empty room is allowed
-        var todo = Todo(
-            const Uuid().v4(),
-            _nameController.text.toString().trim(),
-            _tags,
-            _priority,
-            _effort,
-            null,
-            approximateCost,
-            _noteController.text.toString().trim(),
-            _links,
-            [],
-            // todo need to upload
-            _people,
-            false,
-            false,
-            _completeBy);
-        createdTodos.add(todo);
-      }
+      var todo = Todo(
+          const Uuid().v4(),
+          _nameController.text.toString().trim(),
+          _tags,
+          _priority,
+          _effort,
+          null,
+          approximateCost,
+          _noteController.text.toString().trim(),
+          _links,
+          [],
+          // todo need to upload
+          _people,
+          false,
+          false,
+          _completeBy);
 
-      for (var room in _selectedRooms) {
-        var todo = Todo(
-            const Uuid().v4(),
-            _nameController.text.toString().trim(),
-            _tags,
-            _priority,
-            _effort,
-            room.id,
-            approximateCost,
-            _noteController.text.toString().trim(),
-            _links,
-            [],
-            // todo need to upload
-            _people,
-            false,
-            false,
-            _completeBy);
-        createdTodos.add(todo);
-      }
-
-      Navigator.of(context).pop(createdTodos);
+      Navigator.of(context).pop(todo);
     });
   }
 }

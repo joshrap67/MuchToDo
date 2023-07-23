@@ -67,7 +67,7 @@ class _CreatePersonState extends State<CreatePerson> {
                               ),
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              validator: validName, // todo
+                              validator: validEmail, // todo
                             ),
                           ),
                           Padding(
@@ -79,7 +79,7 @@ class _CreatePersonState extends State<CreatePerson> {
                               ),
                               controller: _numberController,
                               keyboardType: TextInputType.phone,
-                              validator: validName, // todo
+                              validator: validPhoneNumber, // todo
                             ),
                           )
                         ],
@@ -105,6 +105,22 @@ class _CreatePersonState extends State<CreatePerson> {
     }
     // todo check other people names
     return null;
+  }
+
+  String? validEmail(String? email) {
+	  if (email == null || email.isEmpty) {
+		  return null;
+	  }
+	  // todo check valid?
+	  return null;
+  }
+
+  String? validPhoneNumber(String? phoneNumber) {
+	  if (phoneNumber == null || phoneNumber.isEmpty) {
+		  return null;
+	  }
+	  // todo check valid?
+	  return null;
   }
 
   Future<void> onSubmit() async {

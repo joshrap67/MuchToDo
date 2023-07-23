@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class LinksCard extends StatefulWidget {
@@ -21,6 +22,7 @@ class LinkWrapper {
 class _LinksCardState extends State<LinksCard> {
   final List<TextEditingController> _linkControllers = [];
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
   bool _showAddUrl = false;
 
@@ -74,7 +76,8 @@ class _LinksCardState extends State<LinksCard> {
                                   child: TextField(
                                     controller: _linkControllers[index],
                                     decoration: const InputDecoration(hintText: 'URL'),
-                                    onChanged: onChange
+                                    onChanged: onChange,
+                                    focusNode: index == _linkControllers.length - 1 ? _focusNode : null,
                                   ),
                                 ),
                               ),
@@ -108,6 +111,8 @@ class _LinksCardState extends State<LinksCard> {
   void addLink() {
     setState(() {
       _linkControllers.add(TextEditingController());
+      // todo maybe i shouldn't do this for the user? in most cases i would assume they would just be pasting so grabbing focus might be annoying
+      SchedulerBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
     });
   }
 

@@ -6,7 +6,7 @@ class LoadingButton extends StatefulWidget {
   final Icon icon;
   final String label;
 
-  const LoadingButton({super.key, this.label = 'SAVE', required this.onSubmit}) : icon = const Icon(Icons.save);
+  const LoadingButton({super.key, this.label = 'SAVE', this.icon = const Icon(Icons.save), required this.onSubmit});
 
   @override
   State<LoadingButton> createState() => _LoadingButtonState();

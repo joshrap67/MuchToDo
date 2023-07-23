@@ -5,33 +5,34 @@ import 'package:much_todo/src/utils/utils.dart';
 import '../domain/room.dart';
 
 class RoomPickerPopData {
-  List<Room> selectedRooms;
+  Room? selectedRoom;
   List<Room> rooms;
 
-  RoomPickerPopData(this.selectedRooms, this.rooms);
+  RoomPickerPopData(this.selectedRoom, this.rooms);
 }
 
-class RoomPicker extends StatefulWidget {
-  final List<Room> selectedRooms;
+class RoomPickerSingular extends StatefulWidget {
+  final Room? selectedRoom;
   final List<Room> rooms;
 
-  const RoomPicker({super.key, this.selectedRooms = const [], required this.rooms});
+  const RoomPickerSingular({super.key, this.selectedRoom, required this.rooms});
 
   @override
-  State<RoomPicker> createState() => _RoomPickerState();
+  State<RoomPickerSingular> createState() => _RoomPickerSingularState();
 }
 
-class _RoomPickerState extends State<RoomPicker> {
+class _RoomPickerSingularState extends State<RoomPickerSingular> {
   final TextEditingController _searchController = TextEditingController();
 
   List<Room> _displayedRooms = [];
   List<Room> _allRooms = [];
-  List<Room> _selectedRooms = [];
+
+  Room? _selectedRoom;
 
   @override
   void initState() {
     super.initState();
-    _selectedRooms = [...widget.selectedRooms];
+    _selectedRoom = widget.selectedRoom;
     _allRooms = [...widget.rooms];
     _displayedRooms = [...widget.rooms];
   }
@@ -47,7 +48,7 @@ class _RoomPickerState extends State<RoomPicker> {
         padding: const EdgeInsets.all(8.0),
         child: WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, RoomPickerPopData(_selectedRooms, _allRooms));
+            Navigator.pop(context, RoomPickerPopData(_selectedRoom, _allRooms));
             return false;
           },
           child: Column(
@@ -69,9 +70,9 @@ class _RoomPickerState extends State<RoomPicker> {
                     if (index < _displayedRooms.length) {
                       var room = _displayedRooms[index];
                       return CheckboxListTile(
-                        value: _selectedRooms.any((element) => element.id == room.id),
+                        value: _selectedRoom != null && room.id == _selectedRoom!.id,
                         onChanged: (bool? value) {
-                          roomSelected(value ?? true, room);
+                          roomSelected(room);
                         },
                         title: Text(room.name),
                       );
@@ -115,20 +116,21 @@ class _RoomPickerState extends State<RoomPicker> {
       ),
     );
     if (createdRoom != null) {
-      roomSelected(true, createdRoom);
+      roomSelected(createdRoom);
       setState(() {
+        _selectedRoom = createdRoom;
         _allRooms.add(createdRoom);
         _displayedRooms.add(createdRoom);
       });
     }
   }
 
-  void roomSelected(bool selected, Room room) {
-    if (selected) {
+  void roomSelected(Room room) {
+    if (_selectedRoom != null && room.id == _selectedRoom!.id) {
       // unselect the room
-      _selectedRooms.add(room);
+      _selectedRoom = null;
     } else {
-      _selectedRooms.removeWhere((element) => element.id == room.id);
+      _selectedRoom = room;
     }
     setState(() {});
   }

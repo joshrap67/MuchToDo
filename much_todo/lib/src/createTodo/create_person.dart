@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/services/user_service.dart';
 
-import '../domain/professional.dart';
 import '../utils/utils.dart';
 import '../widgets/loading_button.dart';
 
@@ -67,7 +67,7 @@ class _CreatePersonState extends State<CreatePerson> {
                               ),
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              validator: validEmail, // todo
+                              validator: validEmail,
                             ),
                           ),
                           Padding(
@@ -79,7 +79,7 @@ class _CreatePersonState extends State<CreatePerson> {
                               ),
                               controller: _numberController,
                               keyboardType: TextInputType.phone,
-                              validator: validPhoneNumber, // todo
+                              validator: validPhoneNumber,
                             ),
                           )
                         ],
@@ -103,33 +103,31 @@ class _CreatePersonState extends State<CreatePerson> {
     if (name == null || name.isEmpty) {
       return 'Required';
     }
-    // todo check other people names
     return null;
   }
 
   String? validEmail(String? email) {
-	  if (email == null || email.isEmpty) {
-		  return null;
-	  }
-	  // todo check valid?
-	  return null;
+    if (email == null || email.isEmpty) {
+      return null;
+    }
+    return null;
   }
 
   String? validPhoneNumber(String? phoneNumber) {
-	  if (phoneNumber == null || phoneNumber.isEmpty) {
-		  return null;
-	  }
-	  // todo check valid?
-	  return null;
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      return null;
+    }
+    return null;
   }
 
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      await Future.delayed(const Duration(seconds: 5), () {
-        var room = Professional(_nameController.text, _emailController.text, _numberController.text);
-        hideKeyboard();
-        Navigator.pop(context, room);
-      });
+      var person = await UserService.createPerson(
+          context, _nameController.text.trim(), _emailController.text.trim(), _numberController.text.trim());
+      hideKeyboard();
+      if (context.mounted) {
+        Navigator.pop(context, person);
+      }
     }
   }
 }

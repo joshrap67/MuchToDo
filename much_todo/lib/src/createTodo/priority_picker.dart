@@ -31,6 +31,18 @@ class _PriorityPickerState extends State<PriorityPicker> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
+			// Slider(
+          // 	value: _currentSliderValue,
+          // 	max: 4,
+          // 	divisions: 4,
+          // 	min: 0,
+          // 	label: (_currentSliderValue.round() + 1).toString(),
+          // 	onChanged: (double value) {
+          // 		setState(() {
+          // 			_currentSliderValue = value;
+          // 		});
+          // 	},
+          // ),
           SizedBox(
             height: 45,
             child: Center(

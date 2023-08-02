@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/createTodo/people_picker.dart';
-import 'package:much_todo/src/domain/professional.dart';
 
+import '../domain/person.dart';
 import '../utils/utils.dart';
 
 class PeopleCard extends StatefulWidget {
-  final List<Professional> people;
-  final ValueChanged<List<Professional>> onChange;
+  final List<Person> people;
+  final ValueChanged<List<Person>> onChange;
 
   const PeopleCard({super.key, required this.people, required this.onChange});
 
@@ -15,14 +15,12 @@ class PeopleCard extends StatefulWidget {
 }
 
 class _PeopleCardState extends State<PeopleCard> {
-  List<Professional> _selectedPeople = [];
-  List<Professional> _allPeople = [];
+  List<Person> _selectedPeople = [];
 
   @override
   void initState() {
     super.initState();
     _selectedPeople = [...widget.people];
-    _allPeople = [Professional('Dennis', 'A@a.com', '8658675309')];
   }
 
   @override
@@ -61,15 +59,14 @@ class _PeopleCardState extends State<PeopleCard> {
   }
 
   Future<void> launchPickPeople() async {
-    PeopleCreated result = await Navigator.push(
+    PeoplePicked result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PeoplePicker(allPeople: _allPeople, selectedPeople: _selectedPeople)),
+      MaterialPageRoute(builder: (context) => PeoplePicker(selectedPeople: _selectedPeople)),
     );
     hideKeyboard();
     setState(() {
       _selectedPeople = [...result.selectedPeople];
       widget.onChange(_selectedPeople);
-      _allPeople = [...result.allPeople];
     });
   }
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/tags_picker.dart';
 
-import '../utils/utils.dart';
+import '../domain/todo.dart';
 
 class TagsCardReadOnly extends StatelessWidget {
-  final List<String> tags;
+  final List<TodoTag> tags;
 
   const TagsCardReadOnly({super.key, required this.tags});
 
@@ -28,7 +27,7 @@ class TagsCardReadOnly extends StatelessWidget {
               children: [
                 for (var i = 0; i < tags.length; i++)
                   Chip(
-                    label: Text(tags[i]),
+                    label: Text(tags[i].name),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
               ],

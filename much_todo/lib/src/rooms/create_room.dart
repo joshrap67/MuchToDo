@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
-import 'package:uuid/uuid.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/rooms_provider.dart';
 
 class CreateRoom extends StatefulWidget {
   final String? name;
@@ -73,17 +75,19 @@ class _CreateRoomState extends State<CreateRoom> {
     if (name == null || name.isEmpty) {
       return 'Required';
     }
-    // todo check other room names
+    if (context.read<RoomsProvider>().rooms.any((r) => r.name == name)) {
+      return 'Room name already exists';
+    }
     return null;
   }
 
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      await Future.delayed(const Duration(seconds: 5), () {
-        var room = Room(const Uuid().v4(), _nameController.text, []);
-        hideKeyboard();
+      var room = await RoomsService.createRoom(context, _nameController.text);
+      hideKeyboard();
+      if (context.mounted) {
         Navigator.pop(context, room);
-      });
+      }
     }
   }
 }

@@ -1,41 +1,101 @@
-import 'package:much_todo/src/domain/professional.dart';
-
 class Todo {
   String id;
+  String createdBy;
   String name;
-  List<String> tags;
   int priority;
   int effort;
-  String? roomId;
+  TodoRoom? room;
   double? approximateCost;
   String? note;
+  List<TodoTag> tags;
   List<String> links = [];
-  List<String> pictures = [];
-  List<Professional> professionals;
+  List<String> photos = [];
+  List<TodoPerson> people;
   bool isCompleted = false;
   bool inProgress = false;
   DateTime? completeBy;
-  DateTime? creationDate; // todo instant
-  // todo equipment needed? maybe use that for note
-  // todo created by
-  // todo recurring?
+  DateTime? creationDate;
 
-  Todo(this.id, this.name, this.tags, this.priority, this.effort, this.roomId, this.approximateCost, this.note,
-      this.links, this.pictures, this.professionals, this.isCompleted, this.inProgress, this.completeBy);
+  // todo equipment needed? maybe use that for note
+
+  Todo(
+      this.id,
+      this.createdBy,
+      this.name,
+      this.tags,
+      this.priority,
+      this.effort,
+      this.room,
+      this.approximateCost,
+      this.note,
+      this.links,
+      this.photos,
+      this.people,
+      this.isCompleted,
+      this.inProgress,
+      this.completeBy,
+      this.creationDate);
 
   Todo.named(
       {required this.id,
       required this.name,
       required this.priority,
       required this.effort,
+      required this.createdBy,
       this.tags = const [],
-      this.roomId,
+      this.room,
       this.approximateCost,
       this.note,
       this.links = const [],
-      this.pictures = const [],
-      this.professionals = const [],
+      this.photos = const [],
+      this.people = const [],
       this.isCompleted = false,
       this.inProgress = false,
-      this.completeBy});
+      this.completeBy,
+      this.creationDate});
+
+  @override
+  String toString() {
+    return 'Todo{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
+        'room: $room, approximateCost: $approximateCost, note: $note, links: $links, photos: $photos, '
+        'people: $people, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
+  }
+}
+
+class TodoRoom {
+  String id;
+  String name;
+
+  TodoRoom(this.id, this.name);
+
+  @override
+  String toString() {
+    return 'TodoRoom{id: $id, name: $name}';
+  }
+}
+
+class TodoPerson {
+  String id;
+  String name;
+  String? email;
+  String? phoneNumber;
+
+  TodoPerson(this.id, this.name, this.email, this.phoneNumber);
+
+  @override
+  String toString() {
+    return 'TodoPerson{id: $id, name: $name, email: $email, phoneNumber: $phoneNumber}';
+  }
+}
+
+class TodoTag {
+  String id;
+  String name;
+
+  TodoTag(this.id, this.name);
+
+  @override
+  String toString() {
+    return 'TodoTag{id: $id, name: $name}';
+  }
 }

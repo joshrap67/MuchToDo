@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/providers/todos_provider.dart';
+import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
@@ -17,5 +21,12 @@ void main() async {
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
-  runApp(MyApp(settingsController: settingsController));
+  runApp(MultiProvider(
+    providers: [
+		ListenableProvider<UserProvider>(create: (_) => UserProvider()),
+		ListenableProvider<RoomsProvider>(create: (_) => RoomsProvider()),
+		ListenableProvider<TodosProvider>(create: (_) => TodosProvider()),
+    ],
+    child: MyApp(settingsController: settingsController),
+  ));
 }

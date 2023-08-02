@@ -114,6 +114,7 @@ class _PhotosCardState extends State<PhotosCard> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _mediaFileList.add(image!);
+	  // todo just upload directly to storage. delete them if not needed
     });
   }
 

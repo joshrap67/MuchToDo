@@ -6,17 +6,18 @@ import 'package:much_todo/src/createTodo/people_card.dart';
 import 'package:much_todo/src/createTodo/priority_picker.dart';
 import 'package:much_todo/src/createTodo/room_card.dart';
 import 'package:much_todo/src/createTodo/tags_card.dart';
+import 'package:much_todo/src/domain/person.dart';
 import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/domain/todo.dart';
+import 'package:much_todo/src/services/todo_service.dart';
 import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/links_card.dart';
 import 'package:much_todo/src/widgets/photos_card.dart';
-import 'package:uuid/uuid.dart';
 
-import '../domain/professional.dart';
 import 'package:intl/intl.dart';
+
+import '../domain/tag.dart';
 
 class CreateTodo extends StatefulWidget {
   final String? roomId;
@@ -38,24 +39,15 @@ class _CreateTodoState extends State<CreateTodo> {
   List<String> _links = [];
   List<XFile> _pictures = [];
   List<Room> _selectedRooms = [];
-  List<Room> _allRooms = [];
   DateTime? _completeBy;
-  List<Professional> _people = [];
-  List<String> _tags = [];
+  List<Person> _people = [];
+  List<Tag> _tags = [];
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _completeByController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _approximateCostController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _allRooms.add(Room('A', 'Bedroom', []));
-    _allRooms.add(Room('B', 'Bathroom', []));
-    _allRooms.add(Room('C', 'Kitchen', []));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,15 +113,9 @@ class _CreateTodoState extends State<CreateTodo> {
                         const Divider(),
                         RoomCard(
                           selectedRooms: _selectedRooms,
-                          rooms: _allRooms,
                           onRoomsChange: (room) {
                             setState(() {
                               _selectedRooms = room;
-                            });
-                          },
-                          onAllRoomsChanged: (rooms) {
-                            setState(() {
-                              _allRooms = [...rooms];
                             });
                           },
                         ),
@@ -341,47 +327,15 @@ class _CreateTodoState extends State<CreateTodo> {
       hideKeyboard();
       double? approximateCost =
           double.tryParse(_approximateCostController.text.toString().replaceAll(RegExp(r'[$,]+'), ''));
-      List<Todo> createdTodos = [];
-      if (_selectedRooms.isEmpty) {
-        // empty room is allowed
-        var todo = Todo(
-            const Uuid().v4(),
-            _nameController.text.toString().trim(),
-            _tags,
-            _priority,
-            _effort,
-            null,
-            approximateCost,
-            _noteController.text.toString().trim(),
-            _links,
-            [],
-            // todo need to upload
-            _people,
-            false,
-            false,
-            _completeBy);
-        createdTodos.add(todo);
-      }
-
-      for (var room in _selectedRooms) {
-        var todo = Todo(
-            const Uuid().v4(),
-            _nameController.text.toString().trim(),
-            _tags,
-            _priority,
-            _effort,
-            room.id,
-            approximateCost,
-            _noteController.text.toString().trim(),
-            _links,
-            [],
-            // todo need to upload
-            _people,
-            false,
-            false,
-            _completeBy);
-        createdTodos.add(todo);
-      }
+      var createdTodos = TodoService.createTodos(
+          _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
+          photos: _pictures,
+          people: _people,
+          note: _noteController.text.toString().trim(),
+          links: _links,
+          completeBy: _completeBy,
+          approximateCost: approximateCost,
+          tags: _tags);
 
       Navigator.of(context).pop(createdTodos);
     });

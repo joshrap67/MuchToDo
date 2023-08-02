@@ -57,15 +57,8 @@ class MyApp extends StatelessWidget {
           //   brightness: Brightness.dark,
           //   colorSchemeSeed: settingsController.color,
           // ),
-			theme: ThemeData(
-				useMaterial3: true,
-				colorScheme: lightColorScheme
-			),
-			darkTheme: ThemeData(
-				useMaterial3: true,
-				brightness: Brightness.dark,
-				colorScheme: darkColorScheme
-			),
+          theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
+          darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark, colorScheme: darkColorScheme),
           themeMode: settingsController.themeMode,
 
           onGenerateRoute: (RouteSettings routeSettings) {

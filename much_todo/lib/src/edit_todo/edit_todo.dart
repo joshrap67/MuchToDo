@@ -8,15 +8,20 @@ import 'package:much_todo/src/createTodo/tags_card.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/todo.dart';
 import 'package:much_todo/src/edit_todo/room_card.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/links_card.dart';
 import 'package:much_todo/src/widgets/photos_card.dart';
-import 'package:uuid/uuid.dart';
+import 'package:provider/provider.dart';
 
-import '../domain/professional.dart';
 import 'package:intl/intl.dart';
+
+import '../domain/person.dart';
+import '../domain/tag.dart';
+import '../services/todo_service.dart';
 
 class EditTodo extends StatefulWidget {
   final Todo todo;
@@ -34,12 +39,11 @@ class _EditTodoState extends State<EditTodo> {
   late int _effort;
 
   List<String> _links = [];
-  List<XFile> _pictures = [];
+  List<XFile> _photos = [];
   Room? _selectedRoom;
-  List<Room> _allRooms = [];
   DateTime? _completeBy;
-  List<Professional> _people = [];
-  List<String> _tags = [];
+  List<Person> _people = [];
+  List<Tag> _tags = [];
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _completeByController = TextEditingController();
@@ -50,19 +54,25 @@ class _EditTodoState extends State<EditTodo> {
   @override
   void initState() {
     super.initState();
-    _allRooms.add(Room('A', 'Bedroom', []));
-    _allRooms.add(Room('B', 'Bathroom', []));
-    _allRooms.add(Room('C', 'Kitchen', []));
 
     _nameController.text = widget.todo.name;
     _priority = widget.todo.priority;
     _effort = widget.todo.effort;
-    // _selectedRoom = widget.todo.roomId;
-    _tags = [...widget.todo.tags];
-    _people = [...widget.todo.professionals];
     _links = [...widget.todo.links];
     _approximateCostController.text = widget.todo.approximateCost != null ? widget.todo.approximateCost.toString() : '';
     _noteController.text = widget.todo.note ?? '';
+    _photos = widget.todo.photos.map((e) => XFile(e)).toList();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _selectedRoom = context
+          .read<RoomsProvider>()
+          .rooms
+          .cast<Room?>()
+          .firstWhere((element) => element?.id == widget.todo.room?.id, orElse: () => null);
+      _people = context.read<UserProvider>().people.where((x) => widget.todo.people.any((y) => y.id == x.id)).toList();
+      _tags = context.read<UserProvider>().tags.where((x) => widget.todo.tags.any((y) => y.id == x.id)).toList();
+      setState(() {});
+    });
   }
 
   @override
@@ -129,29 +139,26 @@ class _EditTodoState extends State<EditTodo> {
                         const Divider(),
                         RoomCard(
                           selectedRoom: _selectedRoom,
-                          rooms: _allRooms,
                           onRoomChange: (room) {
                             setState(() {
                               _selectedRoom = room;
                             });
                           },
-                          onAllRoomsChanged: (rooms) {
-                            setState(() {
-                              _allRooms = [...rooms];
-                            });
-                          },
                         ),
                         TagsCard(
                           tags: _tags,
+                          key: ValueKey(_tags),
                           onChange: (tags) {
                             _tags = [...tags];
                           },
                         ),
                         PeopleCard(
-                            people: _people,
-                            onChange: (people) {
-                              _people = [...people];
-                            }),
+                          people: _people,
+                          key: ValueKey(_people),
+                          onChange: (people) {
+                            _people = [...people];
+                          },
+                        ),
                         LinksCard(
                           links: _links,
                           onChange: (links) {
@@ -159,9 +166,9 @@ class _EditTodoState extends State<EditTodo> {
                           },
                         ),
                         PhotosCard(
-                          photos: _pictures,
+                          photos: _photos,
                           onChange: (photos) {
-                            _pictures = [...photos];
+                            _photos = [...photos];
                           },
                         ),
                         const Divider(),
@@ -282,17 +289,17 @@ class _EditTodoState extends State<EditTodo> {
   }
 
   bool isModified() {
-    return _nameController.text.isNotEmpty ||
+    return _nameController.text != widget.todo.name ||
         _priority != widget.todo.priority ||
         _effort != widget.todo.effort ||
-        _approximateCostController.text.isNotEmpty ||
-        _noteController.text.isNotEmpty ||
-        _selectedRoom?.id != widget.todo.roomId ||
-        _tags.isNotEmpty ||
-        _people.isNotEmpty ||
-        _links.isNotEmpty ||
-        _pictures.isNotEmpty ||
-        _completeByController.text.isNotEmpty;
+        // _approximateCostController.text.isNotEmpty ||
+        _noteController.text != widget.todo.note ||
+        _selectedRoom?.id != widget.todo.room?.id;
+    // _tags.isNotEmpty ||
+    // _people.isNotEmpty ||
+    // _links.isNotEmpty ||
+    // _photos.isNotEmpty ||
+    // _completeByController.text.isNotEmpty;
   }
 
   String? validName(String? name) {
@@ -341,22 +348,15 @@ class _EditTodoState extends State<EditTodo> {
       hideKeyboard();
       double? approximateCost =
           double.tryParse(_approximateCostController.text.toString().replaceAll(RegExp(r'[$,]+'), ''));
-      var todo = Todo(
-          const Uuid().v4(),
-          _nameController.text.toString().trim(),
-          _tags,
-          _priority,
-          _effort,
-          null,
-          approximateCost,
-          _noteController.text.toString().trim(),
-          _links,
-          [],
-          // todo need to upload
-          _people,
-          false,
-          false,
-          _completeBy);
+      var todo = TodoService.editTodo(_nameController.text.toString().trim(), _priority, _effort, 'createdBy',
+          photos: _photos,
+          room: _selectedRoom,
+          people: _people,
+          note: _noteController.text.toString().trim(),
+          links: _links,
+          completeBy: _completeBy,
+          approximateCost: approximateCost,
+          tags: _tags);
 
       Navigator.of(context).pop(todo);
     });

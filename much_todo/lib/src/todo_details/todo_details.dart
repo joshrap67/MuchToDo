@@ -148,9 +148,9 @@ class _TodoDetailsState extends State<TodoDetails> {
                   ),
                 RoomCardReadOnly(selectedRoom: getRoom()),
                 if (widget.todo.tags.isNotEmpty) TagsCardReadOnly(tags: widget.todo.tags),
-                if (widget.todo.professionals.isNotEmpty) PeopleCardReadOnly(people: widget.todo.professionals),
+                if (widget.todo.people.isNotEmpty) PeopleCardReadOnly(people: widget.todo.people),
                 if (widget.todo.links.isNotEmpty) LinksCardReadOnly(links: widget.todo.links),
-                if (widget.todo.pictures.isNotEmpty) PhotosCardReadOnly(photos: widget.todo.pictures),
+                if (widget.todo.photos.isNotEmpty) PhotosCardReadOnly(photos: widget.todo.photos),
               ],
             )
           ],
@@ -160,7 +160,7 @@ class _TodoDetailsState extends State<TodoDetails> {
   }
 
   Room? getRoom() {
-    if (widget.todo.roomId == null) {
+    if (widget.todo.room == null) {
       return null;
     } else {
       return Room('a', 'Bedroom', []);

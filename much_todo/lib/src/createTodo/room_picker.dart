@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 import '../domain/room.dart';
 
 class RoomPickerPopData {
   List<Room> selectedRooms;
-  List<Room> rooms;
 
-  RoomPickerPopData(this.selectedRooms, this.rooms);
+  RoomPickerPopData(this.selectedRooms);
 }
 
 class RoomPicker extends StatefulWidget {
   final List<Room> selectedRooms;
-  final List<Room> rooms;
 
-  const RoomPicker({super.key, this.selectedRooms = const [], required this.rooms});
+  const RoomPicker({super.key, this.selectedRooms = const []});
 
   @override
   State<RoomPicker> createState() => _RoomPickerState();
@@ -25,15 +25,17 @@ class _RoomPickerState extends State<RoomPicker> {
   final TextEditingController _searchController = TextEditingController();
 
   List<Room> _displayedRooms = [];
-  List<Room> _allRooms = [];
   List<Room> _selectedRooms = [];
 
   @override
   void initState() {
     super.initState();
     _selectedRooms = [...widget.selectedRooms];
-    _allRooms = [...widget.rooms];
-    _displayedRooms = [...widget.rooms];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _displayedRooms = _allRooms();
+      });
+    });
   }
 
   @override
@@ -47,7 +49,7 @@ class _RoomPickerState extends State<RoomPicker> {
         padding: const EdgeInsets.all(8.0),
         child: WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, RoomPickerPopData(_selectedRooms, _allRooms));
+            Navigator.pop(context, RoomPickerPopData(_selectedRooms));
             return false;
           },
           child: Column(
@@ -93,13 +95,17 @@ class _RoomPickerState extends State<RoomPicker> {
     );
   }
 
+  List<Room> _allRooms() {
+    return context.read<RoomsProvider>().rooms;
+  }
+
   void filterRooms(String text) {
     var lowerCaseSearch = text.toLowerCase();
     setState(() {
       if (lowerCaseSearch.isEmpty) {
-        _displayedRooms = _allRooms;
+        _displayedRooms = _allRooms();
       } else {
-        _displayedRooms = _allRooms.where((element) => element.name.toLowerCase().contains(lowerCaseSearch)).toList();
+        _displayedRooms = _allRooms().where((element) => element.name.toLowerCase().contains(lowerCaseSearch)).toList();
       }
     });
   }
@@ -115,9 +121,8 @@ class _RoomPickerState extends State<RoomPicker> {
       ),
     );
     if (createdRoom != null) {
-      roomSelected(true, createdRoom);
       setState(() {
-        _allRooms.add(createdRoom);
+        _selectedRooms.add(createdRoom);
         _displayedRooms.add(createdRoom);
       });
     }

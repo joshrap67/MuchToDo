@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/createTodo/create_todo.dart';
-import 'package:much_todo/src/domain/professional.dart';
+import 'package:much_todo/src/filter/filter_todos.dart';
+import 'package:much_todo/src/providers/todos_provider.dart';
 import 'package:much_todo/src/todo_list/todo_card.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:uuid/uuid.dart';
+import 'package:provider/provider.dart';
 
 import '../domain/todo.dart';
 
@@ -17,10 +18,10 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
-  final List<Todo> _todos = [];
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
 
+  List<Todo> _todos = [];
   bool _showFab = true;
   Timer showFabDebounce = Timer(const Duration(seconds: 1), () {});
 
@@ -28,25 +29,6 @@ class _TodoListState extends State<TodoList> {
 
   @override
   void initState() {
-    super.initState();
-    for (var i = 0; i < 10; i++) {
-      _todos.add(Todo(
-          const Uuid().v4(),
-          'Todo ${i + 1}',
-          ['Electrical', 'Maintenance'],
-          (i % 5) + 1,
-          (i % 5) + 1,
-          null,
-          45.2,
-          'Items needed: hammer, paint, screwdriver, nails, wrench, painter\'s tape',
-          ['https://www.amazon.com/Celebrity-Cutouts-Danny-DeVito-Cutout/dp/B01AACB8J4/'],
-          ['https://upload.wikimedia.org/wikipedia/commons/0/0c/American_Shorthair.jpg', 'https://rb.gy/yk4ed'],
-          [Professional('Dennis Reynolds', 'goldengod@gmail.com', '+18658675309')],
-          false,
-          false,
-          DateTime.now()));
-    }
-
     // need to wait for controller to be attached to list
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.position.isScrollingNotifier.addListener(() {
@@ -64,7 +46,11 @@ class _TodoListState extends State<TodoList> {
           });
         }
       });
+      setState(() {
+        _todos = context.read<TodosProvider>().todos;
+      });
     });
+    super.initState();
   }
 
   @override
@@ -82,26 +68,16 @@ class _TodoListState extends State<TodoList> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
-                        label: Text('Search'),
-                      ),
-                      controller: _searchController,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.filter_list_sharp),
-                      label: const Text('Filter (1)'),
-                    ),
-                  ),
+              child: SearchBar(
+                leading: const Icon(Icons.search),
+                trailing: <Widget>[
+                  ElevatedButton.icon(
+                    onPressed: () {
+						filterDialog();
+					},
+                    icon: const Icon(Icons.filter_list_sharp),
+                    label: const Text('Filter (1)'),
+                  )
                 ],
               ),
             ),
@@ -147,15 +123,68 @@ class _TodoListState extends State<TodoList> {
   }
 
   Future<void> launchAddTodo() async {
-    List<Todo> result = await Navigator.push(
+    List<Todo>? result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateTodo()),
     );
-    if (result.isNotEmpty) {
+    // todo since using provider, this is not needed. just call method to get todos with current filters
+    if (result != null && result.isNotEmpty) {
       setState(() {
         _todos.addAll(result);
         showSnackbar('${result.length} To Dos created.', context);
       });
     }
+  }
+
+  Future<void> filterDialog() async{
+    final List<DropdownMenuEntry<String>> sortEntries = <DropdownMenuEntry<String>>[];
+    sortEntries.add(const DropdownMenuEntry<String>(
+      value: 'alphaAsc',
+      label: 'Alphabetical A-Z',
+    ));
+    sortEntries.add(const DropdownMenuEntry<String>(
+      value: 'alphaDesc',
+      label: 'Alphabetical Z-A',
+    ));
+
+	var result = await Navigator.push(
+		context,
+		MaterialPageRoute(builder: (context) => const FilterTodos()),
+	);
+    // showDialog<void>(
+    //     context: context,
+    //     builder: (ctx) {
+    //       return AlertDialog(
+    //         actions: <Widget>[
+    //           TextButton(
+    //             onPressed: () => Navigator.pop(context, 'OK'),
+    //             child: const Text('CANCEL'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () {},
+    //             child: const Text('APPLY'),
+    //           )
+    //         ],
+    //         insetPadding: const EdgeInsets.all(8.0),
+    //         title: const Text('Filters'),
+    //         content: SizedBox(
+    //           width: MediaQuery.of(context).size.width,
+    //           child: Column(
+	// 			  mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               Row(
+    //                 children: [
+	// 					Text('Sort by'),
+    //                   DropdownMenu(
+    //                     dropdownMenuEntries: sortEntries,
+    //                     enableSearch: false,
+    //                   ),
+    //                 ],
+    //               )
+    //             ],
+    //           ),
+    //         ),
+    //       );
+    //     });
   }
 }

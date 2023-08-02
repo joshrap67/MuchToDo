@@ -6,16 +6,12 @@ import '../utils/utils.dart';
 
 class RoomCard extends StatefulWidget {
   final Room? selectedRoom;
-  final List<Room> rooms;
   final ValueChanged<Room?> onRoomChange;
-  final ValueChanged<List<Room>> onAllRoomsChanged;
 
   const RoomCard(
       {super.key,
       this.selectedRoom,
-      required this.rooms,
-      required this.onRoomChange,
-      required this.onAllRoomsChanged});
+      required this.onRoomChange});
 
   @override
   State<RoomCard> createState() => _RoomCardState();
@@ -55,12 +51,10 @@ class _RoomCardState extends State<RoomCard> {
       context,
       MaterialPageRoute(
         builder: (context) => RoomPickerSingular(
-          rooms: widget.rooms,
           selectedRoom: widget.selectedRoom,
         ),
       ),
     );
     widget.onRoomChange(result.selectedRoom);
-    widget.onAllRoomsChanged(result.rooms);
   }
 }

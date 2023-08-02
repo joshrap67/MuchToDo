@@ -1,3 +1,5 @@
+import 'package:much_todo/src/domain/todo.dart';
+
 class Room {
   // todo rename to something generic like "Section"
   String id;
@@ -13,6 +15,10 @@ class Room {
 
   @override
   String toString() {
-    return '{Id: $id name: $name todos: $todos}';
+    return 'Room{Id: $id, name: $name, todos: $todos}';
+  }
+
+  TodoRoom convert(){
+	  return TodoRoom(id, name);
   }
 }

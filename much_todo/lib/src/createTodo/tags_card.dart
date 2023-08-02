@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/createTodo/tags_picker.dart';
 
+import '../domain/tag.dart';
 import '../utils/utils.dart';
 
 class TagsCard extends StatefulWidget {
-  final List<String> tags;
-  final ValueChanged<List<String>> onChange;
+  final List<Tag> tags;
+  final ValueChanged<List<Tag>> onChange;
 
   const TagsCard({super.key, required this.tags, required this.onChange});
 
@@ -14,14 +15,12 @@ class TagsCard extends StatefulWidget {
 }
 
 class _TagsCardState extends State<TagsCard> {
-  List<String> _selectedTags = [];
-  List<String> _allTags = [];
+  List<Tag> _selectedTags = [];
 
   @override
   void initState() {
     super.initState();
     _selectedTags = [...widget.tags];
-    _allTags = ['Decoration', 'Electrical', 'Maintenance', 'Outside', 'Plumbing', 'Structural'];
   }
 
   @override
@@ -46,7 +45,7 @@ class _TagsCardState extends State<TagsCard> {
                 for (var i = 0; i < _selectedTags.length; i++)
                   // todo allow for custom colors for each tag? problem would be text color
                   Chip(
-                    label: Text(_selectedTags[i]),
+                    label: Text(_selectedTags[i].name),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     onDeleted: () {
                       onDeleteTag(_selectedTags[i]);
@@ -63,19 +62,18 @@ class _TagsCardState extends State<TagsCard> {
   Future<void> launchAddTag() async {
     TagCreated result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TagsPicker(allTags: _allTags, selectedTags: _selectedTags)),
+      MaterialPageRoute(builder: (context) => TagsPicker(selectedTags: _selectedTags)),
     );
     hideKeyboard();
     setState(() {
       _selectedTags = [...result.selectedTags];
       widget.onChange(_selectedTags);
-      _allTags = [...result.allTags];
     });
   }
 
-  void onDeleteTag(String tag) {
+  void onDeleteTag(Tag tag) {
     setState(() {
-      _selectedTags.removeWhere((element) => element == tag);
+      _selectedTags.removeWhere((element) => element.id == tag.id);
       widget.onChange(_selectedTags);
     });
   }

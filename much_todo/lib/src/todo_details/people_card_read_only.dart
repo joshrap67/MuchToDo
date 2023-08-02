@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/professional.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../domain/todo.dart';
+
 class PeopleCardReadOnly extends StatefulWidget {
-  final List<Professional> people;
+  final List<TodoPerson> people;
 
   const PeopleCardReadOnly({super.key, required this.people});
 
@@ -43,7 +44,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  void showProfessionalInfo(Professional professional) {
+  void showProfessionalInfo(TodoPerson professional) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -80,7 +81,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  Future<void> launchEmail(Professional professional) async {
+  Future<void> launchEmail(TodoPerson professional) async {
     if (professional.email == null) {
       showSnackbar('Email is empty.', context);
     }
@@ -95,7 +96,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     }
   }
 
-  Future<void> launchPhone(Professional professional) async {
+  Future<void> launchPhone(TodoPerson professional) async {
     if (professional.phoneNumber == null) {
       showSnackbar('Phone number is empty.', context);
     }

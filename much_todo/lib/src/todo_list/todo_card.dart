@@ -66,7 +66,7 @@ class _TodoCardState extends State<TodoCard> {
   }
 
   String getRoom() {
-    if (widget.todo.roomId == null) {
+    if (widget.todo.room == null) {
       return 'No associated room';
     } else {
       return 'Room 1'; // todo dictionary lookup

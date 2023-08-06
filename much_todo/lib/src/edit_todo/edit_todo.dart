@@ -1,9 +1,9 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:much_todo/src/createTodo/effort_picker.dart';
+import 'package:much_todo/src/widgets/effort_picker.dart';
 import 'package:much_todo/src/createTodo/people_card.dart';
-import 'package:much_todo/src/createTodo/priority_picker.dart';
+import 'package:much_todo/src/widgets/priority_picker.dart';
 import 'package:much_todo/src/createTodo/tags_card.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/todo.dart';
@@ -49,7 +49,7 @@ class _EditTodoState extends State<EditTodo> {
   final TextEditingController _completeByController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _approximateCostController = TextEditingController();
+  final TextEditingController _estimatedCostController = TextEditingController();
 
   @override
   void initState() {
@@ -59,9 +59,17 @@ class _EditTodoState extends State<EditTodo> {
     _priority = widget.todo.priority;
     _effort = widget.todo.effort;
     _links = [...widget.todo.links];
-    _approximateCostController.text = widget.todo.approximateCost != null ? widget.todo.approximateCost.toString() : '';
+
+    CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(symbol: '');
+    _estimatedCostController.text =
+        widget.todo.estimatedCost != null ? formatter.format(widget.todo.estimatedCost!.toStringAsFixed(2)) : '';
+
     _noteController.text = widget.todo.note ?? '';
     _photos = widget.todo.photos.map((e) => XFile(e)).toList();
+    _completeBy = widget.todo.completeBy;
+    if (_completeBy != null) {
+      _completeByController.text = DateFormat('yyyy-MM-dd').format(_completeBy!);
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _selectedRoom = context
@@ -89,6 +97,7 @@ class _EditTodoState extends State<EditTodo> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Edit To Do'),
+          scrolledUnderElevation: 0,
         ),
         body: Form(
           key: _formKey,
@@ -106,11 +115,11 @@ class _EditTodoState extends State<EditTodo> {
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
                               decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.sticky_note_2),
-                                border: OutlineInputBorder(),
-                                hintText: 'Name of Todo',
-                                labelText: 'Name *',
-                              ),
+                                  prefixIcon: Icon(Icons.sticky_note_2),
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Name of Todo',
+                                  labelText: 'Name *',
+                                  counterText: ''),
                               controller: _nameController,
                               keyboardType: TextInputType.name,
                               maxLength: Constants.maxNameLength,
@@ -129,10 +138,10 @@ class _EditTodoState extends State<EditTodo> {
                         ),
                         EffortPicker(
                           effort: _effort,
-                          onChange: (p) {
+                          onChange: (e) {
                             setState(() {
                               hideKeyboard();
-                              _effort = p;
+                              _effort = e;
                             });
                           },
                         ),
@@ -180,17 +189,17 @@ class _EditTodoState extends State<EditTodo> {
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                                   child: TextFormField(
+                                    inputFormatters: [
+                                      CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
+                                    ],
+                                    keyboardType: TextInputType.number,
+                                    controller: _estimatedCostController,
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.attach_money),
-                                      hintText: 'Approximate cost',
+                                      hintText: 'Estimated cost',
                                       labelText: 'Cost',
                                     ),
-                                    inputFormatters: [
-                                      CurrencyTextInputFormatter(locale: 'en', symbol: '\$', enableNegative: false)
-                                    ],
-                                    keyboardType: TextInputType.number,
-                                    controller: _approximateCostController,
                                   ),
                                 ),
                               ),
@@ -346,8 +355,7 @@ class _EditTodoState extends State<EditTodo> {
 
     await Future.delayed(const Duration(seconds: 2), () {
       hideKeyboard();
-      double? approximateCost =
-          double.tryParse(_approximateCostController.text.toString().replaceAll(RegExp(r'[$,]+'), ''));
+      double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
       var todo = TodoService.editTodo(_nameController.text.toString().trim(), _priority, _effort, 'createdBy',
           photos: _photos,
           room: _selectedRoom,
@@ -355,7 +363,7 @@ class _EditTodoState extends State<EditTodo> {
           note: _noteController.text.toString().trim(),
           links: _links,
           completeBy: _completeBy,
-          approximateCost: approximateCost,
+          estimatedCost: estimatedCost,
           tags: _tags);
 
       Navigator.of(context).pop(todo);

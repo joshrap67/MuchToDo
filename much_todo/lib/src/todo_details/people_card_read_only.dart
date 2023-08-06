@@ -19,12 +19,9 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     return Card(
       child: Column(
         children: [
-          ListTile(
-            title: const Text('People'),
-            contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-            subtitle: widget.people.isEmpty
-                ? const Text('No people selected')
-                : Text('${widget.people.length} ${widget.people.length == 1 ? 'person' : 'people'}'),
+          const ListTile(
+            title: Text('People'),
+            contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0)
           ),
           Wrap(
             spacing: 8.0, // gap between adjacent chips
@@ -34,7 +31,12 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
                 ActionChip(
                   label: Text(widget.people[i].name),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  onPressed: () => showProfessionalInfo(widget.people[i]),
+                  onPressed: () {
+                    var person = widget.people[i];
+                    if (person.email != null || person.phoneNumber != null) {
+                      showPersonInfo(widget.people[i]);
+                    }
+                  },
                 ),
             ],
           ),
@@ -44,7 +46,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  void showProfessionalInfo(TodoPerson professional) {
+  void showPersonInfo(TodoPerson person) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -55,7 +57,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: ListTile(
-                title: Text(professional.name),
+                title: Text(person.name),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -63,16 +65,16 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
               ),
             ),
             ListTile(
-              title: Text(professional.email != null ? professional.email! : 'No email'),
+              title: Text(person.email != null ? person.email! : 'No email'),
               subtitle: const Text('Email'),
               leading: const Icon(Icons.email),
-              onTap: () => launchEmail(professional),
+              onTap: () => launchEmail(person),
             ),
             ListTile(
-              title: Text(professional.phoneNumber != null ? professional.phoneNumber! : 'No phone number'),
+              title: Text(person.phoneNumber != null ? person.phoneNumber! : 'No phone number'),
               subtitle: const Text('Phone Number'),
               leading: const Icon(Icons.phone),
-              onTap: () => launchPhone(professional),
+              onTap: () => launchPhone(person),
             ),
             const Padding(padding: EdgeInsets.all(16))
           ],
@@ -81,12 +83,12 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  Future<void> launchEmail(TodoPerson professional) async {
-    if (professional.email == null) {
+  Future<void> launchEmail(TodoPerson person) async {
+    if (person.email == null) {
       showSnackbar('Email is empty.', context);
     }
 
-    final Uri uri = Uri(scheme: 'mailto', path: professional.email);
+    final Uri uri = Uri(scheme: 'mailto', path: person.email);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
@@ -96,12 +98,12 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     }
   }
 
-  Future<void> launchPhone(TodoPerson professional) async {
-    if (professional.phoneNumber == null) {
+  Future<void> launchPhone(TodoPerson person) async {
+    if (person.phoneNumber == null) {
       showSnackbar('Phone number is empty.', context);
     }
 
-    final Uri uri = Uri(scheme: 'tel', path: professional.phoneNumber);
+    final Uri uri = Uri(scheme: 'tel', path: person.phoneNumber);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {

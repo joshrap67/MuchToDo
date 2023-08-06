@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/todo.dart';
 import 'package:much_todo/src/edit_todo/edit_todo.dart';
 import 'package:much_todo/src/todo_details/links_card_read_only.dart';
@@ -9,7 +8,6 @@ import 'package:much_todo/src/todo_details/people_card_read_only.dart';
 import 'package:much_todo/src/todo_details/photos_card_read_only.dart';
 import 'package:much_todo/src/todo_details/room_card_read_only.dart';
 import 'package:much_todo/src/todo_details/tags_card_read_only.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../utils/utils.dart';
 
@@ -22,16 +20,24 @@ class TodoDetails extends StatefulWidget {
   State<TodoDetails> createState() => _TodoDetailsState();
 }
 
-enum TodoOptions { edit, duplicate }
+enum TodoOptions { edit, duplicate, delete }
 
 class _TodoDetailsState extends State<TodoDetails> {
+  late Todo _todo;
+
+  @override
+  void initState() {
+    super.initState();
+    _todo = widget.todo;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const AutoSizeText('To Do Details'),
+        scrolledUnderElevation: 0,
         actions: [
-          IconButton(onPressed: promptDeleteTodo, icon: const Icon(Icons.delete)),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             tooltip: 'More',
@@ -43,13 +49,12 @@ class _TodoDetailsState extends State<TodoDetails> {
             itemBuilder: (context) {
               hideKeyboard();
               return <PopupMenuEntry<TodoOptions>>[
-                PopupMenuItem<TodoOptions>(
+                const PopupMenuItem<TodoOptions>(
                   value: TodoOptions.edit,
                   child: ListTile(
-                    title: const Text('Edit'),
-                    leading: const Icon(Icons.edit),
-                    contentPadding: const EdgeInsets.all(0),
-                    onTap: editTodo,
+                    title: Text('Edit'),
+                    leading: Icon(Icons.edit),
+                    contentPadding: EdgeInsets.all(0),
                   ),
                 ),
                 const PopupMenuItem<TodoOptions>(
@@ -60,130 +65,158 @@ class _TodoDetailsState extends State<TodoDetails> {
                     contentPadding: EdgeInsets.all(0),
                   ),
                 ),
+                const PopupMenuItem<TodoOptions>(
+                  value: TodoOptions.delete,
+                  child: ListTile(
+                    title: Text('Delete'),
+                    leading: Icon(Icons.delete),
+                    contentPadding: EdgeInsets.all(0),
+                  ),
+                ),
               ];
             },
             onSelected: (TodoOptions result) => onOptionSelected(result),
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              child: Column(
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: AutoSizeText(_todo.name),
+                      subtitle: _todo.note != null ? Text(_todo.note!) : null,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: _todo.completeBy != null
+                              ? Text(
+                                  getDueByDate(),
+                                  style: const TextStyle(fontSize: 11),
+                                )
+                              : const Text(''),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Column(
                 children: [
-                  ListTile(
-                    title: AutoSizeText(widget.todo.name),
-                    subtitle: widget.todo.note != null ? Text(widget.todo.note!) : null,
-                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
-                        child: widget.todo.completeBy != null
-                            ? Text(
-                                getDueByDate(),
-                                style: const TextStyle(fontSize: 11),
-                              )
-                            : const Text(''),
+                    children: [
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.pending),
+                          label: const Text('START'),
+                          onPressed: () {},
+                        ),
                       ),
-                      TextButton(
-                        child: const Text('COMPLETE TO DO'),
-                        onPressed: () {
-                          /* ... */
-                        },
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.check),
+                          label: const Text('COMPLETE'),
+                          onPressed: () {},
+                        ),
                       ),
                     ],
                   ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Card(
+                          child: ListTile(
+                            title: Text(_todo.priority.toString()),
+                            contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+                            subtitle: const Text('Priority'),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        child: Card(
+                          child: ListTile(
+                            title: Text(getEffortTitle()),
+                            contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+                            subtitle: const Text('Effort'),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      if (_todo.estimatedCost != null)
+                        Flexible(
+                          child: Card(
+                            child: ListTile(
+                              title: Text(NumberFormat.currency(symbol: '\$').format(_todo.estimatedCost)),
+                              subtitle: const Text('Estimated Cost'),
+                            ),
+                          ),
+                        ),
+                      Flexible(child: RoomCardReadOnly(selectedRoom: _todo.room)),
+                    ],
+                  ),
+                  if (_todo.tags.isNotEmpty) TagsCardReadOnly(tags: _todo.tags),
+                  if (_todo.people.isNotEmpty) PeopleCardReadOnly(people: _todo.people),
+                  if (_todo.links.isNotEmpty) LinksCardReadOnly(links: _todo.links),
+                  if (_todo.photos.isNotEmpty) PhotosCardReadOnly(photos: _todo.photos),
                 ],
-              ),
-            ),
-            Column(
-              children: [
-                const Text('Priority'),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: LinearPercentIndicator(
-                    lineHeight: 20.0,
-                    leading: const Text("Lowest"),
-                    trailing: const Text("Highest"),
-                    percent: getPriorityPercentage(),
-                    center: Text(
-                      widget.todo.priority.toString(),
-                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                    barRadius: const Radius.circular(15.0),
-                    backgroundColor: const Color(0xffb8c7cb),
-                    progressColor: Colors.red[300],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 12.0, 0, 0),
-                  child: Text('Effort'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: LinearPercentIndicator(
-                    lineHeight: 20.0,
-                    leading: const Text("Lowest"),
-                    trailing: const Text("Highest"),
-                    percent: getEffortPercentage(),
-                    center: Text(
-                      widget.todo.priority.toString(),
-                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                    barRadius: const Radius.circular(15.0),
-                    backgroundColor: const Color(0xffb8c7cb),
-                    progressColor: Colors.green[400],
-                  ),
-                ),
-                const Padding(padding: EdgeInsets.fromLTRB(0, 12, 0, 0)),
-                if (widget.todo.approximateCost != null)
-                  Card(
-                    child: ListTile(
-                      title: Text('\$${widget.todo.approximateCost}'),
-                      subtitle: const Text('Approximate Cost'),
-                    ),
-                  ),
-                RoomCardReadOnly(selectedRoom: getRoom()),
-                if (widget.todo.tags.isNotEmpty) TagsCardReadOnly(tags: widget.todo.tags),
-                if (widget.todo.people.isNotEmpty) PeopleCardReadOnly(people: widget.todo.people),
-                if (widget.todo.links.isNotEmpty) LinksCardReadOnly(links: widget.todo.links),
-                if (widget.todo.photos.isNotEmpty) PhotosCardReadOnly(photos: widget.todo.photos),
-              ],
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Room? getRoom() {
-    if (widget.todo.room == null) {
-      return null;
+  String getDueByDate() {
+    if (_todo.completeBy == null) {
+      return '';
     } else {
-      return Room('a', 'Bedroom', []);
+      return 'Due ${DateFormat.yMd().format(_todo.completeBy!)}';
     }
   }
 
-  String getDueByDate() {
-    if (widget.todo.completeBy == null) {
-      return '';
+  String getEffortTitle() {
+    if (_todo.effort == Todo.lowEffort) {
+      return 'Low';
+    } else if (_todo.effort == Todo.mediumEffort) {
+      return 'Medium';
     } else {
-      return 'Due ${DateFormat.yMd().format(widget.todo.completeBy!)}';
+      return 'High';
     }
   }
 
   double getPriorityPercentage() {
-    return widget.todo.priority / 5;
+    // lower priority is more important, so we want linear indicator to be reversed
+    return (6 - _todo.priority) / 5;
   }
 
   double getEffortPercentage() {
-    return widget.todo.effort / 5;
+    return _todo.effort / 3;
   }
 
-  onOptionSelected(TodoOptions result) {}
+  onOptionSelected(TodoOptions result) {
+    switch (result) {
+      case TodoOptions.edit:
+        editTodo();
+        break;
+      case TodoOptions.duplicate:
+        break;
+      case TodoOptions.delete:
+        promptDeleteTodo();
+        break;
+    }
+  }
 
   void promptDeleteTodo() {
     showDialog<void>(
@@ -214,10 +247,16 @@ class _TodoDetailsState extends State<TodoDetails> {
       context,
       MaterialPageRoute(
         builder: (context) => EditTodo(
-          todo: widget.todo,
+          todo: _todo,
         ),
       ),
     );
+
+    if (result != null) {
+      setState(() {
+        _todo = result;
+      });
+    }
   }
 
 // todo allow for notifications?

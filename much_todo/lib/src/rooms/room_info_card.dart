@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 
 class RoomInfoCard extends StatefulWidget {
-  // todo different name
   final Room room;
 
   const RoomInfoCard({super.key, required this.room});
@@ -19,7 +19,11 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ListTile(
-            title: Text('${widget.room.name}'),
+            title: Text(widget.room.name),
+            subtitle: Text(
+              '${widget.room.todos.length} To Dos',
+              style: const TextStyle(fontSize: 11),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,7 +31,7 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
                 child: Text(
-                  '${widget.room.todos.length} To Dos',
+                  '${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())} Total Estimated Cost',
                   style: const TextStyle(fontSize: 11),
                 ),
               ),

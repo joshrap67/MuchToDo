@@ -15,8 +15,9 @@ class TagCreated {
 
 class TagsPicker extends StatefulWidget {
   final List<Tag> selectedTags;
+  final bool showAdd;
 
-  const TagsPicker({super.key, required this.selectedTags});
+  const TagsPicker({super.key, required this.selectedTags, this.showAdd = true});
 
   @override
   State<TagsPicker> createState() => _TagsPickerState();
@@ -53,6 +54,7 @@ class _TagsPickerState extends State<TagsPicker> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Select Tags'),
+        scrolledUnderElevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -63,14 +65,28 @@ class _TagsPickerState extends State<TagsPicker> {
           },
           child: Column(
             children: [
-              TextField(
-                decoration: const InputDecoration(
-                  label: Text('Search Tags'),
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                child: SearchBar(
+                  leading: const Icon(Icons.search),
+                  controller: _searchController,
+                  hintText: 'Search Tags',
+                  onChanged: filterTags,
+                  trailing: _searchController.text.isNotEmpty
+                      ? <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              hideKeyboard();
+                              setState(() {
+                                filterTags('');
+                              });
+                            },
+                          )
+                        ]
+                      : null,
                 ),
-                controller: _searchController,
-                onChanged: filterTags,
               ),
               Expanded(
                 child: ListView.builder(
@@ -84,7 +100,7 @@ class _TagsPickerState extends State<TagsPicker> {
                           onChanged: (val) {
                             selectTag(val!, index);
                           });
-                    } else {
+                    } else if (widget.showAdd) {
                       // footer
                       return OutlinedButton.icon(
                         label: const Text('DON\'T SEE A TAG? CREATE ONE'),
@@ -192,6 +208,7 @@ class _TagsPickerState extends State<TagsPicker> {
     } else {
       _selectedTags.remove(_displayedTags[index]);
     }
+    hideKeyboard();
     setState(() {});
   }
 }

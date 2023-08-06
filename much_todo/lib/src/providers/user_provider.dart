@@ -33,12 +33,12 @@ class UserProvider with ChangeNotifier {
   List<Tag> get tags => [..._user.tags];
 
   void addTag(Tag tag) {
-    _user?.tags.add(tag);
+    _user.tags.add(tag);
     notifyListeners();
   }
 
   void addPerson(Person person) {
-    _user?.people.add(person);
+    _user.people.add(person);
     notifyListeners();
   }
 }

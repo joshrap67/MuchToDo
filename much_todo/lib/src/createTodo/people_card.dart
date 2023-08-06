@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/people_picker.dart';
+import 'package:much_todo/src/widgets/people_picker.dart';
 
 import '../domain/person.dart';
 import '../utils/utils.dart';
@@ -31,11 +31,9 @@ class _PeopleCardState extends State<PeopleCard> {
         child: Column(
           children: [
             ListTile(
-              title: const Text('People'),
+              title: Text(getTitle()),
+              leading: const Icon(Icons.person),
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-              subtitle: _selectedPeople.isEmpty
-                  ? const Text('No people selected')
-                  : Text('${_selectedPeople.length} ${_selectedPeople.length == 1 ? 'person' : 'people'} selected'),
               trailing: IconButton(onPressed: launchPickPeople, icon: const Icon(Icons.add)),
             ),
             Wrap(
@@ -56,6 +54,12 @@ class _PeopleCardState extends State<PeopleCard> {
         ),
       ),
     );
+  }
+
+  String getTitle() {
+    return _selectedPeople.isEmpty
+        ? 'No people selected'
+        : '${_selectedPeople.length} ${_selectedPeople.length == 1 ? 'person' : 'people'}';
   }
 
   Future<void> launchPickPeople() async {

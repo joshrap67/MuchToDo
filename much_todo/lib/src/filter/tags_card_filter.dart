@@ -4,17 +4,17 @@ import 'package:much_todo/src/widgets/tags_picker.dart';
 import '../domain/tag.dart';
 import '../utils/utils.dart';
 
-class TagsCard extends StatefulWidget {
+class TagsCardFilter extends StatefulWidget {
   final List<Tag> tags;
   final ValueChanged<List<Tag>> onChange;
 
-  const TagsCard({super.key, required this.tags, required this.onChange});
+  const TagsCardFilter({super.key, required this.tags, required this.onChange});
 
   @override
-  State<TagsCard> createState() => _TagsCardState();
+  State<TagsCardFilter> createState() => _TagsCardFilterState();
 }
 
-class _TagsCardState extends State<TagsCard> {
+class _TagsCardFilterState extends State<TagsCardFilter> {
   List<Tag> _selectedTags = [];
 
   @override
@@ -31,9 +31,10 @@ class _TagsCardState extends State<TagsCard> {
         child: Column(
           children: [
             ListTile(
-              title: Text(getTitle()),
-			  leading: const Icon(Icons.tag),
+              title: const Text('Tags'),
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+              subtitle:
+                  _selectedTags.isEmpty ? const Text('No tags selected') : const Text('To Dos with any below tags '),
               trailing: IconButton(onPressed: launchAddTag, icon: const Icon(Icons.add)),
             ),
             Wrap(
@@ -41,7 +42,6 @@ class _TagsCardState extends State<TagsCard> {
               runSpacing: 4.0, // gap between lines
               children: [
                 for (var i = 0; i < _selectedTags.length; i++)
-                  // todo allow for custom colors for each tag? problem would be text color
                   Chip(
                     label: Text(_selectedTags[i].name),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -57,16 +57,15 @@ class _TagsCardState extends State<TagsCard> {
     );
   }
 
-  String getTitle() {
-    return _selectedTags.isEmpty
-        ? 'No tags selected'
-        : '${_selectedTags.length} ${_selectedTags.length == 1 ? 'tag' : 'tags'} selected';
-  }
-
   Future<void> launchAddTag() async {
     TagCreated result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TagsPicker(selectedTags: _selectedTags)),
+      MaterialPageRoute(
+        builder: (context) => TagsPicker(
+          selectedTags: _selectedTags,
+          showAdd: false,
+        ),
+      ),
     );
     hideKeyboard();
     setState(() {

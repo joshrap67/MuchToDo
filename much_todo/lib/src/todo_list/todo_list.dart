@@ -73,7 +73,7 @@ class _TodoListState extends State<TodoList> {
                 trailing: <Widget>[
                   ElevatedButton.icon(
                     onPressed: () {
-						filterDialog();
+						filterTodos();
 					},
                     icon: const Icon(Icons.filter_list_sharp),
                     label: const Text('Filter (1)'),
@@ -136,55 +136,10 @@ class _TodoListState extends State<TodoList> {
     }
   }
 
-  Future<void> filterDialog() async{
-    final List<DropdownMenuEntry<String>> sortEntries = <DropdownMenuEntry<String>>[];
-    sortEntries.add(const DropdownMenuEntry<String>(
-      value: 'alphaAsc',
-      label: 'Alphabetical A-Z',
-    ));
-    sortEntries.add(const DropdownMenuEntry<String>(
-      value: 'alphaDesc',
-      label: 'Alphabetical Z-A',
-    ));
-
+  Future<void> filterTodos() async{
 	var result = await Navigator.push(
 		context,
 		MaterialPageRoute(builder: (context) => const FilterTodos()),
 	);
-    // showDialog<void>(
-    //     context: context,
-    //     builder: (ctx) {
-    //       return AlertDialog(
-    //         actions: <Widget>[
-    //           TextButton(
-    //             onPressed: () => Navigator.pop(context, 'OK'),
-    //             child: const Text('CANCEL'),
-    //           ),
-    //           TextButton(
-    //             onPressed: () {},
-    //             child: const Text('APPLY'),
-    //           )
-    //         ],
-    //         insetPadding: const EdgeInsets.all(8.0),
-    //         title: const Text('Filters'),
-    //         content: SizedBox(
-    //           width: MediaQuery.of(context).size.width,
-    //           child: Column(
-	// 			  mainAxisSize: MainAxisSize.min,
-    //             children: [
-    //               Row(
-    //                 children: [
-	// 					Text('Sort by'),
-    //                   DropdownMenu(
-    //                     dropdownMenuEntries: sortEntries,
-    //                     enableSearch: false,
-    //                   ),
-    //                 ],
-    //               )
-    //             ],
-    //           ),
-    //         ),
-    //       );
-    //     });
   }
 }

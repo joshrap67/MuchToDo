@@ -33,6 +33,7 @@ class _CreateRoomState extends State<CreateRoom> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Room'),
+        scrolledUnderElevation: 0,
       ),
       body: Column(
         children: [
@@ -64,7 +65,11 @@ class _CreateRoomState extends State<CreateRoom> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: LoadingButton(onSubmit: onSubmit),
+            child: LoadingButton(
+              onSubmit: onSubmit,
+              label: 'CREATE',
+              icon: const Icon(Icons.add),
+            ),
           )
         ],
       ),

@@ -51,17 +51,19 @@ class _TodoCardState extends State<TodoCard> {
     );
   }
 
+  // todo show one row of tags? if overflow say something like (+2)
+
   Icon getIcon() {
     if (widget.todo.priority == 1) {
-      return Icon(Icons.looks_one, color: Colors.red[100]);
+      return Icon(Icons.looks_one, color: Colors.red[500]);
     } else if (widget.todo.priority == 2) {
-      return Icon(Icons.looks_two, color: Colors.red[200]);
+      return Icon(Icons.looks_two, color: Colors.red[400]);
     } else if (widget.todo.priority == 3) {
       return Icon(Icons.looks_3, color: Colors.red[300]);
     } else if (widget.todo.priority == 4) {
-      return Icon(Icons.looks_4, color: Colors.red[400]);
+      return Icon(Icons.looks_4, color: Colors.red[200]);
     } else {
-      return Icon(Icons.looks_5, color: Colors.red[500]);
+      return Icon(Icons.looks_5, color: Colors.red[100]);
     }
   }
 
@@ -69,7 +71,7 @@ class _TodoCardState extends State<TodoCard> {
     if (widget.todo.room == null) {
       return 'No associated room';
     } else {
-      return 'Room 1'; // todo dictionary lookup
+      return widget.todo.room!.name;
     }
   }
 
@@ -79,6 +81,7 @@ class _TodoCardState extends State<TodoCard> {
     } else {
       return 'Due ${DateFormat.yMd().format(widget.todo.completeBy!)}';
     }
+    // todo bold when close to date?
   }
 
   String getTitle() {

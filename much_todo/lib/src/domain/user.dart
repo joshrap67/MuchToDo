@@ -3,9 +3,9 @@ import 'package:much_todo/src/domain/tag.dart';
 
 class User {
   String id;
+  String email;
   List<Tag> tags;
   List<Person> people;
-  String email;
   List<String> todos;
 
   User(this.id, this.tags, this.email, this.todos, this.people);

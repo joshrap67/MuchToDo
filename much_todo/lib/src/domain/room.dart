@@ -1,15 +1,12 @@
 import 'package:much_todo/src/domain/todo.dart';
 
 class Room {
-  // todo rename to something generic like "Section"
+  // todo rename to something generic like "Space"? Just since if you had outside areas they really aren't rooms
   String id;
   String name;
-  List<String> todos = [];
-  // todo sort val for custom sort
-  // todo area
-  // todo area unit
+  List<RoomTodo> todos = [];
+
   // todo generic note
-  // todo house? that might be too much. how many people have more than one house... this aint a landlord app
 
   Room(this.id, this.name, this.todos);
 
@@ -18,7 +15,31 @@ class Room {
     return 'Room{Id: $id, name: $name, todos: $todos}';
   }
 
-  TodoRoom convert(){
-	  return TodoRoom(id, name);
+  TodoRoom convert() {
+    return TodoRoom(id, name);
+  }
+
+  double totalCost() {
+    var cost = 0.0;
+    for (var todo in todos) {
+      if (todo.estimatedCost != null) {
+        cost += todo.estimatedCost!;
+      }
+    }
+
+    return cost;
+  }
+}
+
+class RoomTodo {
+  String id;
+  String name;
+  double? estimatedCost;
+
+  RoomTodo(this.id, this.name, this.estimatedCost);
+
+  @override
+  String toString() {
+    return 'RoomTodo{Id: $id, name: $name, estimatedCost: $estimatedCost}';
   }
 }

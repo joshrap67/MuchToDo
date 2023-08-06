@@ -17,17 +17,11 @@ class SettingsController with ChangeNotifier {
   // also persisting the changes with the SettingsService.
   late ThemeMode _themeMode;
 
-  late Color _color;
-
   // Allow Widgets to read the user's preferred ThemeMode.
   ThemeMode get themeMode => _themeMode;
 
-  // Allow Widgets to read the user's preferred color.
-  Color get color => _color;
-
   Future<void> loadSettings() async {
     _themeMode = await _settingsService.themeMode();
-    _color = await _settingsService.color();
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
@@ -49,23 +43,5 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateThemeMode(newThemeMode);
-  }
-
-  /// Update and persist the ThemeMode based on the user's selection.
-  Future<void> updateColor(Color? color) async {
-    if (color == null) return;
-
-    // Do not perform any work if new and old ThemeMode are identical
-    if (color == _color) return;
-
-    // Otherwise, store the new ThemeMode in memory
-    _color = color;
-
-    // Important! Inform listeners a change has occurred.
-    notifyListeners();
-
-    // Persist the changes to a local database or the internet using the
-    // SettingService.
-    await _settingsService.updateColor(color);
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/create_person.dart';
+import 'package:much_todo/src/widgets/create_person.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +53,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Select People'),
+        scrolledUnderElevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -63,14 +64,29 @@ class _PeoplePickerState extends State<PeoplePicker> {
           },
           child: Column(
             children: [
-              TextField(
-                decoration: const InputDecoration(
-                  label: Text('Search People'),
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                child: SearchBar(
+                  leading: const Icon(Icons.search),
+                  controller: _searchController,
+                  hintText: 'Search People',
+                  // todo bug with flutter... if you close keyboard while focus is on this you can't open keyboard again
+                  onChanged: filterPeople,
+                  trailing: _searchController.text.isNotEmpty
+                      ? <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              hideKeyboard();
+                              setState(() {
+                                filterPeople('');
+                              });
+                            },
+                          )
+                        ]
+                      : null,
                 ),
-                controller: _searchController,
-                onChanged: filterPeople,
               ),
               Expanded(
                 child: ListView.builder(
@@ -142,6 +158,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
     } else {
       _selectedPeople.remove(_displayedPeople[index]);
     }
+    hideKeyboard();
     setState(() {});
   }
 }

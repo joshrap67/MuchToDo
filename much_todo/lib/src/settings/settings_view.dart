@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 import 'settings_controller.dart';
 
-/// Displays the various settings that can be customized by the user.
-///
-/// When a user changes a setting, the SettingsController is updated and
-/// Widgets that listen to the SettingsController are rebuilt.
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key, required this.controller});
 
@@ -19,32 +14,20 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  late Color pickerColor = widget.controller.color;
-
-  Future<void> changeColor(Color color) async {
-    await widget.controller.updateColor(color);
-    setState(() => pickerColor = color);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        scrolledUnderElevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        // Glue the SettingsController to the theme selection DropdownButton.
-        //
-        // When a user selects a theme from the dropdown list, the
-        // SettingsController is updated, which rebuilds the MaterialApp.
         child: Column(
           children: [
             DropdownButton<ThemeMode>(
-              // Read the selected themeMode from the controller
               value: widget.controller.themeMode,
-              // Call the updateThemeMode method any time the user selects a theme.
-              onChanged: widget.controller.updateThemeMode,
+              onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
               items: const [
                 DropdownMenuItem(
                   value: ThemeMode.system,
@@ -60,10 +43,6 @@ class _SettingsViewState extends State<SettingsView> {
                 )
               ],
             ),
-            ColorPicker(
-              pickerColor: pickerColor,
-              onColorChanged: changeColor,
-            )
           ],
         ),
       ),

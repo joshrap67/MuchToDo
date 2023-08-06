@@ -1,9 +1,9 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:much_todo/src/createTodo/effort_picker.dart';
+import 'package:much_todo/src/widgets/effort_picker.dart';
 import 'package:much_todo/src/createTodo/people_card.dart';
-import 'package:much_todo/src/createTodo/priority_picker.dart';
+import 'package:much_todo/src/widgets/priority_picker.dart';
 import 'package:much_todo/src/createTodo/room_card.dart';
 import 'package:much_todo/src/createTodo/tags_card.dart';
 import 'package:much_todo/src/domain/person.dart';
@@ -30,7 +30,7 @@ class CreateTodo extends StatefulWidget {
 
 class _CreateTodoState extends State<CreateTodo> {
   static const int defaultPriority = 3;
-  static const int defaultEffort = 3;
+  static const int defaultEffort = 2;
 
   bool shouldPop = false;
 
@@ -47,7 +47,7 @@ class _CreateTodoState extends State<CreateTodo> {
   final TextEditingController _completeByController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _approximateCostController = TextEditingController();
+  final TextEditingController _estimatedCostController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +63,7 @@ class _CreateTodoState extends State<CreateTodo> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Create To Do'),
+          scrolledUnderElevation: 0,
         ),
         body: Form(
           key: _formKey,
@@ -80,11 +81,11 @@ class _CreateTodoState extends State<CreateTodo> {
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
                               decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.sticky_note_2),
-                                border: OutlineInputBorder(),
-                                hintText: 'Name of Todo',
-                                labelText: 'Name *',
-                              ),
+                                  prefixIcon: Icon(Icons.sticky_note_2),
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Name of Todo',
+                                  labelText: 'Name *',
+                                  counterText: ''),
                               controller: _nameController,
                               keyboardType: TextInputType.name,
                               maxLength: Constants.maxNameLength,
@@ -103,10 +104,10 @@ class _CreateTodoState extends State<CreateTodo> {
                         ),
                         EffortPicker(
                           effort: _effort,
-                          onChange: (p) {
+                          onChange: (e) {
                             setState(() {
                               hideKeyboard();
-                              _effort = p;
+                              _effort = e;
                             });
                           },
                         ),
@@ -154,14 +155,14 @@ class _CreateTodoState extends State<CreateTodo> {
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.attach_money),
-                                      hintText: 'Approximate cost',
+                                      hintText: 'Estimated cost',
                                       labelText: 'Cost',
                                     ),
                                     inputFormatters: [
-                                      CurrencyTextInputFormatter(locale: 'en', symbol: '\$', enableNegative: false)
+                                      CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
                                     ],
                                     keyboardType: TextInputType.number,
-                                    controller: _approximateCostController,
+                                    controller: _estimatedCostController,
                                   ),
                                 ),
                               ),
@@ -271,7 +272,7 @@ class _CreateTodoState extends State<CreateTodo> {
     return _nameController.text.isNotEmpty ||
         _priority != defaultPriority ||
         _effort != defaultEffort ||
-        _approximateCostController.text.isNotEmpty ||
+        _estimatedCostController.text.isNotEmpty ||
         _noteController.text.isNotEmpty ||
         _selectedRooms.isNotEmpty ||
         _tags.isNotEmpty ||
@@ -325,8 +326,7 @@ class _CreateTodoState extends State<CreateTodo> {
 
     await Future.delayed(const Duration(seconds: 2), () {
       hideKeyboard();
-      double? approximateCost =
-          double.tryParse(_approximateCostController.text.toString().replaceAll(RegExp(r'[$,]+'), ''));
+      double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
       var createdTodos = TodoService.createTodos(
           _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
           photos: _pictures,
@@ -334,7 +334,7 @@ class _CreateTodoState extends State<CreateTodo> {
           note: _noteController.text.toString().trim(),
           links: _links,
           completeBy: _completeBy,
-          approximateCost: approximateCost,
+          estimatedCost: estimatedCost,
           tags: _tags);
 
       Navigator.of(context).pop(createdTodos);

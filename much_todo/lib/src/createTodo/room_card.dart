@@ -23,9 +23,9 @@ class _RoomCardState extends State<RoomCard> {
         child: Column(
           children: [
             ListTile(
-              title: const Text('Room'),
+              title: Text(getTitle()),
+              leading: const Icon(Icons.home),
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-              subtitle: Text(getSubtitle()),
               trailing: IconButton(onPressed: selectRoom, icon: const Icon(Icons.add)),
             ),
             if (widget.selectedRooms.length > 1)
@@ -49,13 +49,13 @@ class _RoomCardState extends State<RoomCard> {
     );
   }
 
-  String getSubtitle() {
+  String getTitle() {
     if (widget.selectedRooms.isEmpty) {
-      return 'No room selected';
+      return 'No room';
     } else if (widget.selectedRooms.length == 1) {
       return widget.selectedRooms[0].name;
     } else {
-      return '${widget.selectedRooms.length} rooms selected';
+      return 'To Do will be created for each room';
     }
   }
 

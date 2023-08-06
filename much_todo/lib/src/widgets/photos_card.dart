@@ -5,20 +5,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class PhotosCard extends StatefulWidget {
-  final ValueChanged<List<XFile>> onChange;
   final List<XFile> photos;
+  final ValueChanged<List<XFile>> onChange;
 
   const PhotosCard({super.key, this.photos = const [], required this.onChange});
 
   @override
   State<PhotosCard> createState() => _PhotosCardState();
-}
-
-class LinkWrapper {
-  String link;
-  TextEditingController controller;
-
-  LinkWrapper(this.link, this.controller);
 }
 
 class _PhotosCardState extends State<PhotosCard> {
@@ -36,9 +29,9 @@ class _PhotosCardState extends State<PhotosCard> {
             // removes weird borders that are enabled by default on expansion tile
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: const Text('Photos'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${_mediaFileList.length} photos added'),
+              title: Text(getTitle()),
+              leading: const Icon(Icons.photo),
               children: [
                 const Divider(),
                 Padding(
@@ -70,7 +63,7 @@ class _PhotosCardState extends State<PhotosCard> {
                               Align(
                                 alignment: Alignment.topRight,
                                 child: GestureDetector(
-                                  onTap: () => removeLink(index),
+                                  onTap: () => removePhoto(index),
                                   child: Container(
                                     decoration: const ShapeDecoration(
                                       color: Color(0xff3f3f3f),
@@ -101,7 +94,7 @@ class _PhotosCardState extends State<PhotosCard> {
             visible: _showAddPhoto && _mediaFileList.length < 5,
             child: OutlinedButton.icon(
               label: const Text('ADD NEW PHOTO'),
-              onPressed: addLink,
+              onPressed: addPhoto,
               icon: const Icon(Icons.add),
             ),
           )
@@ -110,15 +103,23 @@ class _PhotosCardState extends State<PhotosCard> {
     );
   }
 
-  Future<void> addLink() async {
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _mediaFileList.add(image!);
-	  // todo just upload directly to storage. delete them if not needed
-    });
+  String getTitle() {
+    return _mediaFileList.isEmpty
+        ? 'No photos added'
+        : '${_mediaFileList.length} ${_mediaFileList.length == 1 ? 'photo' : 'photos'} added';
   }
 
-  void removeLink(int index) {
+  Future<void> addPhoto() async {
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _mediaFileList.add(image);
+        // todo just upload directly to storage. delete them if not needed
+      });
+    }
+  }
+
+  void removePhoto(int index) {
     setState(() {
       _mediaFileList.removeAt(index);
       widget.onChange(_mediaFileList.map((c) => c).toList());
@@ -126,7 +127,7 @@ class _PhotosCardState extends State<PhotosCard> {
     });
   }
 
-  void onChange(String? link) {
+  void onChange(String? photo) {
     widget.onChange(_mediaFileList.map((c) => c).toList());
   }
 }

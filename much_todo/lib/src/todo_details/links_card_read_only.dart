@@ -38,9 +38,8 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
             // removes weird borders that are enabled by default on expansion tile
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: const Text('Links'),
+              title: Text('Links (${_links.length})'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${_links.length} links'),
               children: [
                 const Divider(),
                 Container(

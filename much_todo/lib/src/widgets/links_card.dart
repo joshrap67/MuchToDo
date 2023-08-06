@@ -53,9 +53,9 @@ class _LinksCardState extends State<LinksCard> {
             // removes weird borders that are enabled by default on expansion tile
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: const Text('Links'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${_linkControllers.length} links added'),
+              title: Text(getTitle()),
+			  leading: const Icon(Icons.link),
               children: [
                 const Divider(),
                 Container(
@@ -106,6 +106,12 @@ class _LinksCardState extends State<LinksCard> {
         ],
       ),
     );
+  }
+
+  String getTitle(){
+	  return _linkControllers.isEmpty
+		  ? 'No links added'
+		  : '${_linkControllers.length} ${_linkControllers.length == 1 ? 'link' : 'links'} added';
   }
 
   void addLink() {

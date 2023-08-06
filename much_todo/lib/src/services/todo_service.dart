@@ -8,7 +8,7 @@ import '../domain/tag.dart';
 
 class TodoService {
   static Todo createTodo(String name, int priority, int effort, String createdBy,
-      {double? approximateCost,
+      {double? estimatedCost,
       String? note,
       DateTime? completeBy,
       TodoRoom? room,
@@ -24,7 +24,7 @@ class TodoService {
         effort: effort,
         createdBy: createdBy,
         tags: tags.map((e) => e.convert()).toList(),
-        approximateCost: approximateCost,
+        estimatedCost: estimatedCost,
         completeBy: completeBy,
         inProgress: false,
         isCompleted: false,
@@ -38,7 +38,7 @@ class TodoService {
   }
 
   static Todo editTodo(String name, int priority, int effort, String createdBy,
-	  {double? approximateCost,
+	  {double? estimatedCost,
 		  String? note,
 		  DateTime? completeBy,
 		  Room? room,
@@ -54,7 +54,7 @@ class TodoService {
 		  effort: effort,
 		  createdBy: createdBy,
 		  tags: tags.map((e) => e.convert()).toList(),
-		  approximateCost: approximateCost,
+		  estimatedCost: estimatedCost,
 		  completeBy: completeBy,
 		  inProgress: false,
 		  isCompleted: false,
@@ -68,7 +68,7 @@ class TodoService {
   }
 
   static List<Todo> createTodos(String name, int priority, int effort, String createdBy, List<Room> rooms,
-      {double? approximateCost,
+      {double? estimatedCost,
       String? note,
       DateTime? completeBy,
       List<String> links = const [],
@@ -86,7 +86,7 @@ class TodoService {
           effort: effort,
           createdBy: createdBy,
           tags: tags.map((e) => e.convert()).toList(),
-          approximateCost: approximateCost,
+          estimatedCost: estimatedCost,
           completeBy: completeBy,
           inProgress: false,
           isCompleted: false,
@@ -106,7 +106,7 @@ class TodoService {
           effort: effort,
           createdBy: createdBy,
           tags: tags.map((e) => e.convert()).toList(),
-          approximateCost: approximateCost,
+          estimatedCost: estimatedCost,
           completeBy: completeBy,
           inProgress: false,
           isCompleted: false,

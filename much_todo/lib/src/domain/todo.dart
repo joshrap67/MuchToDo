@@ -1,11 +1,17 @@
 class Todo {
+  static const lowEffort = 1;
+  static const mediumEffort = 2;
+  static const highEffort = 3;
+
   String id;
   String createdBy;
   String name;
   int priority;
   int effort;
   TodoRoom? room;
-  double? approximateCost;
+
+  // todo should i use the decimal package for this? idk i mean this are approximate anyway so im not too concerned with small floating point errors
+  double? estimatedCost;
   String? note;
   List<TodoTag> tags;
   List<String> links = [];
@@ -15,8 +21,7 @@ class Todo {
   bool inProgress = false;
   DateTime? completeBy;
   DateTime? creationDate;
-
-  // todo equipment needed? maybe use that for note
+  // todo completionDate? could just have that replace isCompleted and make isCompleted a function
 
   Todo(
       this.id,
@@ -26,7 +31,7 @@ class Todo {
       this.priority,
       this.effort,
       this.room,
-      this.approximateCost,
+      this.estimatedCost,
       this.note,
       this.links,
       this.photos,
@@ -44,7 +49,7 @@ class Todo {
       required this.createdBy,
       this.tags = const [],
       this.room,
-      this.approximateCost,
+      this.estimatedCost,
       this.note,
       this.links = const [],
       this.photos = const [],
@@ -57,7 +62,7 @@ class Todo {
   @override
   String toString() {
     return 'Todo{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
-        'room: $room, approximateCost: $approximateCost, note: $note, links: $links, photos: $photos, '
+        'room: $room, estimatedCost: $estimatedCost, note: $note, links: $links, photos: $photos, '
         'people: $people, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
   }
 }

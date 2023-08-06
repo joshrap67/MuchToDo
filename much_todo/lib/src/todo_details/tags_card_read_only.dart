@@ -14,12 +14,9 @@ class TagsCardReadOnly extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
         child: Column(
           children: [
-            ListTile(
-              title: const Text('Tags'),
-              contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-              subtitle: tags.isEmpty
-                  ? const Text('No tags selected')
-                  : Text('${tags.length} ${tags.length == 1 ? 'tag' : 'tags'}'),
+            const ListTile(
+              title: Text('Tags'),
+              contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
             ),
             Wrap(
               spacing: 8.0, // gap between adjacent chips

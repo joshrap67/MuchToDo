@@ -44,6 +44,7 @@ class _RoomPickerSingularState extends State<RoomPickerSingular> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Select Room'),
+        scrolledUnderElevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -54,14 +55,28 @@ class _RoomPickerSingularState extends State<RoomPickerSingular> {
           },
           child: Column(
             children: [
-              TextField(
-                decoration: const InputDecoration(
-                  label: Text('Search Rooms'),
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                child: SearchBar(
+                  leading: const Icon(Icons.search),
+                  controller: _searchController,
+                  hintText: 'Search Rooms',
+                  onChanged: filterRooms,
+                  trailing: _searchController.text.isNotEmpty
+                      ? <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              hideKeyboard();
+                              setState(() {
+                                filterRooms('');
+                              });
+                            },
+                          )
+                        ]
+                      : null,
                 ),
-                controller: _searchController,
-                onChanged: filterRooms,
               ),
               Expanded(
                 child: ListView.builder(
@@ -136,6 +151,7 @@ class _RoomPickerSingularState extends State<RoomPickerSingular> {
     } else {
       _selectedRoom = room;
     }
+    hideKeyboard();
     setState(() {});
   }
 }

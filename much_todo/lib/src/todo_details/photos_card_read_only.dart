@@ -1,14 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/todo_details/photos_gallery.dart';
-import 'package:much_todo/src/utils/utils.dart';
 
 class PhotosCardReadOnly extends StatelessWidget {
-  final List<String> photos;
+  final List<String> _photos;
 
-  const PhotosCardReadOnly({super.key, this.photos = const []});
+  const PhotosCardReadOnly({super.key, List<String> photos = const []}) : _photos = photos;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +15,8 @@ class PhotosCardReadOnly extends StatelessWidget {
             // removes weird borders that are enabled by default on expansion tile
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: const Text('Photos'),
+              title: Text('Photos (${_photos.length})'),
               textColor: Theme.of(context).colorScheme.primary,
-              subtitle: Text('${photos.length} photos'),
               children: [
                 const Divider(),
                 Padding(
@@ -31,7 +26,7 @@ class PhotosCardReadOnly extends StatelessWidget {
                     spacing: 12.0, // gap between adjacent chips
                     runSpacing: 4.0, // gap between lines
                     children: [
-                      for (var index = 0; index < photos.length; index++)
+                      for (var index = 0; index < _photos.length; index++)
                         GestureDetector(
                           onTap: () => open(context, index),
                           child: SizedBox(
@@ -40,7 +35,7 @@ class PhotosCardReadOnly extends StatelessWidget {
                             child: Hero(
                               tag: index.toString(),
                               child: Image.network(
-                                photos[index],
+                                _photos[index],
                                 fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                                   return const Center(child: Text('This image type is not supported'));
@@ -65,7 +60,7 @@ class PhotosCardReadOnly extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => PhotosGallery(
-          links: photos,
+          links: _photos,
           initialIndex: index,
         ),
       ),

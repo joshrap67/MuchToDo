@@ -1,4 +1,13 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/filter/tags_card_filter.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:provider/provider.dart';
+
+import '../utils/globals.dart';
+import '../widgets/loading_button.dart';
 
 class FilterTodos extends StatefulWidget {
   const FilterTodos({super.key});
@@ -12,7 +21,7 @@ enum SortOptions {
   priority(1, 'Priority'),
   effort(2, 'Effort'),
   room(2, 'Room Name'),
-  cost(2, 'Approximate Cost'),
+  cost(2, 'Estimated Cost'),
   creationDate(2, 'Creation Date'),
   dueBy(2, 'Due By'),
   completed(2, 'Completed'),
@@ -24,12 +33,22 @@ enum SortOptions {
   final String label;
 }
 
+enum SortDirection {
+  descending(0, Icon(Icons.arrow_downward)),
+  ascending(1, Icon(Icons.arrow_upward));
+
+  const SortDirection(this.value, this.widget);
+
+  final int value; // using since i will probably want to store these in local prefs
+  final Widget widget;
+}
+
 enum EqualityComparisons {
-  greaterThan(0, 'Greater Than'),
-  greaterThanOrEqualTo(1, 'Greater Than or Equal To'),
-  equalTo(2, 'Equal To'),
-  lessThan(3, 'Less Than'),
-  lessThanOrEqualTo(4, 'Less Than or Equal To');
+  greaterThan(0, '>'),
+  greaterThanOrEqualTo(1, '≥'),
+  equalTo(2, '='),
+  lessThan(3, '<'),
+  lessThanOrEqualTo(4, '≤');
 
   const EqualityComparisons(this.value, this.label);
 
@@ -38,11 +57,11 @@ enum EqualityComparisons {
 }
 
 enum PriorityFilter {
-  greaterThan(0, '1'),
-  greaterThanOrEqualTo(1, '2'),
-  equalTo(2, '3'),
-  lessThan(3, '4'),
-  lessThanOrEqualTo(4, '5');
+  one(1, '1'),
+  two(2, '2'),
+  three(3, '3'),
+  four(4, '4'),
+  five(5, '5');
 
   const PriorityFilter(this.value, this.label);
 
@@ -50,14 +69,39 @@ enum PriorityFilter {
   final String label;
 }
 
+enum EffortFilter {
+  one(1, 'Low'),
+  two(2, 'Medium'),
+  three(3, 'High');
+
+  const EffortFilter(this.value, this.label);
+
+  final int value; // using since i will probably want to store these in local prefs
+  final String label;
+}
+
 class _FilterTodosState extends State<FilterTodos> {
   SortOptions _sortByValue = SortOptions.creationDate;
+  SortDirection _sortDirectionValue = SortDirection.descending;
+
   EqualityComparisons _priorityEquality = EqualityComparisons.equalTo;
   PriorityFilter? _priorityFilter;
 
+  EffortFilter? _effortFilter;
+  EqualityComparisons _costEquality = EqualityComparisons.equalTo;
+
+  bool _includeInactive = false;
+  bool _showOnlyInProgress = false;
+  List<Tag> _selectedTags = [];
+  String? _roomIdFilter;
+
   final List<DropdownMenuItem<SortOptions>> _sortEntries = <DropdownMenuItem<SortOptions>>[];
+  final List<DropdownMenuItem<SortDirection>> _sortDirections = <DropdownMenuItem<SortDirection>>[];
   final List<DropdownMenuItem<EqualityComparisons>> _equalityEntries = <DropdownMenuItem<EqualityComparisons>>[];
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
+  final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
+  final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
+  final TextEditingController _costFilterController = TextEditingController();
 
   @override
   void initState() {
@@ -66,6 +110,12 @@ class _FilterTodosState extends State<FilterTodos> {
       _sortEntries.add(DropdownMenuItem<SortOptions>(
         value: value,
         child: Text(value.label),
+      ));
+    }
+    for (var value in SortDirection.values) {
+      _sortDirections.add(DropdownMenuItem<SortDirection>(
+        value: value,
+        child: value.widget,
       ));
     }
     for (var value in EqualityComparisons.values) {
@@ -80,6 +130,29 @@ class _FilterTodosState extends State<FilterTodos> {
         child: Text(value.label),
       ));
     }
+    for (var value in EffortFilter.values) {
+      _effortEntries.add(DropdownMenuItem<EffortFilter>(
+        value: value,
+        child: Text(value.label),
+      ));
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var rooms = context.read<RoomsProvider>().rooms;
+      for (var room in rooms) {
+        _roomEntries.add(DropdownMenuItem<String>(
+          value: room.id,
+          child: Text(room.name),
+        ));
+      }
+      _roomEntries.insert(
+          0,
+          const DropdownMenuItem<String>(
+            value: Constants.noRoomId,
+            child: Text('No Room'),
+          ));
+      setState(() {});
+    });
   }
 
   @override
@@ -87,113 +160,321 @@ class _FilterTodosState extends State<FilterTodos> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Filter To Dos'),
+        scrolledUnderElevation: 0,
       ),
       body: Column(
         children: [
-          Card(
-            child: Row(
-              children: [
-                const Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Text(
-                    'Sort By',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Flexible(
-                  flex: 3,
-                  fit: FlexFit.tight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField(
-                      items: _sortEntries,
-                      isExpanded: true,
-                      value: _sortByValue,
-                      onChanged: (value) {
-                        setState(() {
-                          _sortByValue = value!;
-                        });
-                      },
+          Expanded(
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Sort By',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _sortEntries,
+                                isExpanded: true,
+                                value: _sortByValue,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _sortByValue = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: IconButton(
+                                icon: _sortDirectionValue == SortDirection.descending
+                                    ? const Icon(Icons.arrow_downward_sharp)
+                                    : const Icon(Icons.arrow_upward_sharp),
+                                tooltip: _sortDirectionValue == SortDirection.descending ? 'Descending' : 'Ascending',
+                                onPressed: () {
+                                  if (_sortDirectionValue == SortDirection.descending) {
+                                    _sortDirectionValue = SortDirection.ascending;
+                                  } else {
+                                    _sortDirectionValue = SortDirection.descending;
+                                  }
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Card(
-            child: Row(
-              children: [
-                const Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Text(
-                    'Priority',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Flexible(
-                  flex: 3,
-                  fit: FlexFit.tight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField(
-                      items: _equalityEntries,
-                      isExpanded: true,
-                      value: _priorityEquality,
-                      onChanged: (value) {
-                        setState(() {
-                          _priorityEquality = value!;
-                        });
-                      },
+                    const Divider(),
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Priority',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _priorityEquality,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _priorityEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _priorityEntries,
+                                isExpanded: true,
+                                value: _priorityFilter,
+                                decoration: InputDecoration(
+                                  suffixIcon: _priorityFilter == null
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _priorityFilter = null;
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _priorityFilter = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-                Flexible(
-                  flex: 2,
-                  fit: FlexFit.tight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField(
-                      items: _priorityEntries,
-                      isExpanded: true,
-                      value: _priorityFilter,
-                      decoration: InputDecoration(
-                        suffixIcon: _priorityFilter == null
-                            ? null
-                            : IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () => setState(
-                                  () {
-                                    _priorityFilter = null;
-                                  },
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Effort',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 5,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _effortEntries,
+                                isExpanded: true,
+                                value: _effortFilter,
+                                decoration: InputDecoration(
+                                  suffixIcon: _effortFilter == null
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _effortFilter = null;
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _effortFilter = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Room',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 5,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _roomEntries,
+                                isExpanded: true,
+                                value: _roomIdFilter,
+                                decoration: InputDecoration(
+                                  suffixIcon: _roomIdFilter == null
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _roomIdFilter = null;
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _roomIdFilter = value as String?;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Cost',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _costEquality,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _costEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: _costFilterController,
+                                onChanged: (_) {
+                                  setState(() {});
+                                },
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
+                                ],
+                                decoration: InputDecoration(
+                                  border: const OutlineInputBorder(),
+                                  label: const Text('\$'),
+                                  suffixIcon: _costFilterController.text.isEmpty
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _costFilterController.clear();
+                                            },
+                                          ),
+                                        ),
                                 ),
                               ),
+                            ),
+                          ),
+                        ],
                       ),
-                      onChanged: (value) {
+                    ),
+                    TagsCardFilter(
+                        tags: _selectedTags,
+                        onChange: (tags) {
+                          setState(() {
+                            _selectedTags = tags;
+                          });
+                        }),
+                    CheckboxListTile(
+                      value: _includeInactive,
+                      onChanged: (bool? value) {
                         setState(() {
-                          _priorityFilter = value!;
+                          _includeInactive = value ?? false;
                         });
                       },
+                      title: const Text('Include Completed To Dos'),
                     ),
-                  ),
+                    CheckboxListTile(
+                      value: _showOnlyInProgress,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _showOnlyInProgress = value ?? false;
+                        });
+                      },
+                      title: const Text('Only Include In Progress To Dos'),
+                    ),
+                    // select people
+                    // complete by >, >=, ==, <=, <
+                    // creation date >, >=, ==, <=, <
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-          // sort by
-          // priority filter >, >=, ==, <=, <
-          // effort filter >, >=, ==, <=, <
-          // filter by room
-          // filter by cost? >, >=, ==, <=, <
-          // select tags
-          // select people
-          // is completed
-          // in progress
-          // complete by >, >=, ==, <=, <
-          // creation date >, >=, ==, <=, <
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: LoadingButton(
+              onSubmit: onSubmit,
+              label: 'APPLY FILTERS',
+              icon: const Icon(Icons.check),
+            ),
+          ),
         ],
       ),
     );
   }
+
+  Future<void> onSubmit() async {}
 }

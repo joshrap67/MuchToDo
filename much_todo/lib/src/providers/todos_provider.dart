@@ -17,7 +17,7 @@ class TodosProvider with ChangeNotifier {
             .map((e) => e.convert())
             .toList(),
         (i % 5) + 1,
-        (i % 5) + 1,
+        (i % 3) + 1,
         RoomsProvider.initialData.first.convert(),
         45.2,
         'Items needed: hammer, paint, screwdriver, nails, wrench, painter\'s tape',

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
 import 'package:much_todo/src/rooms/room_info_card.dart';
@@ -59,20 +60,33 @@ class _RoomListState extends State<RoomList> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        GridView.builder(
-          itemCount: _rooms.length,
-          shrinkWrap: true,
-          controller: _scrollController,
-          key: const PageStorageKey('room-list'),
-          padding: const EdgeInsets.only(bottom: 65),
-          itemBuilder: (ctx, index) {
-            var room = _rooms[index];
-            return RoomInfoCard(room: room);
-          },
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1.8,
-          ),
+        Column(
+          children: [
+            Card(
+              child: ListTile(
+                title: Text('${_rooms.length} Total Rooms'),
+                subtitle:
+                    Text('${totalTodos()} Total To Dos | ${NumberFormat.currency(symbol: '\$').format(totalCost())}'),
+                trailing: IconButton(
+                  icon: const Icon(Icons.sort),
+                  onPressed: () {},
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _rooms.length,
+                shrinkWrap: true,
+                controller: _scrollController,
+                key: const PageStorageKey('room-list'),
+                padding: const EdgeInsets.only(bottom: 65),
+                itemBuilder: (ctx, index) {
+                  var room = _rooms[index];
+                  return RoomInfoCard(room: room);
+                },
+              ),
+            ),
+          ],
         ),
         Visibility(
           visible: true,
@@ -97,6 +111,22 @@ class _RoomListState extends State<RoomList> {
         ),
       ],
     );
+  }
+
+  int totalTodos() {
+    var sum = 0;
+    for (var room in _rooms) {
+      sum += room.todos.length;
+    }
+    return sum;
+  }
+
+  double totalCost() {
+    var cost = 0.0;
+    for (var room in _rooms) {
+      cost += room.totalCost();
+    }
+    return cost;
   }
 
   Future<void> launchAddRoom() async {

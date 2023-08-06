@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/services/user_service.dart';
 
 import '../utils/utils.dart';
-import '../widgets/loading_button.dart';
+import 'loading_button.dart';
 
 class CreatePerson extends StatefulWidget {
   final String? name;
@@ -33,6 +33,7 @@ class _CreatePersonState extends State<CreatePerson> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Person'),
+        scrolledUnderElevation: 0,
       ),
       body: Column(
         children: [
@@ -92,7 +93,11 @@ class _CreatePersonState extends State<CreatePerson> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: LoadingButton(onSubmit: onSubmit),
+            child: LoadingButton(
+              onSubmit: onSubmit,
+              label: 'CREATE',
+              icon: const Icon(Icons.add),
+            ),
           )
         ],
       ),
@@ -122,8 +127,10 @@ class _CreatePersonState extends State<CreatePerson> {
 
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
+      String email = _emailController.text.trim();
+      String phone = _numberController.text.trim();
       var person = await UserService.createPerson(
-          context, _nameController.text.trim(), _emailController.text.trim(), _numberController.text.trim());
+          context, _nameController.text.trim(), email.isNotEmpty ? email : null, phone.isNotEmpty ? phone : null);
       hideKeyboard();
       if (context.mounted) {
         Navigator.pop(context, person);

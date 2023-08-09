@@ -4,15 +4,16 @@ class Room {
   // todo rename to something generic like "Space"? Just since if you had outside areas they really aren't rooms
   String id;
   String name;
+  String? note;
   List<RoomTodo> todos = [];
 
   // todo generic note
 
-  Room(this.id, this.name, this.todos);
+  Room(this.id, this.name, this.note, this.todos);
 
   @override
   String toString() {
-    return 'Room{Id: $id, name: $name, todos: $todos}';
+    return 'Room{Id: $id, name: $name, note: $note, todos: $todos}';
   }
 
   TodoRoom convert() {
@@ -35,6 +36,7 @@ class RoomTodo {
   String id;
   String name;
   double? estimatedCost;
+  // todo isActive
 
   RoomTodo(this.id, this.name, this.estimatedCost);
 

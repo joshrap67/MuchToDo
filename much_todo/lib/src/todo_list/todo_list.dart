@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/createTodo/create_todo.dart';
 import 'package:much_todo/src/filter/filter_todos.dart';
 import 'package:much_todo/src/providers/todos_provider.dart';
+import 'package:much_todo/src/todo_details/todo_details.dart';
 import 'package:much_todo/src/todo_list/todo_card.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -68,15 +70,26 @@ class _TodoListState extends State<TodoList> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SearchBar(
-                leading: const Icon(Icons.search),
-                trailing: <Widget>[
-                  ElevatedButton.icon(
-                    onPressed: () {
-						filterTodos();
-					},
-                    icon: const Icon(Icons.filter_list_sharp),
-                    label: const Text('Filter (1)'),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SearchBar(
+                      leading: const Icon(Icons.search),
+                      trailing: <Widget>[
+                        IconButton(
+                          onPressed: () {
+                            filterTodos();
+                          },
+                          icon: const Icon(Icons.filter_list_sharp),
+                          // label: const Text(''),
+                        )
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: pickRandomTask,
+                    icon: const Icon(Icons.casino_rounded),
+					  tooltip: 'Open Random Task',
                   )
                 ],
               ),
@@ -127,6 +140,7 @@ class _TodoListState extends State<TodoList> {
       context,
       MaterialPageRoute(builder: (context) => const CreateTodo()),
     );
+    hideKeyboard();
     // todo since using provider, this is not needed. just call method to get todos with current filters
     if (result != null && result.isNotEmpty) {
       setState(() {
@@ -136,10 +150,20 @@ class _TodoListState extends State<TodoList> {
     }
   }
 
-  Future<void> filterTodos() async{
-	var result = await Navigator.push(
-		context,
-		MaterialPageRoute(builder: (context) => const FilterTodos()),
-	);
+  Future<void> pickRandomTask() async {
+    var random = Random();
+    var index = random.nextInt(_todos.length);
+    hideKeyboard();
+    var result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TodoDetails(todo: _todos[index])),
+    );
+  }
+
+  Future<void> filterTodos() async {
+    var result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FilterTodos()),
+    );
   }
 }

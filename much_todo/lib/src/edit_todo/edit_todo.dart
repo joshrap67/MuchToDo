@@ -33,7 +33,8 @@ class EditTodo extends StatefulWidget {
 }
 
 class _EditTodoState extends State<EditTodo> {
-  bool shouldPop = false;
+  bool _shouldPop = false;
+  bool _roomError = false;
 
   late int _priority;
   late int _effort;
@@ -76,7 +77,7 @@ class _EditTodoState extends State<EditTodo> {
           .read<RoomsProvider>()
           .rooms
           .cast<Room?>()
-          .firstWhere((element) => element?.id == widget.todo.room?.id, orElse: () => null);
+          .firstWhere((element) => element?.id == widget.todo.room.id, orElse: () => null);
       _people = context.read<UserProvider>().people.where((x) => widget.todo.people.any((y) => y.id == x.id)).toList();
       _tags = context.read<UserProvider>().tags.where((x) => widget.todo.tags.any((y) => y.id == x.id)).toList();
       setState(() {});
@@ -87,7 +88,7 @@ class _EditTodoState extends State<EditTodo> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (isModified() && !shouldPop) {
+        if (isModified() && !_shouldPop) {
           promptUnsavedChanges();
           return false;
         } else {
@@ -101,6 +102,7 @@ class _EditTodoState extends State<EditTodo> {
         ),
         body: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -145,15 +147,17 @@ class _EditTodoState extends State<EditTodo> {
                             });
                           },
                         ),
-                        const Divider(),
                         RoomCard(
                           selectedRoom: _selectedRoom,
+                          showError: _roomError,
                           onRoomChange: (room) {
                             setState(() {
+                              _roomError = false;
                               _selectedRoom = room;
                             });
                           },
                         ),
+                        const Divider(),
                         TagsCard(
                           tags: _tags,
                           key: ValueKey(_tags),
@@ -337,7 +341,7 @@ class _EditTodoState extends State<EditTodo> {
                   setState(() {
                     Navigator.of(context).pop(); // close popup
                     Navigator.of(context).pop(); // pop this page
-                    shouldPop = true;
+                    _shouldPop = true;
                   });
                 },
                 child: const Text('LEAVE')),
@@ -348,7 +352,12 @@ class _EditTodoState extends State<EditTodo> {
   }
 
   Future<void> onSubmit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate() || _selectedRoom == null) {
+      if (_selectedRoom == null) {
+        setState(() {
+          _roomError = true;
+        });
+      }
       showSnackbar('Invalid input.', context);
       return;
     }
@@ -356,9 +365,9 @@ class _EditTodoState extends State<EditTodo> {
     await Future.delayed(const Duration(seconds: 2), () {
       hideKeyboard();
       double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-      var todo = TodoService.editTodo(_nameController.text.toString().trim(), _priority, _effort, 'createdBy',
+      var todo = TodoService.editTodo(
+          _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRoom!,
           photos: _photos,
-          room: _selectedRoom,
           people: _people,
           note: _noteController.text.toString().trim(),
           links: _links,

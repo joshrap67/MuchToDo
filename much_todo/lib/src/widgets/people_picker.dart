@@ -15,8 +15,9 @@ class PeoplePicked {
 
 class PeoplePicker extends StatefulWidget {
   final List<Person> selectedPeople;
+  final bool showAdd;
 
-  const PeoplePicker({super.key, required this.selectedPeople});
+  const PeoplePicker({super.key, required this.selectedPeople, this.showAdd = true});
 
   @override
   State<PeoplePicker> createState() => _PeoplePickerState();
@@ -100,7 +101,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
                           onChanged: (val) {
                             selectPerson(val!, index);
                           });
-                    } else {
+                    } else if (widget.showAdd) {
                       // footer
                       return OutlinedButton.icon(
                         label: const Text('DON\'T SEE A PERSON? CREATE ONE'),

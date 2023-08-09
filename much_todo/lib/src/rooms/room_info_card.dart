@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/rooms/room_details.dart';
 
 class RoomInfoCard extends StatefulWidget {
   final Room room;
@@ -21,32 +22,33 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
           ListTile(
             title: Text(widget.room.name),
             subtitle: Text(
-              '${widget.room.todos.length} To Dos',
+              getSubtitle(),
               style: const TextStyle(fontSize: 11),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
-                child: Text(
-                  '${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())} Total Estimated Cost',
-                  style: const TextStyle(fontSize: 11),
-                ),
-              ),
-              TextButton(
-                onPressed: openRoom,
-                child: const Text('OPEN'),
-              ),
-            ],
+            trailing: TextButton(
+              onPressed: openRoom,
+              child: const Text('OPEN'),
+            ),
           ),
         ],
       ),
     );
   }
 
+  String getSubtitle() {
+    return widget.room.todos.isEmpty
+        ? '${widget.room.todos.length} Active To Dos'
+        : '${widget.room.todos.length} Active To Dos | ${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())}';
+  }
+
+  // todo have a completed indicator
+
   // todo loop through all to dos and get total estimate cost for room
 
-  Future<void> openRoom() async {}
+  Future<void> openRoom() async {
+    var result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RoomDetails(room: widget.room)),
+    );
+  }
 }

@@ -31,10 +31,8 @@ class _TagsCardFilterState extends State<TagsCardFilter> {
         child: Column(
           children: [
             ListTile(
-              title: const Text('Tags'),
+              title: Text(getTitle()),
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-              subtitle:
-                  _selectedTags.isEmpty ? const Text('No tags selected') : const Text('To Dos with any below tags '),
               trailing: IconButton(onPressed: launchAddTag, icon: const Icon(Icons.add)),
             ),
             Wrap(
@@ -55,6 +53,10 @@ class _TagsCardFilterState extends State<TagsCardFilter> {
         ),
       ),
     );
+  }
+
+  String getTitle() {
+    return _selectedTags.isEmpty ? 'No tags selected' : 'With any below tags';
   }
 
   Future<void> launchAddTag() async {

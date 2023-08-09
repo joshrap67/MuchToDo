@@ -7,11 +7,10 @@ import '../domain/room.dart';
 import '../domain/tag.dart';
 
 class TodoService {
-  static Todo createTodo(String name, int priority, int effort, String createdBy,
+  static Todo createTodo(String name, int priority, int effort, String createdBy, TodoRoom room,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
-      TodoRoom? room,
       List<String> links = const [],
       List<Tag> tags = const [],
       List<Person> people = const [],
@@ -37,34 +36,33 @@ class TodoService {
     return todo;
   }
 
-  static Todo editTodo(String name, int priority, int effort, String createdBy,
-	  {double? estimatedCost,
-		  String? note,
-		  DateTime? completeBy,
-		  Room? room,
-		  List<String> links = const [],
-		  List<Tag> tags = const [],
-		  List<Person> people = const [],
-		  List<XFile> photos = const []}) {
-	  // upload photos to cloud
-	  var todo = Todo.named(
-		  id: const Uuid().v4(),
-		  name: name.trim(),
-		  priority: priority,
-		  effort: effort,
-		  createdBy: createdBy,
-		  tags: tags.map((e) => e.convert()).toList(),
-		  estimatedCost: estimatedCost,
-		  completeBy: completeBy,
-		  inProgress: false,
-		  isCompleted: false,
-		  links: links,
-		  note: note,
-		  people: people.map((e) => e.convert()).toList(),
-		  room: room?.convert(),
-		  creationDate: DateTime.now().toUtc());
+  static Todo editTodo(String name, int priority, int effort, String createdBy, Room room,
+      {double? estimatedCost,
+      String? note,
+      DateTime? completeBy,
+      List<String> links = const [],
+      List<Tag> tags = const [],
+      List<Person> people = const [],
+      List<XFile> photos = const []}) {
+    // upload photos to cloud
+    var todo = Todo.named(
+        id: const Uuid().v4(),
+        name: name.trim(),
+        priority: priority,
+        effort: effort,
+        createdBy: createdBy,
+        tags: tags.map((e) => e.convert()).toList(),
+        estimatedCost: estimatedCost,
+        completeBy: completeBy,
+        inProgress: false,
+        isCompleted: false,
+        links: links,
+        note: note,
+        people: people.map((e) => e.convert()).toList(),
+        room: room.convert(),
+        creationDate: DateTime.now().toUtc());
 
-	  return todo;
+    return todo;
   }
 
   static List<Todo> createTodos(String name, int priority, int effort, String createdBy, List<Room> rooms,
@@ -78,24 +76,7 @@ class TodoService {
     // todo upload photos to cloud
     List<Todo> createdTodos = [];
     if (rooms.isEmpty) {
-      // empty room is allowed
-      var todo = Todo.named(
-          id: const Uuid().v4(),
-          name: name.trim(),
-          priority: priority,
-          effort: effort,
-          createdBy: createdBy,
-          tags: tags.map((e) => e.convert()).toList(),
-          estimatedCost: estimatedCost,
-          completeBy: completeBy,
-          inProgress: false,
-          isCompleted: false,
-          links: links,
-          note: note,
-          people: people.map((e) => e.convert()).toList(),
-          room: null,
-          creationDate: DateTime.now().toUtc());
-      createdTodos.add(todo);
+      throw Exception('Room cannot be empty');
     }
 
     for (var room in rooms) {

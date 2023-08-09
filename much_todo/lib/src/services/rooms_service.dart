@@ -6,10 +6,10 @@ import 'package:uuid/uuid.dart';
 import '../providers/rooms_provider.dart';
 
 class RoomsService {
-  static Future<Room> createRoom(BuildContext context, String name) async {
+  static Future<Room> createRoom(BuildContext context, String name, {String? note}) async {
     Room? room;
     await Future.delayed(const Duration(seconds: 2), () {
-      room = Room(const Uuid().v4(), name.trim(), []);
+      room = Room(const Uuid().v4(), name.trim(), note, []);
       context.read<RoomsProvider>().addRoom(room!);
     });
     return room!;

@@ -38,9 +38,14 @@ class _LoadingButtonState extends State<LoadingButton> {
     setState(() {
       _isLoading = true;
     });
-    await widget.onSubmit();
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      await widget.onSubmit();
+    } catch (e) {
+      // todo log
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

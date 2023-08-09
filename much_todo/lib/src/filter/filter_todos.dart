@@ -1,12 +1,15 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/room.dart';
+import 'package:intl/intl.dart';
+import 'package:much_todo/src/domain/person.dart';
 import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/filter/people_card_filter.dart';
 import 'package:much_todo/src/filter/tags_card_filter.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/globals.dart';
+import '../utils/utils.dart';
 import '../widgets/loading_button.dart';
 
 class FilterTodos extends StatefulWidget {
@@ -90,18 +93,30 @@ class _FilterTodosState extends State<FilterTodos> {
   EffortFilter? _effortFilter;
   EqualityComparisons _costEquality = EqualityComparisons.equalTo;
 
+  DateTime? _completeByFilter;
+  EqualityComparisons _completeByEquality = EqualityComparisons.equalTo;
+
+  DateTime? _creationDateFilter;
+  EqualityComparisons _creationDateEquality = EqualityComparisons.equalTo;
+
+  DateTime? _completionDateFilter;
+  EqualityComparisons _completionDateEquality = EqualityComparisons.equalTo;
+
   bool _includeInactive = false;
   bool _showOnlyInProgress = false;
   List<Tag> _selectedTags = [];
+  List<Person> _selectedPeople = [];
   String? _roomIdFilter;
 
   final List<DropdownMenuItem<SortOptions>> _sortEntries = <DropdownMenuItem<SortOptions>>[];
-  final List<DropdownMenuItem<SortDirection>> _sortDirections = <DropdownMenuItem<SortDirection>>[];
   final List<DropdownMenuItem<EqualityComparisons>> _equalityEntries = <DropdownMenuItem<EqualityComparisons>>[];
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
   final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
   final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
   final TextEditingController _costFilterController = TextEditingController();
+  final TextEditingController _completeByFilterController = TextEditingController();
+  final TextEditingController _creationDateFilterController = TextEditingController();
+  final TextEditingController _completionDateFilterController = TextEditingController();
 
   @override
   void initState() {
@@ -112,12 +127,7 @@ class _FilterTodosState extends State<FilterTodos> {
         child: Text(value.label),
       ));
     }
-    for (var value in SortDirection.values) {
-      _sortDirections.add(DropdownMenuItem<SortDirection>(
-        value: value,
-        child: value.widget,
-      ));
-    }
+
     for (var value in EqualityComparisons.values) {
       _equalityEntries.add(DropdownMenuItem<EqualityComparisons>(
         value: value,
@@ -145,12 +155,6 @@ class _FilterTodosState extends State<FilterTodos> {
           child: Text(room.name),
         ));
       }
-      _roomEntries.insert(
-          0,
-          const DropdownMenuItem<String>(
-            value: Constants.noRoomId,
-            child: Text('No Room'),
-          ));
       setState(() {});
     });
   }
@@ -251,7 +255,7 @@ class _FilterTodosState extends State<FilterTodos> {
                             ),
                           ),
                           Flexible(
-                            flex: 3,
+                            flex: 4,
                             fit: FlexFit.tight,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -359,7 +363,7 @@ class _FilterTodosState extends State<FilterTodos> {
                                 ),
                                 onChanged: (value) {
                                   setState(() {
-                                    _roomIdFilter = value as String?;
+                                    _roomIdFilter = value;
                                   });
                                 },
                               ),
@@ -397,7 +401,7 @@ class _FilterTodosState extends State<FilterTodos> {
                             ),
                           ),
                           Flexible(
-                            flex: 3,
+                            flex: 4,
                             fit: FlexFit.tight,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -437,6 +441,13 @@ class _FilterTodosState extends State<FilterTodos> {
                             _selectedTags = tags;
                           });
                         }),
+                    PeopleCardFilter(
+                        people: _selectedPeople,
+                        onChange: (people) {
+                          setState(() {
+                            _selectedPeople = people;
+                          });
+                        }),
                     CheckboxListTile(
                       value: _includeInactive,
                       onChanged: (bool? value) {
@@ -455,9 +466,219 @@ class _FilterTodosState extends State<FilterTodos> {
                       },
                       title: const Text('Only Include In Progress To Dos'),
                     ),
-                    // select people
-                    // complete by >, >=, ==, <=, <
-                    // creation date >, >=, ==, <=, <
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Complete By',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _completeByEquality,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _completeByEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: _completeByFilterController,
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.date_range),
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: _completeByFilterController.text.isNotEmpty
+                                      ? IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _completeByFilterController.clear();
+                                            });
+                                          },
+                                          icon: const Icon(Icons.clear),
+                                        )
+                                      : null,
+                                ),
+                                onTap: () async {
+                                  hideKeyboard();
+                                  DateTime? pickDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2010),
+                                      lastDate: DateTime(2100));
+                                  if (pickDate != null) {
+                                    setState(() {
+                                      _completeByFilter = pickDate;
+                                      _completeByFilterController.text = DateFormat('yyyy-MM-dd').format(pickDate);
+                                    });
+                                  }
+                                  hideKeyboard();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Creation Date',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _creationDateEquality,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _creationDateEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: _creationDateFilterController,
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.date_range),
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: _creationDateFilterController.text.isNotEmpty
+                                      ? IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _creationDateFilterController.clear();
+                                            });
+                                          },
+                                          icon: const Icon(Icons.clear),
+                                        )
+                                      : null,
+                                ),
+                                onTap: () async {
+                                  hideKeyboard();
+                                  DateTime? pickDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2010),
+                                      lastDate: DateTime(2100));
+                                  if (pickDate != null) {
+                                    setState(() {
+                                      _creationDateFilter = pickDate;
+                                      _creationDateFilterController.text = DateFormat('yyyy-MM-dd').format(pickDate);
+                                    });
+                                  }
+                                  hideKeyboard();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Card(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Completion Date',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _completionDateEquality,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _completionDateEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: _completionDateFilterController,
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.date_range),
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: _completionDateFilterController.text.isNotEmpty
+                                      ? IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _completionDateFilterController.clear();
+                                            });
+                                          },
+                                          icon: const Icon(Icons.clear),
+                                        )
+                                      : null,
+                                ),
+                                onTap: () async {
+                                  hideKeyboard();
+                                  DateTime? pickDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2010),
+                                      lastDate: DateTime(2100));
+                                  if (pickDate != null) {
+                                    setState(() {
+                                      _completionDateFilter = pickDate;
+                                      _completionDateFilterController.text = DateFormat('yyyy-MM-dd').format(pickDate);
+                                    });
+                                  }
+                                  hideKeyboard();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

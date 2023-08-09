@@ -5,8 +5,9 @@ import 'package:much_todo/src/todo_details/todo_details.dart';
 
 class TodoCard extends StatefulWidget {
   final Todo todo;
+  final bool showRoom;
 
-  const TodoCard({super.key, required this.todo});
+  const TodoCard({super.key, required this.todo, this.showRoom = true});
 
   @override
   State<TodoCard> createState() => _TodoCardState();
@@ -28,7 +29,7 @@ class _TodoCardState extends State<TodoCard> {
               ],
             ),
             title: Text(widget.todo.name),
-            subtitle: Text(getRoom()),
+            subtitle: widget.showRoom ? Text(getRoom()) : const Text(''),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

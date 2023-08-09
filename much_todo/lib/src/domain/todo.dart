@@ -1,4 +1,5 @@
 class Todo {
+  // todo rename to "Tasks"? only concern is that it might not convey the purpose of the app. task might imply repeatable
   static const lowEffort = 1;
   static const mediumEffort = 2;
   static const highEffort = 3;
@@ -8,7 +9,7 @@ class Todo {
   String name;
   int priority;
   int effort;
-  TodoRoom? room;
+  TodoRoom room;
 
   // todo should i use the decimal package for this? idk i mean this are approximate anyway so im not too concerned with small floating point errors
   double? estimatedCost;
@@ -20,7 +21,7 @@ class Todo {
   bool isCompleted = false;
   bool inProgress = false;
   DateTime? completeBy;
-  DateTime? creationDate;
+  DateTime? creationDate; // todo shouldn't be nullable
   // todo completionDate? could just have that replace isCompleted and make isCompleted a function
 
   Todo(
@@ -47,8 +48,8 @@ class Todo {
       required this.priority,
       required this.effort,
       required this.createdBy,
+      required this.room,
       this.tags = const [],
-      this.room,
       this.estimatedCost,
       this.note,
       this.links = const [],

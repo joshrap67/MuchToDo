@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
+import 'package:much_todo/src/rooms/room_details.dart';
 import 'package:much_todo/src/rooms/room_info_card.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class RoomList extends StatefulWidget {
@@ -15,7 +18,7 @@ class RoomList extends StatefulWidget {
 }
 
 class _RoomListState extends State<RoomList> {
-  final List<Room> _rooms = [];
+  List<Room> _rooms = [];
   final _scrollController = ScrollController();
 
   bool _showFab = true;
@@ -26,9 +29,9 @@ class _RoomListState extends State<RoomList> {
   @override
   void initState() {
     super.initState();
-    for (var i = 0; i < 15; i++) {
-      _rooms.add(Room(const Uuid().v4(), 'Room ${i + 1}', []));
-    }
+    // for (var i = 0; i < 15; i++) {
+    //   _rooms.add(Room(const Uuid().v4(), 'Room ${i + 1}', 'Note', []));
+    // }
 
     // need to wait for controller to be attached to list
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,6 +49,13 @@ class _RoomListState extends State<RoomList> {
             });
           });
         }
+      });
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+		  // todo need to have one for null room... ugh. Have a default one called "Unspecified Room" and make room non nullable for todo
+        _rooms = context.read<RoomsProvider>().rooms;
       });
     });
   }
@@ -66,7 +76,7 @@ class _RoomListState extends State<RoomList> {
               child: ListTile(
                 title: Text('${_rooms.length} Total Rooms'),
                 subtitle:
-                    Text('${totalTodos()} Total To Dos | ${NumberFormat.currency(symbol: '\$').format(totalCost())}'),
+                    Text('${totalTodos()} Total Active To Dos | ${NumberFormat.currency(symbol: '\$').format(totalCost())}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.sort),
                   onPressed: () {},

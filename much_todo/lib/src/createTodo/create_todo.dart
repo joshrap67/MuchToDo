@@ -20,9 +20,9 @@ import 'package:intl/intl.dart';
 import '../domain/tag.dart';
 
 class CreateTodo extends StatefulWidget {
-  final String? roomId;
+  final Room? room;
 
-  const CreateTodo({super.key, this.roomId});
+  const CreateTodo({super.key, this.room});
 
   @override
   State<CreateTodo> createState() => _CreateTodoState();
@@ -32,7 +32,8 @@ class _CreateTodoState extends State<CreateTodo> {
   static const int defaultPriority = 3;
   static const int defaultEffort = 2;
 
-  bool shouldPop = false;
+  bool _shouldPop = false;
+  bool _roomError = false;
 
   int _priority = defaultPriority;
   int _effort = defaultEffort;
@@ -50,10 +51,18 @@ class _CreateTodoState extends State<CreateTodo> {
   final TextEditingController _estimatedCostController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.room != null) {
+      _selectedRooms.add(widget.room!);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (isModified() && !shouldPop) {
+        if (isModified() && !_shouldPop) {
           promptUnsavedChanges();
           return false;
         } else {
@@ -67,6 +76,7 @@ class _CreateTodoState extends State<CreateTodo> {
         ),
         body: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -111,15 +121,17 @@ class _CreateTodoState extends State<CreateTodo> {
                             });
                           },
                         ),
-                        const Divider(),
                         RoomCard(
                           selectedRooms: _selectedRooms,
+                          showError: _roomError,
                           onRoomsChange: (room) {
                             setState(() {
+                              _roomError = false;
                               _selectedRooms = room;
                             });
                           },
                         ),
+                        const Divider(),
                         TagsCard(
                           tags: _tags,
                           onChange: (tags) {
@@ -274,12 +286,20 @@ class _CreateTodoState extends State<CreateTodo> {
         _effort != defaultEffort ||
         _estimatedCostController.text.isNotEmpty ||
         _noteController.text.isNotEmpty ||
-        _selectedRooms.isNotEmpty ||
+        roomChanged() ||
         _tags.isNotEmpty ||
         _people.isNotEmpty ||
         _links.isNotEmpty ||
         _pictures.isNotEmpty ||
         _completeByController.text.isNotEmpty;
+  }
+
+  bool roomChanged() {
+    if (widget.room != null) {
+      return _selectedRooms.isEmpty || _selectedRooms.any((element) => element.id != widget.room!.id);
+    } else {
+      return _selectedRooms.isNotEmpty;
+    }
   }
 
   String? validName(String? name) {
@@ -308,7 +328,7 @@ class _CreateTodoState extends State<CreateTodo> {
                   setState(() {
                     Navigator.of(context).pop(); // close popup
                     Navigator.of(context).pop(); // pop this page
-                    shouldPop = true;
+                    _shouldPop = true;
                   });
                 },
                 child: const Text('LEAVE')),
@@ -319,7 +339,12 @@ class _CreateTodoState extends State<CreateTodo> {
   }
 
   Future<void> onSubmit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate() || _selectedRooms.isEmpty) {
+      if (_selectedRooms.isEmpty) {
+        setState(() {
+          _roomError = true;
+        });
+      }
       showSnackbar('Invalid input.', context);
       return;
     }

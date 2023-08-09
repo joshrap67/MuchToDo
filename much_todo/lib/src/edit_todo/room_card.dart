@@ -7,8 +7,9 @@ import '../utils/utils.dart';
 class RoomCard extends StatefulWidget {
   final Room? selectedRoom;
   final ValueChanged<Room?> onRoomChange;
+  final bool showError;
 
-  const RoomCard({super.key, this.selectedRoom, required this.onRoomChange});
+  const RoomCard({super.key, this.selectedRoom, required this.onRoomChange, this.showError = false});
 
   @override
   State<RoomCard> createState() => _RoomCardState();
@@ -23,8 +24,12 @@ class _RoomCardState extends State<RoomCard> {
         child: Column(
           children: [
             ListTile(
-              title: Text(getTitle()),
-              leading: const Icon(Icons.home),
+              title: getTitle(),
+              subtitle: getSubtitle(),
+              leading: Icon(
+                Icons.home,
+                color: widget.showError ? Theme.of(context).colorScheme.error : null,
+              ),
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
               trailing: IconButton(onPressed: selectRoom, icon: const Icon(Icons.add)),
             ),
@@ -34,11 +39,28 @@ class _RoomCardState extends State<RoomCard> {
     );
   }
 
-  String getTitle() {
+  Widget getTitle() {
+    var title = '';
     if (widget.selectedRoom == null) {
-      return 'No room';
+      title = 'Room *';
     } else {
-      return widget.selectedRoom!.name;
+      title = widget.selectedRoom!.name;
+    }
+    return Text(
+      title,
+      style: TextStyle(color: widget.showError ? Theme.of(context).colorScheme.error : null),
+    );
+  }
+
+  Widget? getSubtitle() {
+    // todo shake the card?
+    if (widget.showError) {
+      return Text(
+        'Room is required',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      );
+    } else {
+      return null;
     }
   }
 

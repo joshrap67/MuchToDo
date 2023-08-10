@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/todo_details/photos_gallery.dart';
+import 'package:much_todo/src/task_details/photos_gallery.dart';
 
 class PhotosCardReadOnly extends StatelessWidget {
   final List<String> _photos;

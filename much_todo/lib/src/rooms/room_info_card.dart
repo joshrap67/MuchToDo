@@ -36,14 +36,14 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
   }
 
   String getSubtitle() {
-    return widget.room.todos.isEmpty
-        ? '${widget.room.todos.length} Active To Dos'
-        : '${widget.room.todos.length} Active To Dos | ${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())}';
+    return widget.room.tasks.isEmpty
+        ? '${widget.room.tasks.length} Active Tasks'
+        : '${widget.room.tasks.length} Active Tasks | ${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())}';
   }
 
   // todo have a completed indicator
 
-  // todo loop through all to dos and get total estimate cost for room
+  // todo loop through all tasks and get total estimate cost for room
 
   Future<void> openRoom() async {
     var result = await Navigator.push(

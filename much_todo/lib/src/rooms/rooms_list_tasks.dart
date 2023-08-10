@@ -3,24 +3,24 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:uuid/uuid.dart';
 
-import '../createTodo/create_todo.dart';
-import '../domain/todo.dart';
-import '../filter/filter_todos.dart';
-import '../todo_list/todo_card.dart';
+import '../create_task/create_task.dart';
+import '../domain/task.dart';
+import '../filter/filter_tasks.dart';
+import '../task_list/task_card.dart';
 import '../utils/utils.dart';
 
-class RoomsListTodos extends StatefulWidget {
-  final List<Todo> todos;
+class RoomsListTasks extends StatefulWidget {
+  final List<Task> tasks;
   final Room room;
 
-  const RoomsListTodos({super.key, required this.room, required this.todos});
+  const RoomsListTasks({super.key, required this.room, required this.tasks});
 
   @override
-  State<RoomsListTodos> createState() => _RoomsListTodosState();
+  State<RoomsListTasks> createState() => _RoomsListTasksState();
 }
 
-class _RoomsListTodosState extends State<RoomsListTodos> {
-  late List<Todo> _todos;
+class _RoomsListTasksState extends State<RoomsListTasks> {
+  late List<Task> _tasks;
 
   SortOptions _sortByValue = SortOptions.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
@@ -31,10 +31,10 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
   void initState() {
     super.initState();
     // for testing purposes todo remove
-    widget.todos.add(Todo.named(
-        id: Uuid().v4(), name: 'Inactive', priority: 1, effort: 1, createdBy: 'createdBy', isCompleted: true, room: TodoRoom('id', 'Name')));
-    _todos = [...widget.todos];
-    sortAndFilterTodos();
+    widget.tasks.add(Task.named(
+        id: const Uuid().v4(), name: 'Inactive', priority: 1, effort: 1, createdBy: 'createdBy', isCompleted: true, room: TaskRoom('id', 'Name')));
+    _tasks = [...widget.tasks];
+    sortAndFilterTasks();
     for (var value in SortOptions.values) {
       _sortEntries.add(DropdownMenuItem<SortOptions>(
         value: value,
@@ -53,7 +53,7 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
             title: Text(getTitle()),
             subtitle: Text(getSubTitle()),
             trailing: IconButton(
-              onPressed: filterTodos,
+              onPressed: filterTasks,
               icon: const Icon(Icons.filter_list_sharp),
             ),
             contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
@@ -62,11 +62,11 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
         Expanded(
           child: Scrollbar(
             child: ListView.builder(
-              itemCount: _todos.length,
+              itemCount: _tasks.length,
               itemBuilder: (ctx, index) {
-                var todo = _todos[index];
-                return TodoCard(
-                  todo: todo,
+                var task = _tasks[index];
+                return TaskCard(
+                  task: task,
                   showRoom: false,
                 );
               },
@@ -76,45 +76,45 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton.icon(
-            onPressed: launchAddTodo,
+            onPressed: launchAddTask,
             icon: const Icon(Icons.add),
-            label: const Text('CREATE NEW TODO'),
+            label: const Text('CREATE NEW TASK'),
           ),
         )
       ],
     );
   }
 
-  Future<void> launchAddTodo() async {
-	  List<Todo>? result = await Navigator.push(
+  Future<void> launchAddTask() async {
+	  List<Task>? result = await Navigator.push(
 		  context,
-		  MaterialPageRoute(builder: (context) => CreateTodo(room: widget.room,)),
+		  MaterialPageRoute(builder: (context) => CreateTask(room: widget.room,)),
 	  );
-	  // todo need to verify todo list gets this todo properly with the provider. i don't think it will since i need to manually tell it to rebuild
+	  // todo need to verify task list gets this task properly with the provider. i don't think it will since i need to manually tell it to rebuild
 	  if (result != null && result.isNotEmpty) {
 		  setState(() {
-			  _todos.addAll(result);
-			  showSnackbar('${result.length} To Dos created.', context);
+			  _tasks.addAll(result);
+			  showSnackbar('${result.length} Tasks created.', context);
 		  });
 	  }
   }
 
   String getTitle() {
-    return _todos.isEmpty ? 'Room has no associated To Dos' : '${_todos.length} To Dos';
+    return _tasks.isEmpty ? 'Room has no associated Tasks' : '${_tasks.length} Tasks';
   }
 
   String getSubTitle() {
-    // todo need to make clear on todo list that it only includes aggregated cost of non completed ones
+    // todo need to make clear on task list that it only includes aggregated cost of non completed ones
     var totalCost = 0.0;
-    for (var e in _todos) {
+    for (var e in _tasks) {
       if (e.estimatedCost != null) {
         totalCost += e.estimatedCost!;
       }
     }
-    return _todos.isEmpty ? '' : '${NumberFormat.currency(symbol: '\$').format(totalCost)} Total Estimated Cost';
+    return _tasks.isEmpty ? '' : '${NumberFormat.currency(symbol: '\$').format(totalCost)} Total Estimated Cost';
   }
 
-  void filterTodos() {
+  void filterTasks() {
     // todo max amount check
     showDialog<void>(
         context: context,
@@ -128,7 +128,7 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, 'OK');
-                  sortAndFilterTodos();
+                  sortAndFilterTasks();
                   setState(() {});
                 },
                 child: const Text('APPLY'),
@@ -201,7 +201,7 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
                           });
                         },
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-                        title: const Text('Include Completed To Dos'),
+                        title: const Text('Include Completed Tasks'),
                       ),
                     ],
                   ),
@@ -212,34 +212,33 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
         });
   }
 
-  void sortAndFilterTodos() {
-    var todos = widget.todos.where((element) => _includeInactive || !element.isCompleted).toList();
+  void sortAndFilterTasks() {
+    var tasks = widget.tasks.where((element) => _includeInactive || !element.isCompleted).toList();
     // initially ascending
     switch (_sortByValue) {
       case SortOptions.name:
-        todos.sort((a, b) => a.name.compareTo(b.name));
+        tasks.sort((a, b) => a.name.compareTo(b.name));
         break;
       case SortOptions.priority:
-        // todo ugh so ascending in this case will be 1..5 but it might be confusing since its not ascending in terms of semantic priority but the actual nubmer (lower number is higher priortity)
-        todos.sort((a, b) => a.priority.compareTo(b.priority));
+        tasks.sort((a, b) => a.priority.compareTo(b.priority));
         break;
       case SortOptions.effort:
-        todos.sort((a, b) => a.effort.compareTo(b.effort));
+        tasks.sort((a, b) => a.effort.compareTo(b.effort));
         break;
       case SortOptions.room:
-        todos.sort((a, b) => a.room?.name.compareTo(b.room?.name ?? '') ?? -1); // todo ugh
+        tasks.sort((a, b) => a.room.name.compareTo(b.room.name));
         break;
       case SortOptions.cost:
-        todos.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1); // todo ugh
+        tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1); // todo ugh
         break;
       case SortOptions.creationDate:
-        todos.sort((a, b) => a.creationDate?.compareTo(b.creationDate ?? DateTime(1970)) ?? -1); // todo ugh
+        tasks.sort((a, b) => a.creationDate?.compareTo(b.creationDate ?? DateTime(1970)) ?? -1); // todo ugh
         break;
       case SortOptions.dueBy:
-        todos.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1); // todo ugh
+        tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1); // todo ugh
         break;
       case SortOptions.inProgress:
-        todos.sort((a, b) {
+        tasks.sort((a, b) {
           if (b.inProgress) {
             // ones that are in progress are on top in ascending
             return 1;
@@ -248,7 +247,7 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
         });
         break;
       case SortOptions.completed:
-        todos.sort((a, b) {
+        tasks.sort((a, b) {
           if (b.isCompleted) {
             // ones that are completed are on top in ascending
             return 1;
@@ -258,9 +257,9 @@ class _RoomsListTodosState extends State<RoomsListTodos> {
         break;
     }
     if (_sortDirectionValue == SortDirection.descending) {
-      todos = todos.reversed.toList();
+      tasks = tasks.reversed.toList();
     }
 
-    _todos = todos;
+    _tasks = tasks;
   }
 }

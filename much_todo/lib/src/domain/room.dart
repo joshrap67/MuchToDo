@@ -1,30 +1,30 @@
-import 'package:much_todo/src/domain/todo.dart';
+import 'package:much_todo/src/domain/task.dart';
 
 class Room {
   // todo rename to something generic like "Space"? Just since if you had outside areas they really aren't rooms
   String id;
   String name;
   String? note;
-  List<RoomTodo> todos = [];
+  List<RoomTask> tasks = [];
 
   // todo generic note
 
-  Room(this.id, this.name, this.note, this.todos);
+  Room(this.id, this.name, this.note, this.tasks);
 
   @override
   String toString() {
-    return 'Room{Id: $id, name: $name, note: $note, todos: $todos}';
+    return 'Room{Id: $id, name: $name, note: $note, tasks: $tasks}';
   }
 
-  TodoRoom convert() {
-    return TodoRoom(id, name);
+  TaskRoom convert() {
+    return TaskRoom(id, name);
   }
 
   double totalCost() {
     var cost = 0.0;
-    for (var todo in todos) {
-      if (todo.estimatedCost != null) {
-        cost += todo.estimatedCost!;
+    for (var task in tasks) {
+      if (task.estimatedCost != null) {
+        cost += task.estimatedCost!;
       }
     }
 
@@ -32,16 +32,16 @@ class Room {
   }
 }
 
-class RoomTodo {
+class RoomTask {
   String id;
   String name;
   double? estimatedCost;
   // todo isActive
 
-  RoomTodo(this.id, this.name, this.estimatedCost);
+  RoomTask(this.id, this.name, this.estimatedCost);
 
   @override
   String toString() {
-    return 'RoomTodo{Id: $id, name: $name, estimatedCost: $estimatedCost}';
+    return 'RoomTask{Id: $id, name: $name, estimatedCost: $estimatedCost}';
   }
 }

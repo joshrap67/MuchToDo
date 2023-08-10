@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../domain/todo.dart';
+import '../domain/task.dart';
 
 class TagsCardReadOnly extends StatelessWidget {
-  final List<TodoTag> tags;
+  final List<TaskTag> tags;
 
   const TagsCardReadOnly({super.key, required this.tags});
 

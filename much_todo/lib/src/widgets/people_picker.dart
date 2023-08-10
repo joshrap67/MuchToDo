@@ -109,6 +109,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
                         icon: const Icon(Icons.add),
                       );
                     }
+                    return null;
                   },
                 ),
               ),

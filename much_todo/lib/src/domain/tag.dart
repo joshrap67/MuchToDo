@@ -1,18 +1,18 @@
-import 'package:much_todo/src/domain/todo.dart';
+import 'package:much_todo/src/domain/task.dart';
 
 class Tag {
   String id;
   String name;
-  List<String> todos;
+  List<String> tasks;
 
-  Tag(this.id, this.name, {this.todos = const []});
+  Tag(this.id, this.name, {this.tasks = const []});
 
-  TodoTag convert() {
-    return TodoTag(id, name);
+  TaskTag convert() {
+    return TaskTag(id, name);
   }
 
   @override
   String toString() {
-    return 'Tag{id: $id, name: $name, todos: $todos}';
+    return 'Tag{id: $id, name: $name, tasks: $tasks}';
   }
 }

@@ -3,15 +3,14 @@ import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:uuid/uuid.dart';
 
-import '../domain/room.dart';
-import '../domain/todo.dart';
+import '../domain/task.dart';
 
-class TodosProvider with ChangeNotifier {
-  static final List<Todo> initialData = List.generate(10, (i) {
-    return Todo(
+class TasksProvider with ChangeNotifier {
+  static final List<Task> initialData = List.generate(10, (i) {
+    return Task(
         const Uuid().v4(),
         const Uuid().v4(),
-        'Todo ${i + 1}',
+        'Task ${i + 1}',
         UserProvider.initialData.tags
             .sublist((UserProvider.initialData.tags.length ~/ 2))
             .map((e) => e.convert())
@@ -23,27 +22,27 @@ class TodosProvider with ChangeNotifier {
         'Items needed: hammer, paint, screwdriver, nails, wrench, painter\'s tape',
         ['https://www.amazon.com/Celebrity-Cutouts-Danny-DeVito-Cutout/dp/B01AACB8J4/'],
         ['https://upload.wikimedia.org/wikipedia/commons/0/0c/American_Shorthair.jpg', 'https://rb.gy/yk4ed'],
-		UserProvider.initialData.people
-			.sublist((UserProvider.initialData.tags.length ~/ 2))
-			.map((e) => e.convert())
-			.toList(),
+        UserProvider.initialData.people
+            .sublist((UserProvider.initialData.tags.length ~/ 2))
+            .map((e) => e.convert())
+            .toList(),
         false,
         false,
         DateTime.now(),
         DateTime.now().toUtc());
   });
 
-  final List<Todo> _todos = initialData;
+  final List<Task> _tasks = initialData;
 
-  List<Todo> get todos => [..._todos]; // spread since otherwise widgets could bypass mutation methods
+  List<Task> get tasks => [..._tasks]; // spread since otherwise widgets could bypass mutation methods
 
-  void addTodo(Todo todo) {
-    _todos.add(todo);
+  void addTask(Task task) {
+    _tasks.add(task);
     notifyListeners();
   }
 
-  void removeTodo(Todo todo) {
-    _todos.removeWhere((r) => r.id == todo.id);
+  void removeTask(Task task) {
+    _tasks.removeWhere((t) => t.id == task.id);
     notifyListeners();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
-import 'package:much_todo/src/providers/todos_provider.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +25,7 @@ void main() async {
     providers: [
 		ListenableProvider<UserProvider>(create: (_) => UserProvider()),
 		ListenableProvider<RoomsProvider>(create: (_) => RoomsProvider()),
-		ListenableProvider<TodosProvider>(create: (_) => TodosProvider()),
+		ListenableProvider<TasksProvider>(create: (_) => TasksProvider()),
     ],
     child: MyApp(settingsController: settingsController),
   ));

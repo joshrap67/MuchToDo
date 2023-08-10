@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:much_todo/src/domain/todo.dart';
-import 'package:much_todo/src/todo_details/todo_details.dart';
+import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/task_details/task_details.dart';
 
-class TodoCard extends StatefulWidget {
-  final Todo todo;
+class TaskCard extends StatefulWidget {
+  final Task task;
   final bool showRoom;
 
-  const TodoCard({super.key, required this.todo, this.showRoom = true});
+  const TaskCard({super.key, required this.task, this.showRoom = true});
 
   @override
-  State<TodoCard> createState() => _TodoCardState();
+  State<TaskCard> createState() => _TaskCardState();
 }
 
-class _TodoCardState extends State<TodoCard> {
+class _TaskCardState extends State<TaskCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -28,7 +28,7 @@ class _TodoCardState extends State<TodoCard> {
                 const Text('Priority'),
               ],
             ),
-            title: Text(widget.todo.name),
+            title: Text(widget.task.name),
             subtitle: widget.showRoom ? Text(getRoom()) : const Text(''),
           ),
           Row(
@@ -42,7 +42,7 @@ class _TodoCardState extends State<TodoCard> {
                 ),
               ),
               TextButton(
-                onPressed: openTodo,
+                onPressed: openTask,
                 child: const Text('OPEN'),
               ),
             ],
@@ -55,13 +55,13 @@ class _TodoCardState extends State<TodoCard> {
   // todo show one row of tags? if overflow say something like (+2)
 
   Icon getIcon() {
-    if (widget.todo.priority == 1) {
+    if (widget.task.priority == 1) {
       return Icon(Icons.looks_one, color: Colors.red[500]);
-    } else if (widget.todo.priority == 2) {
+    } else if (widget.task.priority == 2) {
       return Icon(Icons.looks_two, color: Colors.red[400]);
-    } else if (widget.todo.priority == 3) {
+    } else if (widget.task.priority == 3) {
       return Icon(Icons.looks_3, color: Colors.red[300]);
-    } else if (widget.todo.priority == 4) {
+    } else if (widget.task.priority == 4) {
       return Icon(Icons.looks_4, color: Colors.red[200]);
     } else {
       return Icon(Icons.looks_5, color: Colors.red[100]);
@@ -69,34 +69,30 @@ class _TodoCardState extends State<TodoCard> {
   }
 
   String getRoom() {
-    if (widget.todo.room == null) {
-      return 'No associated room';
-    } else {
-      return widget.todo.room!.name;
-    }
+	  return widget.task.room.name;
   }
 
   String getDueByDate() {
-    if (widget.todo.completeBy == null) {
+    if (widget.task.completeBy == null) {
       return '';
     } else {
-      return 'Due ${DateFormat.yMd().format(widget.todo.completeBy!)}';
+      return 'Due ${DateFormat.yMd().format(widget.task.completeBy!)}';
     }
     // todo bold when close to date?
   }
 
   String getTitle() {
-    if (widget.todo.completeBy != null) {
-      return '${widget.todo.name} - Due by ${DateFormat.yMd().format(widget.todo.completeBy!)}';
+    if (widget.task.completeBy != null) {
+      return '${widget.task.name} - Due by ${DateFormat.yMd().format(widget.task.completeBy!)}';
     } else {
-      return widget.todo.name;
+      return widget.task.name;
     }
   }
 
-  Future<void> openTodo() async {
+  Future<void> openTask() async {
     var result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TodoDetails(todo: widget.todo)),
+      MaterialPageRoute(builder: (context) => TaskDetails(task: widget.task)),
     );
   }
 }

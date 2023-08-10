@@ -1,5 +1,4 @@
-class Todo {
-  // todo rename to "Tasks"? only concern is that it might not convey the purpose of the app. task might imply repeatable
+class Task {
   static const lowEffort = 1;
   static const mediumEffort = 2;
   static const highEffort = 3;
@@ -9,22 +8,22 @@ class Todo {
   String name;
   int priority;
   int effort;
-  TodoRoom room;
+  TaskRoom room;
 
   // todo should i use the decimal package for this? idk i mean this are approximate anyway so im not too concerned with small floating point errors
   double? estimatedCost;
   String? note;
-  List<TodoTag> tags;
+  List<TaskTag> tags;
   List<String> links = [];
   List<String> photos = [];
-  List<TodoPerson> people;
+  List<TaskPerson> people;
   bool isCompleted = false;
   bool inProgress = false;
   DateTime? completeBy;
   DateTime? creationDate; // todo shouldn't be nullable
   // todo completionDate? could just have that replace isCompleted and make isCompleted a function
 
-  Todo(
+  Task(
       this.id,
       this.createdBy,
       this.name,
@@ -42,7 +41,7 @@ class Todo {
       this.completeBy,
       this.creationDate);
 
-  Todo.named(
+  Task.named(
       {required this.id,
       required this.name,
       required this.priority,
@@ -62,46 +61,46 @@ class Todo {
 
   @override
   String toString() {
-    return 'Todo{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
+    return 'Task{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
         'room: $room, estimatedCost: $estimatedCost, note: $note, links: $links, photos: $photos, '
         'people: $people, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
   }
 }
 
-class TodoRoom {
+class TaskRoom {
   String id;
   String name;
 
-  TodoRoom(this.id, this.name);
+  TaskRoom(this.id, this.name);
 
   @override
   String toString() {
-    return 'TodoRoom{id: $id, name: $name}';
+    return 'TaskRoom{id: $id, name: $name}';
   }
 }
 
-class TodoPerson {
+class TaskPerson {
   String id;
   String name;
   String? email;
   String? phoneNumber;
 
-  TodoPerson(this.id, this.name, this.email, this.phoneNumber);
+  TaskPerson(this.id, this.name, this.email, this.phoneNumber);
 
   @override
   String toString() {
-    return 'TodoPerson{id: $id, name: $name, email: $email, phoneNumber: $phoneNumber}';
+    return 'TaskPerson{id: $id, name: $name, email: $email, phoneNumber: $phoneNumber}';
   }
 }
 
-class TodoTag {
+class TaskTag {
   String id;
   String name;
 
-  TodoTag(this.id, this.name);
+  TaskTag(this.id, this.name);
 
   @override
   String toString() {
-    return 'TodoTag{id: $id, name: $name}';
+    return 'TaskTag{id: $id, name: $name}';
   }
 }

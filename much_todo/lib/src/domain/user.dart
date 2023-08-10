@@ -6,12 +6,12 @@ class User {
   String email;
   List<Tag> tags;
   List<Person> people;
-  List<String> todos;
+  List<String> tasks;
 
-  User(this.id, this.tags, this.email, this.todos, this.people);
+  User(this.id, this.tags, this.email, this.tasks, this.people);
 
   @override
   String toString() {
-    return 'User{id: $id, tags: $tags, email: $email,  todos: $todos, people: $people}';
+    return 'User{id: $id, tags: $tags, email: $email, tasks: $tasks, people: $people}';
   }
 }

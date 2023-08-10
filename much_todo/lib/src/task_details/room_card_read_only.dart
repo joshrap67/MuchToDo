@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/room_picker.dart';
-import 'package:much_todo/src/domain/todo.dart';
-
-import '../domain/room.dart';
-import '../utils/utils.dart';
+import 'package:much_todo/src/domain/task.dart';
 
 class RoomCardReadOnly extends StatelessWidget {
-  final TodoRoom selectedRoom;
+  final TaskRoom selectedRoom;
 
   const RoomCardReadOnly({super.key, required this.selectedRoom});
 

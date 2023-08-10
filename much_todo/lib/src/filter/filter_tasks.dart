@@ -8,15 +8,14 @@ import 'package:much_todo/src/filter/tags_card_filter.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../utils/globals.dart';
 import '../utils/utils.dart';
 import '../widgets/loading_button.dart';
 
-class FilterTodos extends StatefulWidget {
-  const FilterTodos({super.key});
+class FilterTasks extends StatefulWidget {
+  const FilterTasks({super.key});
 
   @override
-  State<FilterTodos> createState() => _FilterTodosState();
+  State<FilterTasks> createState() => _FilterTasksState();
 }
 
 enum SortOptions {
@@ -83,7 +82,7 @@ enum EffortFilter {
   final String label;
 }
 
-class _FilterTodosState extends State<FilterTodos> {
+class _FilterTasksState extends State<FilterTasks> {
   SortOptions _sortByValue = SortOptions.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
 
@@ -163,7 +162,7 @@ class _FilterTodosState extends State<FilterTodos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Filter To Dos'),
+        title: const Text('Filter Tasks'),
         scrolledUnderElevation: 0,
       ),
       body: Column(
@@ -455,7 +454,7 @@ class _FilterTodosState extends State<FilterTodos> {
                           _includeInactive = value ?? false;
                         });
                       },
-                      title: const Text('Include Completed To Dos'),
+                      title: const Text('Include Completed Tasks'),
                     ),
                     CheckboxListTile(
                       value: _showOnlyInProgress,
@@ -464,7 +463,7 @@ class _FilterTodosState extends State<FilterTodos> {
                           _showOnlyInProgress = value ?? false;
                         });
                       },
-                      title: const Text('Only Include In Progress To Dos'),
+                      title: const Text('Only Include In Progress Tasks'),
                     ),
                     Card(
                       child: Row(

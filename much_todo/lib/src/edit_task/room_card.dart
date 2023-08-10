@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/room_picker.dart';
+import 'package:much_todo/src/edit_task/room_picker_singular.dart';
 
 import '../domain/room.dart';
 import '../utils/utils.dart';
 
 class RoomCard extends StatefulWidget {
-  final List<Room> selectedRooms;
-  final ValueChanged<List<Room>> onRoomsChange;
+  final Room? selectedRoom;
+  final ValueChanged<Room?> onRoomChange;
   final bool showError;
 
-  const RoomCard({super.key, this.selectedRooms = const [], required this.onRoomsChange, this.showError = false});
+  const RoomCard({super.key, this.selectedRoom, required this.onRoomChange, this.showError = false});
 
   @override
   State<RoomCard> createState() => _RoomCardState();
@@ -33,21 +33,6 @@ class _RoomCardState extends State<RoomCard> {
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
               trailing: IconButton(onPressed: selectRoom, icon: const Icon(Icons.add)),
             ),
-            if (widget.selectedRooms.length > 1)
-              Wrap(
-                spacing: 8.0, // gap between adjacent chips
-                runSpacing: 4.0, // gap between lines
-                children: [
-                  for (var i = 0; i < widget.selectedRooms.length; i++)
-                    Chip(
-                      label: Text(widget.selectedRooms[i].name),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      onDeleted: () {
-                        onDeleteRoom(widget.selectedRooms[i]);
-                      },
-                    ),
-                ],
-              )
           ],
         ),
       ),
@@ -56,12 +41,10 @@ class _RoomCardState extends State<RoomCard> {
 
   Widget getTitle() {
     var title = '';
-    if (widget.selectedRooms.isEmpty) {
+    if (widget.selectedRoom == null) {
       title = 'Room *';
-    } else if (widget.selectedRooms.length == 1) {
-      title = widget.selectedRooms[0].name;
     } else {
-      title = 'To Do will be created for each room';
+      title = widget.selectedRoom!.name;
     }
     return Text(
       title,
@@ -86,16 +69,11 @@ class _RoomCardState extends State<RoomCard> {
     RoomPickerPopData result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RoomPicker(
-          selectedRooms: widget.selectedRooms,
+        builder: (context) => RoomPickerSingular(
+          selectedRoom: widget.selectedRoom,
         ),
       ),
     );
-    widget.onRoomsChange(result.selectedRooms);
-  }
-
-  void onDeleteRoom(Room room) {
-    var rooms = widget.selectedRooms.where((x) => x.id != room.id).toList();
-    widget.onRoomsChange(rooms);
+    widget.onRoomChange(result.selectedRoom);
   }
 }

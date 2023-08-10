@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/todo.dart';
+import 'package:much_todo/src/domain/task.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class EffortPicker extends StatefulWidget {
@@ -37,16 +37,16 @@ class _EffortPickerState extends State<EffortPicker> {
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
             child: SfSlider(
               value: _selectedEffort,
-              min: Todo.lowEffort,
-              max: Todo.highEffort,
+              min: Task.lowEffort,
+              max: Task.highEffort,
               interval: 1,
               showTicks: true,
               showLabels: true,
               activeColor: const Color(0xFF48db63),
               labelFormatterCallback: (dynamic actualValue, String formattedText) {
-                if (actualValue == Todo.lowEffort) {
+                if (actualValue == Task.lowEffort) {
                   return 'Low';
-                } else if (actualValue == Todo.mediumEffort) {
+                } else if (actualValue == Task.mediumEffort) {
                   return 'Medium';
                 } else {
                   return 'High';

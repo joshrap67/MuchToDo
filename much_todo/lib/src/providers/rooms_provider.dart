@@ -7,7 +7,7 @@ class RoomsProvider with ChangeNotifier {
     Room('A', 'Bedroom', 'Note', []),
     Room('B', 'Bathroom', 'Note', []),
     Room('C', 'Kitchen', 'Note', []),
-    Room('D', 'Unspecified Room', 'Note', []),
+    Room('D', 'Unspecified Room', 'Note', []), // todo call it "No Room" and make it never be deletable? idk seems excessive
   ];
   final List<Room> _rooms = initialData;
 

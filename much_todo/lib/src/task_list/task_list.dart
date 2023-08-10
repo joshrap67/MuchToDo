@@ -2,28 +2,28 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/createTodo/create_todo.dart';
-import 'package:much_todo/src/filter/filter_todos.dart';
-import 'package:much_todo/src/providers/todos_provider.dart';
-import 'package:much_todo/src/todo_details/todo_details.dart';
-import 'package:much_todo/src/todo_list/todo_card.dart';
+import 'package:much_todo/src/create_task/create_task.dart';
+import 'package:much_todo/src/filter/filter_tasks.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:much_todo/src/task_details/task_details.dart';
+import 'package:much_todo/src/task_list/task_card.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 
-import '../domain/todo.dart';
+import '../domain/task.dart';
 
-class TodoList extends StatefulWidget {
-  const TodoList({super.key});
+class TaskList extends StatefulWidget {
+  const TaskList({super.key});
 
   @override
-  State<TodoList> createState() => _TodoListState();
+  State<TaskList> createState() => _TaskListState();
 }
 
-class _TodoListState extends State<TodoList> {
+class _TaskListState extends State<TaskList> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
 
-  List<Todo> _todos = [];
+  List<Task> _tasks = [];
   bool _showFab = true;
   Timer showFabDebounce = Timer(const Duration(seconds: 1), () {});
 
@@ -49,7 +49,7 @@ class _TodoListState extends State<TodoList> {
         }
       });
       setState(() {
-        _todos = context.read<TodosProvider>().todos;
+        _tasks = context.read<TasksProvider>().tasks;
       });
     });
     super.initState();
@@ -78,7 +78,7 @@ class _TodoListState extends State<TodoList> {
                       trailing: <Widget>[
                         IconButton(
                           onPressed: () {
-                            filterTodos();
+                            filterTasks();
                           },
                           icon: const Icon(Icons.filter_list_sharp),
                           // label: const Text(''),
@@ -96,15 +96,15 @@ class _TodoListState extends State<TodoList> {
             ),
             Expanded(
               child: ListView.builder(
-                key: const PageStorageKey('todo-list'),
-                itemCount: _todos.length,
+                key: const PageStorageKey('task-list'),
+                itemCount: _tasks.length,
                 padding: const EdgeInsets.only(bottom: 65),
                 shrinkWrap: true,
                 controller: _scrollController,
                 itemBuilder: (ctx, index) {
-                  var todo = _todos[index];
+                  var task = _tasks[index];
                   // todo swipe left to delete, swipe right to edit?
-                  return TodoCard(todo: todo);
+                  return TaskCard(task: task);
                 },
               ),
             ),
@@ -123,7 +123,7 @@ class _TodoListState extends State<TodoList> {
                 },
                 child: _showFab
                     ? FloatingActionButton(
-                        onPressed: launchAddTodo,
+                        onPressed: launchAddTask,
                         child: const Icon(Icons.add),
                       )
                     : null,
@@ -135,35 +135,35 @@ class _TodoListState extends State<TodoList> {
     );
   }
 
-  Future<void> launchAddTodo() async {
-    List<Todo>? result = await Navigator.push(
+  Future<void> launchAddTask() async {
+    List<Task>? result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CreateTodo()),
+      MaterialPageRoute(builder: (context) => const CreateTask()),
     );
     hideKeyboard();
-    // todo since using provider, this is not needed. just call method to get todos with current filters
+    // todo since using provider, this is not needed. just call method to get tasks with current filters
     if (result != null && result.isNotEmpty) {
       setState(() {
-        _todos.addAll(result);
-        showSnackbar('${result.length} To Dos created.', context);
+        _tasks.addAll(result);
+        showSnackbar('${result.length} Tasks created.', context);
       });
     }
   }
 
   Future<void> pickRandomTask() async {
     var random = Random();
-    var index = random.nextInt(_todos.length);
+    var index = random.nextInt(_tasks.length);
     hideKeyboard();
     var result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TodoDetails(todo: _todos[index])),
+      MaterialPageRoute(builder: (context) => TaskDetails(task: _tasks[index])),
     );
   }
 
-  Future<void> filterTodos() async {
+  Future<void> filterTasks() async {
     var result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const FilterTodos()),
+      MaterialPageRoute(builder: (context) => const FilterTasks()),
     );
   }
 }

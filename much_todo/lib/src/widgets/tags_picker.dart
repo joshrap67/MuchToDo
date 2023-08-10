@@ -108,6 +108,7 @@ class _TagsPickerState extends State<TagsPicker> {
                         icon: const Icon(Icons.add),
                       );
                     }
+                    return null;
                   },
                 ),
               ),

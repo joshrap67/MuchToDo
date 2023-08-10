@@ -2,44 +2,46 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
-import 'package:much_todo/src/createTodo/people_card.dart';
+import 'package:much_todo/src/create_task/people_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
-import 'package:much_todo/src/createTodo/room_card.dart';
-import 'package:much_todo/src/createTodo/tags_card.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/create_task/tags_card.dart';
 import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/services/todo_service.dart';
+import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/edit_task/room_card.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/links_card.dart';
 import 'package:much_todo/src/widgets/photos_card.dart';
+import 'package:provider/provider.dart';
 
 import 'package:intl/intl.dart';
 
+import '../domain/person.dart';
 import '../domain/tag.dart';
+import '../services/task_service.dart';
 
-class CreateTodo extends StatefulWidget {
-  final Room? room;
+class EditTask extends StatefulWidget {
+  final Task task;
 
-  const CreateTodo({super.key, this.room});
+  const EditTask({super.key, required this.task});
 
   @override
-  State<CreateTodo> createState() => _CreateTodoState();
+  State<EditTask> createState() => _EditTaskState();
 }
 
-class _CreateTodoState extends State<CreateTodo> {
-  static const int defaultPriority = 3;
-  static const int defaultEffort = 2;
-
+class _EditTaskState extends State<EditTask> {
   bool _shouldPop = false;
   bool _roomError = false;
 
-  int _priority = defaultPriority;
-  int _effort = defaultEffort;
+  late int _priority;
+  late int _effort;
+
   List<String> _links = [];
-  List<XFile> _pictures = [];
-  List<Room> _selectedRooms = [];
+  List<XFile> _photos = [];
+  Room? _selectedRoom;
   DateTime? _completeBy;
   List<Person> _people = [];
   List<Tag> _tags = [];
@@ -53,9 +55,33 @@ class _CreateTodoState extends State<CreateTodo> {
   @override
   void initState() {
     super.initState();
-    if (widget.room != null) {
-      _selectedRooms.add(widget.room!);
+
+    _nameController.text = widget.task.name;
+    _priority = widget.task.priority;
+    _effort = widget.task.effort;
+    _links = [...widget.task.links];
+
+    CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(symbol: '');
+    _estimatedCostController.text =
+        widget.task.estimatedCost != null ? formatter.format(widget.task.estimatedCost!.toStringAsFixed(2)) : '';
+
+    _noteController.text = widget.task.note ?? '';
+    _photos = widget.task.photos.map((e) => XFile(e)).toList();
+    _completeBy = widget.task.completeBy;
+    if (_completeBy != null) {
+      _completeByController.text = DateFormat('yyyy-MM-dd').format(_completeBy!);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _selectedRoom = context
+          .read<RoomsProvider>()
+          .rooms
+          .cast<Room?>()
+          .firstWhere((element) => element?.id == widget.task.room.id, orElse: () => null);
+      _people = context.read<UserProvider>().people.where((x) => widget.task.people.any((y) => y.id == x.id)).toList();
+      _tags = context.read<UserProvider>().tags.where((x) => widget.task.tags.any((y) => y.id == x.id)).toList();
+      setState(() {});
+    });
   }
 
   @override
@@ -71,7 +97,7 @@ class _CreateTodoState extends State<CreateTodo> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Create To Do'),
+          title: const Text('Edit Task'),
           scrolledUnderElevation: 0,
         ),
         body: Form(
@@ -93,7 +119,7 @@ class _CreateTodoState extends State<CreateTodo> {
                               decoration: const InputDecoration(
                                   prefixIcon: Icon(Icons.sticky_note_2),
                                   border: OutlineInputBorder(),
-                                  hintText: 'Name of Todo',
+                                  hintText: 'Name of Task',
                                   labelText: 'Name *',
                                   counterText: ''),
                               controller: _nameController,
@@ -122,27 +148,30 @@ class _CreateTodoState extends State<CreateTodo> {
                           },
                         ),
                         RoomCard(
-                          selectedRooms: _selectedRooms,
+                          selectedRoom: _selectedRoom,
                           showError: _roomError,
-                          onRoomsChange: (room) {
+                          onRoomChange: (room) {
                             setState(() {
                               _roomError = false;
-                              _selectedRooms = room;
+                              _selectedRoom = room;
                             });
                           },
                         ),
                         const Divider(),
                         TagsCard(
                           tags: _tags,
+                          key: ValueKey(_tags),
                           onChange: (tags) {
                             _tags = [...tags];
                           },
                         ),
                         PeopleCard(
-                            people: _people,
-                            onChange: (people) {
-                              _people = [...people];
-                            }),
+                          people: _people,
+                          key: ValueKey(_people),
+                          onChange: (people) {
+                            _people = [...people];
+                          },
+                        ),
                         LinksCard(
                           links: _links,
                           onChange: (links) {
@@ -150,9 +179,9 @@ class _CreateTodoState extends State<CreateTodo> {
                           },
                         ),
                         PhotosCard(
-                          photos: _pictures,
+                          photos: _photos,
                           onChange: (photos) {
-                            _pictures = [...photos];
+                            _photos = [...photos];
                           },
                         ),
                         const Divider(),
@@ -164,17 +193,17 @@ class _CreateTodoState extends State<CreateTodo> {
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                                   child: TextFormField(
+                                    inputFormatters: [
+                                      CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
+                                    ],
+                                    keyboardType: TextInputType.number,
+                                    controller: _estimatedCostController,
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.attach_money),
                                       hintText: 'Estimated cost',
                                       labelText: 'Cost',
                                     ),
-                                    inputFormatters: [
-                                      CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
-                                    ],
-                                    keyboardType: TextInputType.number,
-                                    controller: _estimatedCostController,
                                   ),
                                 ),
                               ),
@@ -261,8 +290,8 @@ class _CreateTodoState extends State<CreateTodo> {
                 padding: const EdgeInsets.all(8.0),
                 child: LoadingButton(
                   onSubmit: onSubmit,
-                  label: getCreateButtonLabel(),
-                  icon: const Icon(Icons.add),
+                  label: 'SAVE',
+                  icon: const Icon(Icons.save),
                 ),
               ),
             ],
@@ -272,34 +301,18 @@ class _CreateTodoState extends State<CreateTodo> {
     );
   }
 
-  String getCreateButtonLabel() {
-    if (_selectedRooms.length > 1) {
-      return 'CREATE (${_selectedRooms.length})';
-    } else {
-      return 'CREATE';
-    }
-  }
-
   bool isModified() {
-    return _nameController.text.isNotEmpty ||
-        _priority != defaultPriority ||
-        _effort != defaultEffort ||
-        _estimatedCostController.text.isNotEmpty ||
-        _noteController.text.isNotEmpty ||
-        roomChanged() ||
-        _tags.isNotEmpty ||
-        _people.isNotEmpty ||
-        _links.isNotEmpty ||
-        _pictures.isNotEmpty ||
-        _completeByController.text.isNotEmpty;
-  }
-
-  bool roomChanged() {
-    if (widget.room != null) {
-      return _selectedRooms.isEmpty || _selectedRooms.any((element) => element.id != widget.room!.id);
-    } else {
-      return _selectedRooms.isNotEmpty;
-    }
+    return _nameController.text != widget.task.name ||
+        _priority != widget.task.priority ||
+        _effort != widget.task.effort ||
+        // _approximateCostController.text.isNotEmpty ||
+        _noteController.text != widget.task.note ||
+        _selectedRoom?.id != widget.task.room?.id;
+    // _tags.isNotEmpty ||
+    // _people.isNotEmpty ||
+    // _links.isNotEmpty ||
+    // _photos.isNotEmpty ||
+    // _completeByController.text.isNotEmpty;
   }
 
   String? validName(String? name) {
@@ -339,8 +352,8 @@ class _CreateTodoState extends State<CreateTodo> {
   }
 
   Future<void> onSubmit() async {
-    if (!_formKey.currentState!.validate() || _selectedRooms.isEmpty) {
-      if (_selectedRooms.isEmpty) {
+    if (!_formKey.currentState!.validate() || _selectedRoom == null) {
+      if (_selectedRoom == null) {
         setState(() {
           _roomError = true;
         });
@@ -352,9 +365,9 @@ class _CreateTodoState extends State<CreateTodo> {
     await Future.delayed(const Duration(seconds: 2), () {
       hideKeyboard();
       double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-      var createdTodos = TodoService.createTodos(
-          _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
-          photos: _pictures,
+      var task = TaskService.editTask(
+          _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRoom!,
+          photos: _photos,
           people: _people,
           note: _noteController.text.toString().trim(),
           links: _links,
@@ -362,7 +375,7 @@ class _CreateTodoState extends State<CreateTodo> {
           estimatedCost: estimatedCost,
           tags: _tags);
 
-      Navigator.of(context).pop(createdTodos);
+      Navigator.of(context).pop(task);
     });
   }
 }

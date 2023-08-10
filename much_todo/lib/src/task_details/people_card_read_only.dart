@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../domain/todo.dart';
+import '../domain/task.dart';
 
 class PeopleCardReadOnly extends StatefulWidget {
-  final List<TodoPerson> people;
+  final List<TaskPerson> people;
 
   const PeopleCardReadOnly({super.key, required this.people});
 
@@ -46,7 +46,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  void showPersonInfo(TodoPerson person) {
+  void showPersonInfo(TaskPerson person) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -83,7 +83,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  Future<void> launchEmail(TodoPerson person) async {
+  Future<void> launchEmail(TaskPerson person) async {
     if (person.email == null) {
       showSnackbar('Email is empty.', context);
     }
@@ -98,7 +98,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     }
   }
 
-  Future<void> launchPhone(TodoPerson person) async {
+  Future<void> launchPhone(TaskPerson person) async {
     if (person.phoneNumber == null) {
       showSnackbar('Phone number is empty.', context);
     }

@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/providers/todos_provider.dart';
-import 'package:much_todo/src/rooms/rooms_list_todos.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:much_todo/src/rooms/rooms_list_tasks.dart';
 import 'package:provider/provider.dart';
 
 import '../domain/room.dart';
-import '../domain/todo.dart';
+import '../domain/task.dart';
 
 class RoomDetails extends StatefulWidget {
   final Room room;
@@ -19,13 +19,13 @@ class RoomDetails extends StatefulWidget {
 class _RoomDetailsState extends State<RoomDetails> {
   late Room _room;
 
-  late Future<List<Todo>> _todos;
+  late Future<List<Task>> _tasks;
 
   @override
   void initState() {
     super.initState();
     _room = widget.room;
-    _todos = getRoomTodos();
+    _tasks = getRoomTasks();
   }
 
   @override
@@ -48,13 +48,13 @@ class _RoomDetailsState extends State<RoomDetails> {
               ],
             ),
           ),
-          FutureBuilder<List<Todo>>(
-            future: _todos,
-            builder: (BuildContext context, AsyncSnapshot<List<Todo>> snapshot) {
+          FutureBuilder<List<Task>>(
+            future: _tasks,
+            builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
               if (snapshot.hasData) {
                 return Expanded(
-                  child: RoomsListTodos(
-                    todos: snapshot.data!,
+                  child: RoomsListTasks(
+                    tasks: snapshot.data!,
                     room: widget.room,
                   ),
                 );
@@ -68,12 +68,12 @@ class _RoomDetailsState extends State<RoomDetails> {
     );
   }
 
-  Future<List<Todo>> getRoomTodos() async {
-    List<Todo> todos = [];
+  Future<List<Task>> getRoomTasks() async {
+    List<Task> tasks = [];
     await Future.delayed(const Duration(seconds: 2), () {
-      todos = context.read<TodosProvider>().todos.where((element) => element.room?.id == widget.room.id).toList();
+      tasks = context.read<TasksProvider>().tasks.where((element) => element.room.id == widget.room.id).toList();
     });
     setState(() {});
-    return todos;
+    return tasks;
   }
 }

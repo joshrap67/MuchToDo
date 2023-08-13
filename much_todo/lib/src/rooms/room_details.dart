@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/rooms/rooms_list_tasks.dart';
 import 'package:provider/provider.dart';
-
-import '../domain/room.dart';
-import '../domain/task.dart';
+import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/domain/task.dart';
 
 class RoomDetails extends StatefulWidget {
   final Room room;
@@ -70,6 +69,7 @@ class _RoomDetailsState extends State<RoomDetails> {
 
   Future<List<Task>> getRoomTasks() async {
     List<Task> tasks = [];
+    // todo use a separate provider for this?
     await Future.delayed(const Duration(seconds: 2), () {
       tasks = context.read<TasksProvider>().tasks.where((element) => element.room.id == widget.room.id).toList();
     });

@@ -1,13 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-
-import '../domain/person.dart';
-import '../domain/room.dart';
-import '../domain/tag.dart';
+import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/domain/tag.dart';
 
 class TaskService {
-  static Task createTask(String name, int priority, int effort, String createdBy, TaskRoom room,
+  static Task createTask(BuildContext context, String name, int priority, int effort, String createdBy, TaskRoom room,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
@@ -36,7 +38,8 @@ class TaskService {
     return task;
   }
 
-  static Task editTask(String name, int priority, int effort, String createdBy, Room room,
+  static Task editTask(
+      BuildContext context, String id, String name, int priority, int effort, String createdBy, Room room,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
@@ -46,7 +49,7 @@ class TaskService {
       List<XFile> photos = const []}) {
     // upload photos to cloud
     var task = Task.named(
-        id: const Uuid().v4(),
+        id: id,
         name: name.trim(),
         priority: priority,
         effort: effort,
@@ -61,11 +64,13 @@ class TaskService {
         people: people.map((e) => e.convert()).toList(),
         room: room.convert(),
         creationDate: DateTime.now().toUtc());
+    context.read<TasksProvider>().updateTask(task);
 
     return task;
   }
 
-  static List<Task> createTasks(String name, int priority, int effort, String createdBy, List<Room> rooms,
+  static List<Task> createTasks(
+      BuildContext context, String name, int priority, int effort, String createdBy, List<Room> rooms,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
@@ -74,6 +79,7 @@ class TaskService {
       List<Person> people = const [],
       List<XFile> photos = const []}) {
     // todo upload photos to cloud
+    // todo grab userid here instead of requiring it in method
     List<Task> createdTasks = [];
     if (rooms.isEmpty) {
       throw Exception('Room cannot be empty');
@@ -98,7 +104,12 @@ class TaskService {
           creationDate: DateTime.now().toUtc());
       createdTasks.add(task);
     }
+    context.read<TasksProvider>().addTasks(createdTasks);
 
     return createdTasks;
+  }
+
+  static void deleteTask(BuildContext context, Task task) {
+    context.read<TasksProvider>().removeTask(task);
   }
 }

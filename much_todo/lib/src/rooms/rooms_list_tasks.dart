@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:uuid/uuid.dart';
-
-import '../create_task/create_task.dart';
-import '../domain/task.dart';
-import '../filter/filter_tasks.dart';
-import '../task_list/task_card.dart';
-import '../utils/utils.dart';
+import 'package:much_todo/src/create_task/create_task.dart';
+import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/filter/filter_tasks.dart';
+import 'package:much_todo/src/task_list/task_card.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class RoomsListTasks extends StatefulWidget {
   final List<Task> tasks;
@@ -32,7 +31,13 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
     super.initState();
     // for testing purposes todo remove
     widget.tasks.add(Task.named(
-        id: const Uuid().v4(), name: 'Inactive', priority: 1, effort: 1, createdBy: 'createdBy', isCompleted: true, room: TaskRoom('id', 'Name')));
+        id: const Uuid().v4(),
+        name: 'Inactive',
+        priority: 1,
+        effort: 1,
+        createdBy: 'createdBy',
+        isCompleted: true,
+        room: TaskRoom('id', 'Name')));
     _tasks = [...widget.tasks];
     sortAndFilterTasks();
     for (var value in SortOptions.values) {
@@ -65,10 +70,7 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
               itemCount: _tasks.length,
               itemBuilder: (ctx, index) {
                 var task = _tasks[index];
-                return TaskCard(
-                  task: task,
-                  showRoom: false,
-                );
+                return TaskCard(task: task, showRoom: false);
               },
             ),
           ),
@@ -86,17 +88,19 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
   }
 
   Future<void> launchAddTask() async {
-	  List<Task>? result = await Navigator.push(
-		  context,
-		  MaterialPageRoute(builder: (context) => CreateTask(room: widget.room,)),
-	  );
-	  // todo need to verify task list gets this task properly with the provider. i don't think it will since i need to manually tell it to rebuild
-	  if (result != null && result.isNotEmpty) {
-		  setState(() {
-			  _tasks.addAll(result);
-			  showSnackbar('${result.length} Tasks created.', context);
-		  });
-	  }
+    List<Task>? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => CreateTask(
+                room: widget.room,
+              )),
+    );
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _tasks.addAll(result);
+        showSnackbar('${result.length} Tasks created.', context);
+      });
+    }
   }
 
   String getTitle() {

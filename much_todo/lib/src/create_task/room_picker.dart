@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-
-import '../domain/room.dart';
 
 class RoomPickerPopData {
   List<Room> selectedRooms;
@@ -24,22 +23,17 @@ class RoomPicker extends StatefulWidget {
 class _RoomPickerState extends State<RoomPicker> {
   final TextEditingController _searchController = TextEditingController();
 
-  List<Room> _displayedRooms = [];
   List<Room> _selectedRooms = [];
 
   @override
   void initState() {
     super.initState();
     _selectedRooms = [...widget.selectedRooms];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _displayedRooms = _allRooms();
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    var rooms = getRooms();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -61,7 +55,9 @@ class _RoomPickerState extends State<RoomPicker> {
                   leading: const Icon(Icons.search),
                   controller: _searchController,
                   hintText: 'Search Rooms',
-                  onChanged: filterRooms,
+                  onChanged: (_) {
+                    setState(() {});
+                  },
                   trailing: _searchController.text.isNotEmpty
                       ? <Widget>[
                           IconButton(
@@ -69,9 +65,7 @@ class _RoomPickerState extends State<RoomPicker> {
                             onPressed: () {
                               _searchController.clear();
                               hideKeyboard();
-                              setState(() {
-                                filterRooms('');
-                              });
+                              setState(() {});
                             },
                           )
                         ]
@@ -80,11 +74,11 @@ class _RoomPickerState extends State<RoomPicker> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: _displayedRooms.length + 1,
+                  itemCount: rooms.length + 1,
                   // todo key?
                   itemBuilder: (BuildContext ctx, int index) {
-                    if (index < _displayedRooms.length) {
-                      var room = _displayedRooms[index];
+                    if (index < rooms.length) {
+                      var room = rooms[index];
                       return CheckboxListTile(
                         value: _selectedRooms.any((element) => element.id == room.id),
                         onChanged: (bool? value) {
@@ -110,19 +104,17 @@ class _RoomPickerState extends State<RoomPicker> {
     );
   }
 
-  List<Room> _allRooms() {
-    return context.read<RoomsProvider>().rooms;
-  }
-
-  void filterRooms(String text) {
-    var lowerCaseSearch = text.toLowerCase();
-    setState(() {
-      if (lowerCaseSearch.isEmpty) {
-        _displayedRooms = _allRooms();
-      } else {
-        _displayedRooms = _allRooms().where((element) => element.name.toLowerCase().contains(lowerCaseSearch)).toList();
-      }
-    });
+  List<Room> getRooms() {
+    if (_searchController.text.isNotEmpty) {
+      var lowerCaseSearch = _searchController.text.toLowerCase();
+      return context
+          .read<RoomsProvider>()
+          .rooms
+          .where((element) => element.name.toLowerCase().contains(lowerCaseSearch))
+          .toList();
+    } else {
+      return context.watch<RoomsProvider>().rooms;
+    }
   }
 
   Future<void> addRoom() async {
@@ -138,7 +130,6 @@ class _RoomPickerState extends State<RoomPicker> {
     if (createdRoom != null) {
       setState(() {
         _selectedRooms.add(createdRoom);
-        _displayedRooms.add(createdRoom);
       });
     }
   }

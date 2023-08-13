@@ -1,6 +1,9 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
 import 'package:much_todo/src/create_task/people_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
@@ -18,10 +21,6 @@ import 'package:much_todo/src/widgets/photos_card.dart';
 import 'package:provider/provider.dart';
 
 import 'package:intl/intl.dart';
-
-import '../domain/person.dart';
-import '../domain/tag.dart';
-import '../services/task_service.dart';
 
 class EditTask extends StatefulWidget {
   final Task task;
@@ -307,7 +306,7 @@ class _EditTaskState extends State<EditTask> {
         _effort != widget.task.effort ||
         // _approximateCostController.text.isNotEmpty ||
         _noteController.text != widget.task.note ||
-        _selectedRoom?.id != widget.task.room?.id;
+        _selectedRoom?.id != widget.task.room.id;
     // _tags.isNotEmpty ||
     // _people.isNotEmpty ||
     // _links.isNotEmpty ||
@@ -366,7 +365,7 @@ class _EditTaskState extends State<EditTask> {
       hideKeyboard();
       double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
       var task = TaskService.editTask(
-          _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRoom!,
+          context, widget.task.id, _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRoom!,
           photos: _photos,
           people: _people,
           note: _noteController.text.toString().trim(),

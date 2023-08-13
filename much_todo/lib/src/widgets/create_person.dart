@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/services/user_service.dart';
-
-import '../utils/utils.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'loading_button.dart';
 
 class CreatePerson extends StatefulWidget {

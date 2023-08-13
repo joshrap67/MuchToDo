@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
 import 'package:much_todo/src/rooms/room_info_card.dart';
@@ -16,7 +15,6 @@ class RoomList extends StatefulWidget {
 }
 
 class _RoomListState extends State<RoomList> {
-  List<Room> _rooms = [];
   final _scrollController = ScrollController();
 
   bool _showFab = true;
@@ -27,9 +25,6 @@ class _RoomListState extends State<RoomList> {
   @override
   void initState() {
     super.initState();
-    // for (var i = 0; i < 15; i++) {
-    //   _rooms.add(Room(const Uuid().v4(), 'Room ${i + 1}', 'Note', []));
-    // }
 
     // need to wait for controller to be attached to list
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,12 +44,6 @@ class _RoomListState extends State<RoomList> {
         }
       });
     });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _rooms = context.read<RoomsProvider>().rooms;
-      });
-    });
   }
 
   @override
@@ -65,15 +54,16 @@ class _RoomListState extends State<RoomList> {
 
   @override
   Widget build(BuildContext context) {
+    var rooms = context.watch<RoomsProvider>().rooms;
     return Stack(
       children: [
         Column(
           children: [
             Card(
               child: ListTile(
-                title: Text('${_rooms.length} Total Rooms'),
-                subtitle:
-                    Text('${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}'),
+                title: Text('${rooms.length} Total Rooms'),
+                subtitle: Text(
+                    '${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.sort),
                   onPressed: () {},
@@ -82,13 +72,13 @@ class _RoomListState extends State<RoomList> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: _rooms.length,
+                itemCount: rooms.length,
                 shrinkWrap: true,
                 controller: _scrollController,
                 key: const PageStorageKey('room-list'),
                 padding: const EdgeInsets.only(bottom: 65),
                 itemBuilder: (ctx, index) {
-                  var room = _rooms[index];
+                  var room = rooms[index];
                   return RoomInfoCard(room: room);
                 },
               ),
@@ -122,7 +112,7 @@ class _RoomListState extends State<RoomList> {
 
   int totalTasks() {
     var sum = 0;
-    for (var room in _rooms) {
+    for (var room in context.read<RoomsProvider>().rooms) {
       sum += room.tasks.length;
     }
     return sum;
@@ -130,21 +120,16 @@ class _RoomListState extends State<RoomList> {
 
   double totalCost() {
     var cost = 0.0;
-    for (var room in _rooms) {
+    for (var room in context.read<RoomsProvider>().rooms) {
       cost += room.totalCost();
     }
     return cost;
   }
 
   Future<void> launchAddRoom() async {
-    var result = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateRoom()),
     );
-    if (result != null) {
-      setState(() {
-        _rooms.add(result);
-      });
-    }
   }
 }

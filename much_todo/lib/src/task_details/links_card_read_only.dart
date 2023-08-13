@@ -56,7 +56,7 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
                           children: [
                             Expanded(
                               child: GestureDetector(
-                                onTap: () => launchLink(_links[index]),
+                                onTap: () => promptLaunchLink(_links[index]),
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 0.0, 8.0),
                                   child: AutoSizeText(
@@ -98,8 +98,32 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
     }
   }
 
+  Future<void> promptLaunchLink(String link) async {
+    showDialog<void>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            actions: <Widget>[
+              TextButton(
+                child: const Text('NO'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                child: const Text('YES'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  launchLink(link);
+                },
+              )
+            ],
+            insetPadding: const EdgeInsets.all(8.0),
+            title: const Text('Launch Link'),
+            content: const Text('Launch this link with an external application?'),
+          );
+        });
+  }
+
   Future<void> launchLink(String link) async {
-    // todo prompt if they want to launch using external app?
     var uri = Uri.parse(link);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);

@@ -23,7 +23,7 @@ class PhotosCardReadOnly extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Wrap(
                     direction: Axis.horizontal,
-                    spacing: 12.0, // gap between adjacent chips
+                    spacing: 12.0, // gap between adjacent photos
                     runSpacing: 4.0, // gap between lines
                     children: [
                       for (var index = 0; index < _photos.length; index++)
@@ -33,12 +33,12 @@ class PhotosCardReadOnly extends StatelessWidget {
                             width: 60,
                             height: 60,
                             child: Hero(
-                              tag: index.toString(),
+                              tag: _photos[index].hashCode,
                               child: Image.network(
                                 _photos[index],
                                 fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                                  return const Center(child: Text('This image type is not supported'));
+                                  return const Center(child: Icon(Icons.broken_image));
                                 },
                               ),
                             ),

@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:much_todo/src/create_task/create_task.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/edit_task/edit_task.dart';
 import 'package:much_todo/src/task_details/links_card_read_only.dart';
@@ -8,8 +9,8 @@ import 'package:much_todo/src/task_details/people_card_read_only.dart';
 import 'package:much_todo/src/task_details/photos_card_read_only.dart';
 import 'package:much_todo/src/task_details/room_card_read_only.dart';
 import 'package:much_todo/src/task_details/tags_card_read_only.dart';
-
-import '../utils/utils.dart';
+import 'package:much_todo/src/widgets/priority_indicator.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class TaskDetails extends StatefulWidget {
   final Task task;
@@ -113,18 +114,24 @@ class _TaskDetailsState extends State<TaskDetails> {
                     children: [
                       Flexible(
                         fit: FlexFit.tight,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.pending),
-                          label: const Text('START'),
-                          onPressed: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.pending),
+                            label: const Text('START'),
+                            onPressed: () {},
+                          ),
                         ),
                       ),
                       Flexible(
                         fit: FlexFit.tight,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.check),
-                          label: const Text('COMPLETE'),
-                          onPressed: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.check),
+                            label: const Text('COMPLETE'),
+                            onPressed: () {},
+                          ),
                         ),
                       ),
                     ],
@@ -134,9 +141,15 @@ class _TaskDetailsState extends State<TaskDetails> {
                       Flexible(
                         child: Card(
                           child: ListTile(
-                            title: Text(_task.priority.toString()),
+                            title: Align(
+                              alignment: Alignment.topLeft,
+                              child: PriorityIndicator(task: widget.task),
+                            ),
                             contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-                            subtitle: const Text('Priority'),
+                            subtitle: const Text(
+                              'Priority',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
                         ),
                       ),
@@ -145,7 +158,10 @@ class _TaskDetailsState extends State<TaskDetails> {
                           child: ListTile(
                             title: Text(getEffortTitle()),
                             contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-                            subtitle: const Text('Effort'),
+                            subtitle: const Text(
+                              'Effort',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
                         ),
                       )
@@ -158,7 +174,10 @@ class _TaskDetailsState extends State<TaskDetails> {
                           child: Card(
                             child: ListTile(
                               title: Text(NumberFormat.currency(symbol: '\$').format(_task.estimatedCost)),
-                              subtitle: const Text('Estimated Cost'),
+                              subtitle: const Text(
+                                'Estimated Cost',
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ),
                           ),
                         ),
@@ -211,6 +230,7 @@ class _TaskDetailsState extends State<TaskDetails> {
         editTask();
         break;
       case TaskOptions.duplicate:
+        duplicateTask();
         break;
       case TaskOptions.delete:
         promptDeleteTask();
@@ -257,6 +277,17 @@ class _TaskDetailsState extends State<TaskDetails> {
         _task = result;
       });
     }
+  }
+
+  Future<void> duplicateTask() async {
+    var result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateTask(
+          task: _task,
+        ),
+      ),
+    );
   }
 
 // todo allow for notifications?

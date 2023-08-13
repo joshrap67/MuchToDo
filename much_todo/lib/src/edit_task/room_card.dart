@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/edit_task/room_picker_singular.dart';
-
-import '../domain/room.dart';
-import '../utils/utils.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class RoomCard extends StatefulWidget {
   final Room? selectedRoom;

@@ -3,8 +3,7 @@ import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-
-import '../domain/person.dart';
+import 'package:much_todo/src/domain/person.dart';
 
 class UserService {
   static Tag createTag(BuildContext context, String name) {

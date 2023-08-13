@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-
-import '../domain/tag.dart';
 
 class TagCreated {
   // emitted to any parent consuming the result of this widget popping
@@ -27,18 +26,12 @@ class _TagsPickerState extends State<TagsPicker> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _newTagController = TextEditingController();
 
-  List<Tag> _displayedTags = [];
   List<Tag> _selectedTags = [];
 
   @override
   void initState() {
     super.initState();
     _selectedTags = [...widget.selectedTags];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _displayedTags = _allTags();
-      });
-    });
   }
 
   @override
@@ -50,6 +43,7 @@ class _TagsPickerState extends State<TagsPicker> {
 
   @override
   Widget build(BuildContext context) {
+    var tags = getTags();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -71,7 +65,9 @@ class _TagsPickerState extends State<TagsPicker> {
                   leading: const Icon(Icons.search),
                   controller: _searchController,
                   hintText: 'Search Tags',
-                  onChanged: filterTags,
+                  onChanged: (_) {
+                    setState(() {});
+                  },
                   trailing: _searchController.text.isNotEmpty
                       ? <Widget>[
                           IconButton(
@@ -79,9 +75,7 @@ class _TagsPickerState extends State<TagsPicker> {
                             onPressed: () {
                               _searchController.clear();
                               hideKeyboard();
-                              setState(() {
-                                filterTags('');
-                              });
+                              setState(() {});
                             },
                           )
                         ]
@@ -90,15 +84,16 @@ class _TagsPickerState extends State<TagsPicker> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: _displayedTags.length + 1,
+                  itemCount: tags.length + 1,
                   // todo key?
                   itemBuilder: (BuildContext ctx, int index) {
-                    if (index < _displayedTags.length) {
+                    if (index < tags.length) {
+                      var tag = tags[index];
                       return CheckboxListTile(
-                          value: _selectedTags.contains(_displayedTags[index]),
-                          title: Text(_displayedTags[index].name),
+                          value: _selectedTags.contains(tag),
+                          title: Text(tag.name),
                           onChanged: (val) {
-                            selectTag(val!, index);
+                            selectTag(val!, tag);
                           });
                     } else if (widget.showAdd) {
                       // footer
@@ -117,17 +112,6 @@ class _TagsPickerState extends State<TagsPicker> {
         ),
       ),
     );
-  }
-
-  void filterTags(String text) {
-    var lowerCaseSearch = text.toLowerCase();
-    setState(() {
-      if (lowerCaseSearch.isEmpty) {
-        _displayedTags = _allTags();
-      } else {
-        _displayedTags = _allTags().where((element) => element.name.toLowerCase().contains(lowerCaseSearch)).toList();
-      }
-    });
   }
 
   void promptAddTag() {
@@ -174,14 +158,23 @@ class _TagsPickerState extends State<TagsPicker> {
         }).then((value) => _newTagController.clear());
   }
 
-  List<Tag> _allTags() {
-    return context.read<UserProvider>().tags;
+  List<Tag> getTags() {
+    if (_searchController.text.isNotEmpty) {
+      var lowerCaseSearch = _searchController.text.toLowerCase();
+      return context
+          .read<UserProvider>()
+          .tags
+          .where((element) => element.name.toLowerCase().contains(lowerCaseSearch))
+          .toList();
+    } else {
+      return context.watch<UserProvider>().tags;
+    }
   }
 
   String? validNewTag(String? tagName) {
     if (tagName == null || tagName.isEmpty) {
       return 'Name is required.';
-    } else if (_allTags().any((x) => x.name == tagName)) {
+    } else if (context.read<UserProvider>().tags.any((x) => x.name == tagName)) {
       return 'Tag already exists';
     } else {
       return null;
@@ -197,17 +190,16 @@ class _TagsPickerState extends State<TagsPicker> {
 
     setState(() {
       _selectedTags.add(tag);
-      _displayedTags.add(tag);
       hideKeyboard();
       _searchController.clear();
     });
   }
 
-  void selectTag(bool isSelected, int index) {
+  void selectTag(bool isSelected, Tag tag) {
     if (isSelected) {
-      _selectedTags.add(_displayedTags[index]);
+      _selectedTags.add(tag);
     } else {
-      _selectedTags.remove(_displayedTags[index]);
+      _selectedTags.removeWhere((t) => t.id == tag.id);
     }
     hideKeyboard();
     setState(() {});

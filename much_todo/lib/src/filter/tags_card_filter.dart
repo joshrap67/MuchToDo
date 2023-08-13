@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/widgets/tags_picker.dart';
-
-import '../domain/tag.dart';
-import '../utils/utils.dart';
+import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class TagsCardFilter extends StatefulWidget {
   final List<Tag> tags;

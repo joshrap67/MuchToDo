@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-
-import '../domain/room.dart';
+import 'package:much_todo/src/domain/room.dart';
 
 class RoomsProvider with ChangeNotifier {
   static final List<Room> initialData = [
     Room('A', 'Bedroom', 'Note', []),
     Room('B', 'Bathroom', 'Note', []),
     Room('C', 'Kitchen', 'Note', []),
-    Room('D', 'Unspecified Room', 'Note', []), // todo call it "No Room" and make it never be deletable? idk seems excessive
+    Room('D', 'Unspecified Room', 'Note', []),
   ];
   final List<Room> _rooms = initialData;
 

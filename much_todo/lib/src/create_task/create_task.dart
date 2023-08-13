@@ -1,6 +1,9 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
 import 'package:much_todo/src/create_task/people_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
@@ -16,13 +19,13 @@ import 'package:much_todo/src/widgets/links_card.dart';
 import 'package:much_todo/src/widgets/photos_card.dart';
 
 import 'package:intl/intl.dart';
-
-import '../domain/tag.dart';
+import 'package:provider/provider.dart';
 
 class CreateTask extends StatefulWidget {
   final Room? room;
+  final Task? task;
 
-  const CreateTask({super.key, this.room});
+  const CreateTask({super.key, this.room, this.task});
 
   @override
   State<CreateTask> createState() => _CreateTaskState();
@@ -38,7 +41,7 @@ class _CreateTaskState extends State<CreateTask> {
   int _priority = defaultPriority;
   int _effort = defaultEffort;
   List<String> _links = [];
-  List<XFile> _pictures = [];
+  List<XFile> _photos = [];
   List<Room> _selectedRooms = [];
   DateTime? _completeBy;
   List<Person> _people = [];
@@ -55,6 +58,30 @@ class _CreateTaskState extends State<CreateTask> {
     super.initState();
     if (widget.room != null) {
       _selectedRooms.add(widget.room!);
+    }
+    if (widget.task != null) {
+      _nameController.text = widget.task!.name;
+      _priority = widget.task!.priority;
+      _effort = widget.task!.effort;
+      _links = [...widget.task!.links];
+
+      CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(symbol: '');
+      _estimatedCostController.text =
+          widget.task!.estimatedCost != null ? formatter.format(widget.task!.estimatedCost!.toStringAsFixed(2)) : '';
+
+      _noteController.text = widget.task!.note ?? '';
+      _photos = widget.task!.photos.map((e) => XFile(e)).toList();
+      _completeBy = widget.task!.completeBy;
+      if (_completeBy != null) {
+        _completeByController.text = DateFormat('yyyy-MM-dd').format(_completeBy!);
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _people =
+            context.read<UserProvider>().people.where((x) => widget.task!.people.any((y) => y.id == x.id)).toList();
+        _tags = context.read<UserProvider>().tags.where((x) => widget.task!.tags.any((y) => y.id == x.id)).toList();
+        setState(() {});
+      });
     }
   }
 
@@ -134,12 +161,14 @@ class _CreateTaskState extends State<CreateTask> {
                         const Divider(),
                         TagsCard(
                           tags: _tags,
+                          key: ValueKey(_tags),
                           onChange: (tags) {
                             _tags = [...tags];
                           },
                         ),
                         PeopleCard(
                             people: _people,
+                            key: ValueKey(_people),
                             onChange: (people) {
                               _people = [...people];
                             }),
@@ -150,9 +179,9 @@ class _CreateTaskState extends State<CreateTask> {
                           },
                         ),
                         PhotosCard(
-                          photos: _pictures,
+                          photos: _photos,
                           onChange: (photos) {
-                            _pictures = [...photos];
+                            _photos = [...photos];
                           },
                         ),
                         const Divider(),
@@ -290,7 +319,7 @@ class _CreateTaskState extends State<CreateTask> {
         _tags.isNotEmpty ||
         _people.isNotEmpty ||
         _links.isNotEmpty ||
-        _pictures.isNotEmpty ||
+        _photos.isNotEmpty ||
         _completeByController.text.isNotEmpty;
   }
 
@@ -353,8 +382,8 @@ class _CreateTaskState extends State<CreateTask> {
       hideKeyboard();
       double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
       var createdTasks = TaskService.createTasks(
-          _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
-          photos: _pictures,
+          context, _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
+          photos: _photos,
           people: _people,
           note: _noteController.text.toString().trim(),
           links: _links,

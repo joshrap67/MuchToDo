@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/task_details/task_details.dart';
+import 'package:much_todo/src/widgets/priority_indicator.dart';
 
 class TaskCard extends StatefulWidget {
   final Task task;
@@ -24,7 +25,7 @@ class _TaskCardState extends State<TaskCard> {
             leading: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                getIcon(),
+                PriorityIndicator(task: widget.task),
                 const Text('Priority'),
               ],
             ),
@@ -53,23 +54,8 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   // todo show one row of tags? if overflow say something like (+2)
-
-  Icon getIcon() {
-    if (widget.task.priority == 1) {
-      return Icon(Icons.looks_one, color: Colors.red[500]);
-    } else if (widget.task.priority == 2) {
-      return Icon(Icons.looks_two, color: Colors.red[400]);
-    } else if (widget.task.priority == 3) {
-      return Icon(Icons.looks_3, color: Colors.red[300]);
-    } else if (widget.task.priority == 4) {
-      return Icon(Icons.looks_4, color: Colors.red[200]);
-    } else {
-      return Icon(Icons.looks_5, color: Colors.red[100]);
-    }
-  }
-
   String getRoom() {
-	  return widget.task.room.name;
+    return widget.task.room.name;
   }
 
   String getDueByDate() {

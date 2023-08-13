@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/person.dart';
 import 'package:much_todo/src/widgets/create_person.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-
-import '../domain/person.dart';
 
 class PeoplePicked {
   // emitted to any parent consuming the result of this widget popping
@@ -27,18 +26,12 @@ class _PeoplePickerState extends State<PeoplePicker> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _newTagController = TextEditingController();
 
-  List<Person> _displayedPeople = [];
   List<Person> _selectedPeople = [];
 
   @override
   void initState() {
     super.initState();
     _selectedPeople = [...widget.selectedPeople];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _displayedPeople = _allPeople();
-      });
-    });
   }
 
   @override
@@ -50,6 +43,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
 
   @override
   Widget build(BuildContext context) {
+    var people = getPeople();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -72,7 +66,9 @@ class _PeoplePickerState extends State<PeoplePicker> {
                   controller: _searchController,
                   hintText: 'Search People',
                   // todo bug with flutter... if you close keyboard while focus is on this you can't open keyboard again
-                  onChanged: filterPeople,
+                  onChanged: (_) {
+                    setState(() {});
+                  },
                   trailing: _searchController.text.isNotEmpty
                       ? <Widget>[
                           IconButton(
@@ -80,9 +76,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
                             onPressed: () {
                               _searchController.clear();
                               hideKeyboard();
-                              setState(() {
-                                filterPeople('');
-                              });
+                              setState(() {});
                             },
                           )
                         ]
@@ -91,15 +85,16 @@ class _PeoplePickerState extends State<PeoplePicker> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: _displayedPeople.length + 1,
+                  itemCount: people.length + 1,
                   // todo key?
                   itemBuilder: (BuildContext ctx, int index) {
-                    if (index < _displayedPeople.length) {
+                    if (index < people.length) {
+                      var person = people[index];
                       return CheckboxListTile(
-                          value: _selectedPeople.contains(_displayedPeople[index]),
-                          title: Text(_displayedPeople[index].name),
+                          value: _selectedPeople.contains(person),
+                          title: Text(person.name),
                           onChanged: (val) {
-                            selectPerson(val!, index);
+                            selectPerson(val!, person);
                           });
                     } else if (widget.showAdd) {
                       // footer
@@ -120,20 +115,17 @@ class _PeoplePickerState extends State<PeoplePicker> {
     );
   }
 
-  List<Person> _allPeople() {
-    return context.read<UserProvider>().people;
-  }
-
-  void filterPeople(String text) {
-    var lowerCaseSearch = text.toLowerCase();
-    setState(() {
-      if (lowerCaseSearch.isEmpty) {
-        _displayedPeople = _allPeople();
-      } else {
-        _displayedPeople =
-            _allPeople().where((element) => element.name.toLowerCase().contains(lowerCaseSearch)).toList();
-      }
-    });
+  List<Person> getPeople() {
+    if (_searchController.text.isNotEmpty) {
+      var lowerCaseSearch = _searchController.text.toLowerCase();
+      return context
+          .read<UserProvider>()
+          .people
+          .where((element) => element.name.toLowerCase().contains(lowerCaseSearch))
+          .toList();
+    } else {
+      return context.watch<UserProvider>().people;
+    }
   }
 
   Future<void> addPerson() async {
@@ -149,16 +141,15 @@ class _PeoplePickerState extends State<PeoplePicker> {
     if (createdPerson != null) {
       setState(() {
         _selectedPeople.add(createdPerson);
-        _displayedPeople.add(createdPerson);
       });
     }
   }
 
-  void selectPerson(bool isSelected, int index) {
+  void selectPerson(bool isSelected, Person person) {
     if (isSelected) {
-      _selectedPeople.add(_displayedPeople[index]);
+      _selectedPeople.add(person);
     } else {
-      _selectedPeople.remove(_displayedPeople[index]);
+      _selectedPeople.removeWhere((p) => p.id == person.id);
     }
     hideKeyboard();
     setState(() {});

@@ -6,10 +6,9 @@ import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/filter/people_card_filter.dart';
 import 'package:much_todo/src/filter/tags_card_filter.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:provider/provider.dart';
-
-import '../utils/utils.dart';
-import '../widgets/loading_button.dart';
 
 class FilterTasks extends StatefulWidget {
   const FilterTasks({super.key});

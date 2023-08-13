@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../domain/task.dart';
+import 'package:much_todo/src/domain/task.dart';
 
 class PeopleCardReadOnly extends StatefulWidget {
   final List<TaskPerson> people;
@@ -19,10 +18,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     return Card(
       child: Column(
         children: [
-          const ListTile(
-            title: Text('People'),
-            contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0)
-          ),
+          const ListTile(title: Text('People'), contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0)),
           Wrap(
             spacing: 8.0, // gap between adjacent chips
             runSpacing: 4.0, // gap between lines
@@ -66,13 +62,19 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
             ),
             ListTile(
               title: Text(person.email != null ? person.email! : 'No email'),
-              subtitle: const Text('Email'),
+              subtitle: const Text(
+                'Email',
+                style: TextStyle(fontSize: 12),
+              ),
               leading: const Icon(Icons.email),
               onTap: () => launchEmail(person),
             ),
             ListTile(
               title: Text(person.phoneNumber != null ? person.phoneNumber! : 'No phone number'),
-              subtitle: const Text('Phone Number'),
+              subtitle: const Text(
+                'Phone Number',
+                style: TextStyle(fontSize: 12),
+              ),
               leading: const Icon(Icons.phone),
               onTap: () => launchPhone(person),
             ),

@@ -10,9 +10,12 @@ class RoomCardReadOnly extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        subtitle: const Text('Room'),
-        contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
         title: Text(selectedRoom.name),
+        subtitle: const Text(
+          'Room',
+          style: TextStyle(fontSize: 12),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
       ),
     );
   }

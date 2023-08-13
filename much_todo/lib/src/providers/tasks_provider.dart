@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/domain/task.dart';
 import 'package:uuid/uuid.dart';
-
-import '../domain/task.dart';
 
 class TasksProvider with ChangeNotifier {
   static final List<Task> initialData = List.generate(10, (i) {
@@ -38,6 +37,20 @@ class TasksProvider with ChangeNotifier {
 
   void addTask(Task task) {
     _tasks.add(task);
+    notifyListeners();
+  }
+
+  void addTasks(List<Task> tasks) {
+    _tasks.addAll(tasks);
+    // todo sort/filter according to current filter/sort values
+    notifyListeners();
+  }
+
+  void updateTask(Task task) {
+    var index = _tasks.indexWhere((element) => element.id == task.id);
+    if (index >= 0) {
+      _tasks[index] = task;
+    }
     notifyListeners();
   }
 

@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:much_todo/src/create_task/create_task.dart';
+import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/filter/filter_tasks.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/task_details/task_details.dart';
 import 'package:much_todo/src/task_list/task_card.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-
-import '../domain/task.dart';
 
 class TaskList extends StatefulWidget {
   const TaskList({super.key});
@@ -19,19 +19,22 @@ class TaskList extends StatefulWidget {
   State<TaskList> createState() => _TaskListState();
 }
 
-class _TaskListState extends State<TaskList> {
+class _TaskListState extends State<TaskList> with TickerProviderStateMixin {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
+  late AnimationController _diceController;
 
-  List<Task> _tasks = [];
   bool _showFab = true;
+  bool _bounceDice = false;
   Timer showFabDebounce = Timer(const Duration(seconds: 1), () {});
 
   Future<void> debounceShowFab() async {}
 
   @override
   void initState() {
-    // need to wait for controller to be attached to list
+    setDiceController();
+
+    // need to wait for controller to be attached to list. When user scrolls hide the FAB so it doesn't block a card
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.position.isScrollingNotifier.addListener(() {
         showFabDebounce.cancel();
@@ -48,22 +51,21 @@ class _TaskListState extends State<TaskList> {
           });
         }
       });
-      setState(() {
-        _tasks = context.read<TasksProvider>().tasks;
-      });
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
     _searchController.dispose();
+    _diceController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    var tasks = getTasks();
     return Stack(
       children: [
         Column(
@@ -75,39 +77,76 @@ class _TaskListState extends State<TaskList> {
                   Expanded(
                     child: SearchBar(
                       leading: const Icon(Icons.search),
+                      onChanged: (val) {
+                        setState(() {});
+                      },
+                      controller: _searchController,
                       trailing: <Widget>[
                         IconButton(
                           onPressed: () {
                             filterTasks();
                           },
+                          tooltip: 'Filter',
                           icon: const Icon(Icons.filter_list_sharp),
-                          // label: const Text(''),
-                        )
+                        ),
+                        Visibility(
+                          visible: !_bounceDice,
+                          child: IconButton(
+                            onPressed: pickRandomTask,
+                            icon: SvgPicture.asset(
+                              'assets/icons/dice.svg',
+                              width: 24,
+                              height: 24,
+                              colorFilter: ColorFilter.mode(Theme.of(context).iconTheme.color!, BlendMode.srcIn),
+                            ),
+                            tooltip: 'Open Random Task',
+                          ),
+                        ),
+                        Visibility(
+                          visible: _bounceDice,
+                          child: ScaleTransition(
+                            scale: Tween(begin: 0.75, end: 1.25).animate(
+                              CurvedAnimation(
+                                parent: _diceController,
+                                curve: Curves.elasticOut,
+                              ),
+                            ),
+                            child: IconButton(
+                              onPressed: () {},
+                              isSelected: false,
+                              icon: SvgPicture.asset(
+                                'assets/icons/dice.svg',
+                                width: 24,
+                                height: 24,
+                                colorFilter: ColorFilter.mode(Theme.of(context).iconTheme.color!, BlendMode.srcIn),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: pickRandomTask,
-                    icon: const Icon(Icons.casino_rounded),
-					  tooltip: 'Open Random Task',
-                  )
                 ],
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                key: const PageStorageKey('task-list'),
-                itemCount: _tasks.length,
-                padding: const EdgeInsets.only(bottom: 65),
-                shrinkWrap: true,
-                controller: _scrollController,
-                itemBuilder: (ctx, index) {
-                  var task = _tasks[index];
-                  // todo swipe left to delete, swipe right to edit?
-                  return TaskCard(task: task);
-                },
-              ),
-            ),
+            tasks.isNotEmpty
+                ? Expanded(
+                    child: ListView.builder(
+                      key: const PageStorageKey('task-list'),
+                      itemCount: tasks.length,
+                      padding: const EdgeInsets.only(bottom: 65),
+                      shrinkWrap: true,
+                      controller: _scrollController,
+                      itemBuilder: (ctx, index) {
+                        var task = tasks[index];
+                        // todo swipe left to delete, swipe right to edit?
+                        return TaskCard(task: task);
+                      },
+                    ),
+                  )
+                : const Center(
+                    child: Text('No tasks'),
+                  ),
           ],
         ),
         Visibility(
@@ -135,35 +174,63 @@ class _TaskListState extends State<TaskList> {
     );
   }
 
+  List<Task> getTasks() {
+    if (_searchController.text.isNotEmpty) {
+      return context
+          .read<TasksProvider>()
+          .tasks
+          .where((element) => element.name.contains(_searchController.text))
+          .toList();
+    } else {
+      return context.watch<TasksProvider>().tasks;
+    }
+  }
+
   Future<void> launchAddTask() async {
     List<Task>? result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateTask()),
     );
     hideKeyboard();
-    // todo since using provider, this is not needed. just call method to get tasks with current filters
-    if (result != null && result.isNotEmpty) {
-      setState(() {
-        _tasks.addAll(result);
-        showSnackbar('${result.length} Tasks created.', context);
-      });
+    if (result != null && result.isNotEmpty && context.mounted) {
+      var msg = result.length == 1 ? 'Task created' : '${result.length} Tasks created';
+      showSnackbar(msg, context);
     }
   }
 
   Future<void> pickRandomTask() async {
-    var random = Random();
-    var index = random.nextInt(_tasks.length);
+    var tasks = context.read<TasksProvider>().tasks;
     hideKeyboard();
-    var result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => TaskDetails(task: _tasks[index])),
-    );
+    setState(() {
+      _bounceDice = true;
+      // there is probably a better way of doing this but for now this works
+      setDiceController();
+    });
+    await Future.delayed(const Duration(seconds: 2), () {});
+    setState(() {
+      _bounceDice = false;
+    });
+
+    var random = Random();
+    var index = random.nextInt(tasks.length);
+
+    if (context.mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TaskDetails(task: tasks[index])),
+      );
+    }
   }
 
   Future<void> filterTasks() async {
-    var result = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FilterTasks()),
     );
+  }
+
+  void setDiceController() {
+    _diceController = AnimationController(duration: const Duration(milliseconds: 700), vsync: this);
+    _diceController.repeat(reverse: true);
   }
 }

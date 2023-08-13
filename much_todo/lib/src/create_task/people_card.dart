@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/people_picker.dart';
-
-import '../domain/person.dart';
-import '../utils/utils.dart';
 
 class PeopleCard extends StatefulWidget {
   final List<Person> people;

@@ -3,8 +3,7 @@ import 'package:much_todo/src/rooms/rooms_list.dart';
 import 'package:much_todo/src/settings/settings_controller.dart';
 import 'package:much_todo/src/settings/settings_view.dart';
 import 'package:much_todo/src/task_list/task_list.dart';
-
-import '../utils/utils.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class Home extends StatefulWidget {
   final SettingsController controller;
@@ -47,7 +46,7 @@ class _HomeState extends State<Home> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.sticky_note_2_rounded), label: 'Tasks'),
             BottomNavigationBarItem(icon: Icon(Icons.house), label: 'Rooms'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+            BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
           ],
           currentIndex: _selectedIndex,
           onTap: onItemTapped,

@@ -38,12 +38,13 @@ class _PhotosGalleryState extends State<PhotosGallery> {
             PhotoViewGallery.builder(
               scrollPhysics: const BouncingScrollPhysics(),
               builder: (context, index) {
+                var url = widget.links[index];
                 return PhotoViewGalleryPageOptions(
-                  imageProvider: NetworkImage(widget.links[index]),
+                  imageProvider: NetworkImage(url),
                   initialScale: PhotoViewComputedScale.contained,
                   minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
                   maxScale: PhotoViewComputedScale.covered * 4.1,
-                  heroAttributes: PhotoViewHeroAttributes(tag: index.toString()),
+                  heroAttributes: PhotoViewHeroAttributes(tag: url.hashCode),
                 );
               },
               itemCount: widget.links.length,
@@ -55,7 +56,7 @@ class _PhotosGalleryState extends State<PhotosGallery> {
             Container(
               padding: const EdgeInsets.all(20.0),
               child: Text(
-                "Image ${currentIndex + 1}",
+                "Photo ${currentIndex + 1}",
                 style: const TextStyle(
                   fontSize: 17.0,
                 ),

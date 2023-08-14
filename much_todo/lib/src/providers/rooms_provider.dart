@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/utils/globals.dart';
 
 class RoomsProvider with ChangeNotifier {
   static final List<Room> initialData = [
@@ -19,6 +20,29 @@ class RoomsProvider with ChangeNotifier {
 
   void removeRoom(Room room) {
     _rooms.removeWhere((r) => r.id == room.id);
+    notifyListeners();
+  }
+
+  Room? updateRoom(String id, String name, String? note) {
+    Room? room;
+    var index = _rooms.indexWhere((element) => element.id == id);
+    if (index >= 0) {
+      _rooms[index].update(name, note);
+      room = _rooms[index];
+      notifyListeners();
+    }
+    return room;
+  }
+
+  void sortRooms(RoomSortingValues sort) {
+    switch (sort) {
+      case RoomSortingValues.alphaAscending:
+        _rooms.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case RoomSortingValues.alphaDescending:
+        _rooms.sort((a, b) => b.name.compareTo(a.name));
+        break;
+    }
     notifyListeners();
   }
 }

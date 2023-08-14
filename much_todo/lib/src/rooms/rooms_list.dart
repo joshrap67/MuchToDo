@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
 import 'package:much_todo/src/rooms/room_info_card.dart';
+import 'package:much_todo/src/utils/globals.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class RoomList extends StatefulWidget {
@@ -19,6 +21,7 @@ class _RoomListState extends State<RoomList> {
 
   bool _showFab = true;
   Timer showFabDebounce = Timer(const Duration(seconds: 1), () {});
+  RoomSortingValues sortValue = RoomSortingValues.alphaAscending;
 
   Future<void> debounceShowFab() async {}
 
@@ -48,8 +51,8 @@ class _RoomListState extends State<RoomList> {
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -59,17 +62,18 @@ class _RoomListState extends State<RoomList> {
       children: [
         Column(
           children: [
-            Card(
-              child: ListTile(
-                title: Text('${rooms.length} Total Rooms'),
-                subtitle: Text(
-                    '${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.sort),
-                  onPressed: () {},
-                ),
+            ListTile(
+              title: Text(
+                '${rooms.length} Total Rooms',
+                style: const TextStyle(fontSize: 22),
               ),
+              subtitle: Text(
+                '${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
+                style: const TextStyle(fontSize: 12),
+              ),
+              trailing: sortDropdown(),
             ),
+            const Divider(),
             Expanded(
               child: ListView.builder(
                 itemCount: rooms.length,
@@ -110,6 +114,33 @@ class _RoomListState extends State<RoomList> {
     );
   }
 
+  Widget sortDropdown() {
+    return PopupMenuButton(
+      icon: const Icon(Icons.sort_rounded),
+      tooltip: 'Sort Media',
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(15.0),
+        ),
+      ),
+      initialValue: sortValue,
+      itemBuilder: (context) {
+        hideKeyboard();
+        return <PopupMenuEntry<RoomSortingValues>>[
+          const PopupMenuItem<RoomSortingValues>(
+            value: RoomSortingValues.alphaAscending,
+            child: Text('Room Name (A-Z)'),
+          ),
+          const PopupMenuItem<RoomSortingValues>(
+            value: RoomSortingValues.alphaDescending,
+            child: Text('Room Name (Z-A)'),
+          ),
+        ];
+      },
+      onSelected: (RoomSortingValues result) => onSortSelected(result),
+    );
+  }
+
   int totalTasks() {
     var sum = 0;
     for (var room in context.read<RoomsProvider>().rooms) {
@@ -126,10 +157,16 @@ class _RoomListState extends State<RoomList> {
     return cost;
   }
 
-  Future<void> launchAddRoom() async {
-    await Navigator.push(
+  void launchAddRoom() {
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateRoom()),
     );
+  }
+
+  void onSortSelected(RoomSortingValues result) {
+    sortValue = result;
+    setState(() {});
+    context.read<RoomsProvider>().sortRooms(result);
   }
 }

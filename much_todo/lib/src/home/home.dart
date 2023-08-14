@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/rooms/rooms_list.dart';
-import 'package:much_todo/src/settings/settings_controller.dart';
-import 'package:much_todo/src/settings/settings_view.dart';
+import 'package:much_todo/src/providers/settings_provider.dart';
+import 'package:much_todo/src/settings/settings.dart';
 import 'package:much_todo/src/task_list/task_list.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class Home extends StatefulWidget {
-  final SettingsController controller;
+  final SettingsProvider controller;
 
   const Home({super.key, required this.controller});
 
@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _screens = <Widget>[const TaskList(), const RoomList(), SettingsView(controller: widget.controller)];
+    _screens = <Widget>[const TaskList(), const RoomList(), Settings(controller: widget.controller)];
     _navStack.add(_selectedIndex);
   }
 

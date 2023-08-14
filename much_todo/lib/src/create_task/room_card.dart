@@ -69,7 +69,6 @@ class _RoomCardState extends State<RoomCard> {
   }
 
   Widget? getSubtitle() {
-    // todo shake the card?
     if (widget.showError) {
       return Text(
         'Room is required',

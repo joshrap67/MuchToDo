@@ -41,4 +41,30 @@ class UserProvider with ChangeNotifier {
     _user.people.add(person);
     notifyListeners();
   }
+
+  void updateTag(Tag tag) {
+    var index = _user.tags.indexWhere((t) => t.id == tag.id);
+    if (index >= 0) {
+      _user.tags[index] = tag;
+    }
+    notifyListeners();
+  }
+
+  void updatePerson(Person person) {
+    var index = _user.people.indexWhere((p) => p.id == person.id);
+    if (index >= 0) {
+      _user.people[index] = person;
+    }
+    notifyListeners();
+  }
+
+  void deleteTag(Tag tag) {
+    _user.tags.removeWhere((t) => t.id == tag.id);
+    notifyListeners();
+  }
+
+  void deletePerson(Person person) {
+    _user.people.removeWhere((p) => p.id == person.id);
+    notifyListeners();
+  }
 }

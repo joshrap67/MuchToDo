@@ -36,6 +36,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin {
 
     // need to wait for controller to be attached to list. When user scrolls hide the FAB so it doesn't block a card
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // todo will throw error if list is empty
       _scrollController.position.isScrollingNotifier.addListener(() {
         showFabDebounce.cancel();
         if (_scrollController.position.isScrollingNotifier.value && _showFab) {

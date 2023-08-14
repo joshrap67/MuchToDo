@@ -53,16 +53,17 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
     return Column(
       children: [
         const Divider(),
-        Card(
-          child: ListTile(
-            title: Text(getTitle()),
-            subtitle: Text(getSubTitle()),
-            trailing: IconButton(
-              onPressed: filterTasks,
-              icon: const Icon(Icons.filter_list_sharp),
-            ),
-            contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
+        ListTile(
+          title: Text(
+            getTitle(),
+            style: const TextStyle(fontSize: 22),
           ),
+          subtitle: getSubTitle(),
+          trailing: IconButton(
+            onPressed: filterTasks,
+            icon: const Icon(Icons.filter_list_sharp),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
         ),
         Expanded(
           child: Scrollbar(
@@ -107,7 +108,7 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
     return _tasks.isEmpty ? 'Room has no associated Tasks' : '${_tasks.length} Tasks';
   }
 
-  String getSubTitle() {
+  Widget? getSubTitle() {
     // todo need to make clear on task list that it only includes aggregated cost of non completed ones
     var totalCost = 0.0;
     for (var e in _tasks) {
@@ -115,11 +116,15 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
         totalCost += e.estimatedCost!;
       }
     }
-    return _tasks.isEmpty ? '' : '${NumberFormat.currency(symbol: '\$').format(totalCost)} Total Estimated Cost';
+    return _tasks.isNotEmpty
+        ? Text(
+            '${NumberFormat.currency(symbol: '\$').format(totalCost)} Total Estimated Cost',
+            style: const TextStyle(fontSize: 12),
+          )
+        : null;
   }
 
   void filterTasks() {
-    // todo max amount check
     showDialog<void>(
         context: context,
         builder: (ctx) {

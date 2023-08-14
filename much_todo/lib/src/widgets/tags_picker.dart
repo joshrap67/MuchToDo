@@ -129,10 +129,9 @@ class _TagsPickerState extends State<TagsPicker> {
               ),
               TextButton(
                 onPressed: () {
-                  // todo loading indicator
                   if (formKey.currentState!.validate()) {
-                    addTag(_newTagController.text);
                     Navigator.pop(context, 'OK');
+                    addTag(_newTagController.text);
                   }
                 },
                 child: const Text('CREATE'),
@@ -149,7 +148,7 @@ class _TagsPickerState extends State<TagsPicker> {
                     label: Text('Tag name'),
                     border: OutlineInputBorder(),
                   ),
-                  validator: validNewTag,
+                  validator: (val) => validNewTag(val, context.read<UserProvider>().tags),
                   controller: _newTagController,
                 ),
               ),
@@ -171,22 +170,12 @@ class _TagsPickerState extends State<TagsPicker> {
     }
   }
 
-  String? validNewTag(String? tagName) {
-    if (tagName == null || tagName.isEmpty) {
-      return 'Name is required.';
-    } else if (context.read<UserProvider>().tags.any((x) => x.name == tagName)) {
-      return 'Tag already exists';
-    } else {
-      return null;
-    }
-  }
-
-  void addTag(String tagName) {
+  Future<void> addTag(String tagName) async {
     if (tagName.isEmpty) {
       return;
     }
 
-    var tag = UserService.createTag(context, tagName.trim());
+    var tag = await UserService.createTag(context, tagName.trim());
 
     setState(() {
       _selectedTags.add(tag);

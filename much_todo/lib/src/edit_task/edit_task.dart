@@ -128,6 +128,16 @@ class _EditTaskState extends State<EditTask> {
                             ),
                           ),
                         ),
+                        RoomCard(
+                          selectedRoom: _selectedRoom,
+                          showError: _roomError,
+                          onRoomChange: (room) {
+                            setState(() {
+                              _roomError = false;
+                              _selectedRoom = room;
+                            });
+                          },
+                        ),
                         PriorityPicker(
                           priority: _priority,
                           onChange: (p) {
@@ -143,16 +153,6 @@ class _EditTaskState extends State<EditTask> {
                             setState(() {
                               hideKeyboard();
                               _effort = e;
-                            });
-                          },
-                        ),
-                        RoomCard(
-                          selectedRoom: _selectedRoom,
-                          showError: _roomError,
-                          onRoomChange: (room) {
-                            setState(() {
-                              _roomError = false;
-                              _selectedRoom = room;
                             });
                           },
                         ),
@@ -364,8 +364,8 @@ class _EditTaskState extends State<EditTask> {
     await Future.delayed(const Duration(seconds: 2), () {
       hideKeyboard();
       double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-      var task = TaskService.editTask(
-          context, widget.task.id, _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRoom!,
+      var task = TaskService.editTask(context, widget.task.id, _nameController.text.toString().trim(), _priority,
+          _effort, 'createdBy', _selectedRoom!,
           photos: _photos,
           people: _people,
           note: _noteController.text.toString().trim(),

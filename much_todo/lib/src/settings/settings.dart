@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/user.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/user/user_people.dart';
+import 'package:much_todo/src/user/user_tags.dart';
 import 'package:provider/provider.dart';
+import 'package:much_todo/src/providers/settings_provider.dart';
 
-import 'settings_controller.dart';
-
-class SettingsView extends StatefulWidget {
-  const SettingsView({super.key, required this.controller});
+class Settings extends StatefulWidget {
+  const Settings({super.key, required this.controller});
 
   static const routeName = '/settings';
 
-  final SettingsController controller;
+  final SettingsProvider controller;
 
   @override
-  State<SettingsView> createState() => _SettingsViewState();
+  State<Settings> createState() => _SettingsState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
@@ -57,22 +58,14 @@ class _SettingsViewState extends State<SettingsView> {
             const Divider(),
             Card(
               child: ListTile(
-                title: Text(user.tags.isNotEmpty ? '${user.tags.length} Tags' : ''),
-                subtitle: const Text(
-                  'Tags',
-                  style: TextStyle(fontSize: 12),
-                ),
-                trailing: IconButton(onPressed: () {}, icon: const Icon(Icons.arrow_forward)),
+                title: Text(user.tags.isNotEmpty ? '${user.tags.length} Tags' : 'No tags'),
+                trailing: IconButton(onPressed: launchTags, icon: const Icon(Icons.arrow_forward)),
               ),
             ),
             Card(
               child: ListTile(
-                title: Text(user.people.isNotEmpty ? '${user.people.length} People' : ''),
-                subtitle: const Text(
-                  'People',
-                  style: TextStyle(fontSize: 12),
-                ),
-                trailing: IconButton(onPressed: () {}, icon: const Icon(Icons.arrow_forward)),
+                title: Text(user.people.isNotEmpty ? '${user.people.length} People' : 'No people'),
+                trailing: IconButton(onPressed: launchPeople, icon: const Icon(Icons.arrow_forward)),
               ),
             ),
             Card(
@@ -103,6 +96,24 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void launchTags() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const UserTags(),
+      ),
+    );
+  }
+
+  void launchPeople() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const UserPeople(),
       ),
     );
   }

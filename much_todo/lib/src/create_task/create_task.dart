@@ -130,6 +130,16 @@ class _CreateTaskState extends State<CreateTask> {
                             ),
                           ),
                         ),
+                        RoomCard(
+                          selectedRooms: _selectedRooms,
+                          showError: _roomError,
+                          onRoomsChange: (room) {
+                            setState(() {
+                              _roomError = false;
+                              _selectedRooms = room;
+                            });
+                          },
+                        ),
                         PriorityPicker(
                           priority: _priority,
                           onChange: (p) {
@@ -145,16 +155,6 @@ class _CreateTaskState extends State<CreateTask> {
                             setState(() {
                               hideKeyboard();
                               _effort = e;
-                            });
-                          },
-                        ),
-                        RoomCard(
-                          selectedRooms: _selectedRooms,
-                          showError: _roomError,
-                          onRoomsChange: (room) {
-                            setState(() {
-                              _roomError = false;
-                              _selectedRooms = room;
                             });
                           },
                         ),

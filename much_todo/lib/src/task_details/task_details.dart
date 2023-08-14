@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/create_task/create_task.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/edit_task/edit_task.dart';
+import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/task_details/links_card_read_only.dart';
 import 'package:much_todo/src/task_details/people_card_read_only.dart';
 import 'package:much_todo/src/task_details/photos_card_read_only.dart';
@@ -84,29 +85,27 @@ class _TaskDetailsState extends State<TaskDetails> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: AutoSizeText(_task.name),
-                      subtitle: _task.note != null ? Text(_task.note!) : null,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: _task.completeBy != null
-                              ? Text(
-                                  getDueByDate(),
-                                  style: const TextStyle(fontSize: 11),
-                                )
-                              : const Text(''),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              Column(
+                children: [
+                  ListTile(
+                    title: AutoSizeText(_task.name),
+                    subtitle: _task.note != null ? Text(_task.note!) : null,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _task.completeBy != null
+                            ? Text(
+                                getDueByDate(),
+                                style: const TextStyle(fontSize: 11),
+                              )
+                            : const Text(''),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               Column(
                 children: [
@@ -251,6 +250,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  deleteTask();
                 },
                 child: const Text('DELETE'),
               )
@@ -260,6 +260,11 @@ class _TaskDetailsState extends State<TaskDetails> {
             content: const Text('Are you sure you wish to delete this task?'),
           );
         });
+  }
+
+  Future<void> deleteTask() async {
+    TaskService.deleteTask(context, widget.task);
+    Navigator.of(context).pop();
   }
 
   Future<void> editTask() async {
@@ -280,7 +285,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> duplicateTask() async {
-    var result = await Navigator.push(
+    List<Task>? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CreateTask(
@@ -288,6 +293,10 @@ class _TaskDetailsState extends State<TaskDetails> {
         ),
       ),
     );
+    if (result != null && result.isNotEmpty && context.mounted) {
+      var msg = result.length == 1 ? 'Task created' : '${result.length} Tasks created';
+      showSnackbar(msg, context);
+    }
   }
 
 // todo allow for notifications?

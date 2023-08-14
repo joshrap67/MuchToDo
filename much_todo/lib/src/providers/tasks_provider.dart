@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/domain/task.dart';
@@ -56,6 +58,54 @@ class TasksProvider with ChangeNotifier {
 
   void removeTask(Task task) {
     _tasks.removeWhere((t) => t.id == task.id);
+    notifyListeners();
+  }
+
+  void removeTagFromTasks(Tag tag) {
+    for (var task in _tasks) {
+      task.tags.removeWhere((t) => t.id == tag.id);
+    }
+    notifyListeners();
+  }
+
+  void updateTagForTasks(Tag tag) {
+    for (var task in _tasks) {
+      var index = task.tags.indexWhere((t) => t.id == tag.id);
+      if (index >= 0) {
+        task.tags[index] = tag.convert();
+      }
+    }
+    notifyListeners();
+  }
+
+  void updatePersonForTasks(Person person) {
+    for (var task in _tasks) {
+      var index = task.people.indexWhere((p) => p.id == person.id);
+      if (index >= 0) {
+        task.people[index] = person.convert();
+      }
+    }
+    notifyListeners();
+  }
+
+  void removePersonFromTasks(Person person) {
+    for (var task in _tasks) {
+      task.people.removeWhere((p) => p.id == person.id);
+    }
+    notifyListeners();
+  }
+
+  void updateRoom(String id, String name) {
+    for (var task in _tasks) {
+      if (task.room.id == id) {
+        task.room.name = name;
+      }
+    }
+    notifyListeners();
+  }
+
+  void removeTasksFromRoomId(String id) {
+    _tasks.removeWhere((t) => t.room.id == id);
     notifyListeners();
   }
 }

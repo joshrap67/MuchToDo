@@ -11,6 +11,11 @@ class Room {
 
   Room(this.id, this.name, this.note, this.tasks);
 
+  void update(String name, String? note){
+	  this.name = name;
+	  this.note = note;
+  }
+
   @override
   String toString() {
     return 'Room{Id: $id, name: $name, note: $note, tasks: $tasks}';

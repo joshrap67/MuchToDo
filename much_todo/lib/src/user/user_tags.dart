@@ -86,9 +86,10 @@ class _UserTagsState extends State<UserTags> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: promptAddTag,
-          child: const Icon(Icons.add),
+          label: const Text('ADD TAG'),
+          icon: const Icon(Icons.add),
         ),
       ),
     );
@@ -163,6 +164,7 @@ class _UserTagsState extends State<UserTags> {
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: ListTile(
                 title: Text(tag.name),
+                subtitle: Text('Used with ${tag.tasks.length} ${tag.tasks.length == 1 ? 'Task' : 'Tasks'}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),

@@ -41,9 +41,14 @@ class RoomTask {
   String id;
   String name;
   double? estimatedCost;
-  // todo isActive
+  // todo isActive?
 
   RoomTask(this.id, this.name, this.estimatedCost);
+
+  void update(String name, double? estimatedCost){
+	  this.name = name;
+	  this.estimatedCost = estimatedCost;
+  }
 
   @override
   String toString() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/utils/globals.dart';
 
 class RoomsProvider with ChangeNotifier {
@@ -42,6 +43,38 @@ class RoomsProvider with ChangeNotifier {
       case RoomSortingValues.alphaDescending:
         _rooms.sort((a, b) => b.name.compareTo(a.name));
         break;
+    }
+    notifyListeners();
+  }
+
+  void updateTask(Task task) {
+    for (var room in _rooms) {
+      for (var roomTask in room.tasks) {
+        if (roomTask.id == task.id) {
+          roomTask.update(task.name, task.estimatedCost);
+          notifyListeners();
+          return;
+        }
+      }
+    }
+  }
+
+  void addTasks(List<Task> createdTasks) {
+    Map<String, Task> roomIdToTask = {};
+    for (var task in createdTasks) {
+      roomIdToTask[task.room.id] = task;
+    }
+    for (var room in _rooms) {
+      if (roomIdToTask.containsKey(room.id)) {
+        room.tasks.add(roomIdToTask[room.id]!.convert());
+      }
+    }
+    notifyListeners();
+  }
+
+  void removeTask(Task task) {
+    for (var room in _rooms) {
+      room.tasks.removeWhere((element) => element.id == task.id);
     }
     notifyListeners();
   }

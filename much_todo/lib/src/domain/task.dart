@@ -1,3 +1,5 @@
+import 'package:much_todo/src/domain/room.dart';
+
 class Task {
   static const lowEffort = 1;
   static const mediumEffort = 2;
@@ -64,6 +66,10 @@ class Task {
     return 'Task{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
         'room: $room, estimatedCost: $estimatedCost, note: $note, links: $links, photos: $photos, '
         'people: $people, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
+  }
+
+  RoomTask convert(){
+	  return RoomTask(id, name, estimatedCost);
   }
 }
 

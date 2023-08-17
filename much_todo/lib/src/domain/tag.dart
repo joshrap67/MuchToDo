@@ -3,9 +3,9 @@ import 'package:much_todo/src/domain/task.dart';
 class Tag {
   String id;
   String name;
-  List<String> tasks;
+  List<String> tasks = [];
 
-  Tag(this.id, this.name, {this.tasks = const []});
+  Tag(this.id, this.name);
 
   TaskTag convert() {
     return TaskTag(id, name);

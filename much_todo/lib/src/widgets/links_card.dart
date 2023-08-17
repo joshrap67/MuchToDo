@@ -22,7 +22,6 @@ class LinkWrapper {
 class _LinksCardState extends State<LinksCard> {
   final List<TextEditingController> _linkControllers = [];
   final ScrollController _scrollController = ScrollController();
-  final FocusNode _focusNode = FocusNode();
 
   bool _showAddUrl = false;
 
@@ -55,7 +54,7 @@ class _LinksCardState extends State<LinksCard> {
             child: ExpansionTile(
               textColor: Theme.of(context).colorScheme.primary,
               title: Text(getTitle()),
-			  leading: const Icon(Icons.link),
+              leading: const Icon(Icons.link),
               children: [
                 const Divider(),
                 Container(
@@ -77,7 +76,6 @@ class _LinksCardState extends State<LinksCard> {
                                     controller: _linkControllers[index],
                                     decoration: const InputDecoration(hintText: 'URL'),
                                     onChanged: onChange,
-                                    focusNode: index == _linkControllers.length - 1 ? _focusNode : null,
                                   ),
                                 ),
                               ),
@@ -91,6 +89,7 @@ class _LinksCardState extends State<LinksCard> {
               onExpansionChanged: (newVal) {
                 setState(() {
                   _showAddUrl = newVal;
+                  hideKeyboard();
                 });
               },
             ),
@@ -108,17 +107,22 @@ class _LinksCardState extends State<LinksCard> {
     );
   }
 
-  String getTitle(){
-	  return _linkControllers.isEmpty
-		  ? 'No links added'
-		  : '${_linkControllers.length} ${_linkControllers.length == 1 ? 'link' : 'links'} added';
+  String getTitle() {
+    return _linkControllers.isEmpty
+        ? 'No links added'
+        : '${_linkControllers.length} ${_linkControllers.length == 1 ? 'link' : 'links'} added';
   }
 
   void addLink() {
     setState(() {
       _linkControllers.add(TextEditingController());
-      // todo maybe i shouldn't do this for the user? in most cases i would assume they would just be pasting so grabbing focus might be annoying
-      SchedulerBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
     });
   }
 

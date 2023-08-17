@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:much_todo/src/domain/person.dart';
 import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/domain/user.dart';
 import 'package:uuid/uuid.dart';
 
@@ -65,6 +66,53 @@ class UserProvider with ChangeNotifier {
 
   void deletePerson(Person person) {
     _user.people.removeWhere((p) => p.id == person.id);
+    notifyListeners();
+  }
+
+  void addTasks(List<Task> createdTasks) {
+    Map<String, Tag> tagIdToTag = {};
+    Map<String, Person> personIdToPerson = {};
+    // for quicker lookup
+    for (var tag in _user.tags) {
+      tagIdToTag[tag.id] = tag;
+    }
+    for (var person in _user.people) {
+      personIdToPerson[person.id] = person;
+    }
+
+    for (var task in createdTasks) {
+      for (TaskTag taskTag in task.tags) {
+        Tag? tag = tagIdToTag[taskTag.id];
+        tag?.tasks.add(task.id);
+      }
+      for (TaskPerson taskPerson in task.people) {
+        Person? person = personIdToPerson[taskPerson.id];
+        person?.tasks.add(task.id);
+      }
+    }
+
+    notifyListeners();
+  }
+
+  void updateTask(Task task) {
+    for (var person in _user.people) {
+      person.tasks.removeWhere((t) => t == task.id);
+    }
+    for (var person in _user.tags) {
+      person.tasks.removeWhere((t) => t == task.id);
+    }
+    // honestly easier to just assume the tag or person was removed from the task, then add it back instead of keeping track of old task
+    addTasks([task]);
+  }
+
+  void removeTask(Task task) {
+    for (var person in _user.people) {
+      person.tasks.removeWhere((t) => t == task.id);
+    }
+    for (var person in _user.tags) {
+      person.tasks.removeWhere((t) => t == task.id);
+    }
+
     notifyListeners();
   }
 }

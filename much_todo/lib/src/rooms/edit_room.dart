@@ -81,10 +81,11 @@ class _EditRoomState extends State<EditRoom> {
 
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
+      hideKeyboard();
       var name = _nameController.text.trim();
       var note = _noteController.text.trim().isNotEmpty ? _noteController.text.trim() : null;
       var room = await RoomsService.editRoom(context, widget.room.id, name, note);
-      hideKeyboard();
+
       if (context.mounted) {
         Navigator.pop(context, room);
       }

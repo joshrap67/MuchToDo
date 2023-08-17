@@ -126,11 +126,12 @@ class _CreatePersonState extends State<CreatePerson> {
 
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
+      hideKeyboard();
       String email = _emailController.text.trim();
       String phone = _numberController.text.trim();
       var person = await UserService.createPerson(
           context, _nameController.text.trim(), email.isNotEmpty ? email : null, phone.isNotEmpty ? phone : null);
-      hideKeyboard();
+
       if (context.mounted) {
         Navigator.pop(context, person);
       }

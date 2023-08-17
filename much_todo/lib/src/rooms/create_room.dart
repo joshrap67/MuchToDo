@@ -84,8 +84,8 @@ class _CreateRoomState extends State<CreateRoom> {
 
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      var room = await RoomsService.createRoom(context, _nameController.text, note: _noteController.text);
       hideKeyboard();
+      var room = await RoomsService.createRoom(context, _nameController.text, note: _noteController.text);
       if (context.mounted) {
         Navigator.pop(context, room);
       }

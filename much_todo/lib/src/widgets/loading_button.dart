@@ -41,6 +41,7 @@ class _LoadingButtonState extends State<LoadingButton> {
     try {
       await widget.onSubmit();
     } catch (e) {
+      print(e);
       // todo log
     } finally {
       setState(() {

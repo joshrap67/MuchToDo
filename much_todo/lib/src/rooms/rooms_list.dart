@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
@@ -16,38 +15,11 @@ class RoomList extends StatefulWidget {
   State<RoomList> createState() => _RoomListState();
 }
 
-class _RoomListState extends State<RoomList> {
+class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
 
   bool _showFab = true;
-  Timer showFabDebounce = Timer(const Duration(seconds: 1), () {});
-  RoomSortingValues sortValue = RoomSortingValues.alphaAscending;
-
-  Future<void> debounceShowFab() async {}
-
-  @override
-  void initState() {
-    super.initState();
-
-    // need to wait for controller to be attached to list
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.position.isScrollingNotifier.addListener(() {
-        showFabDebounce.cancel();
-        if (_scrollController.position.isScrollingNotifier.value && _showFab) {
-          // second conditional check is to avoid constant re-renders
-          setState(() {
-            _showFab = false;
-          });
-        } else if (!_scrollController.position.isScrollingNotifier.value && !_showFab) {
-          showFabDebounce = Timer(const Duration(milliseconds: 800), () {
-            setState(() {
-              _showFab = true;
-            });
-          });
-        }
-      });
-    });
-  }
+  RoomSortingValues sortValue = RoomSortingValues.alphaAscending; // todo shared prefs?
 
   @override
   void dispose() {
@@ -57,60 +29,74 @@ class _RoomListState extends State<RoomList> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var rooms = context.watch<RoomsProvider>().rooms;
-    return Stack(
-      children: [
-        Column(
-          children: [
-            ListTile(
-              title: Text(
-                '${rooms.length} Total Rooms',
-                style: const TextStyle(fontSize: 22),
+    return NotificationListener<UserScrollNotification>(
+      onNotification: (notification) {
+        var direction = notification.direction;
+        setState(() {
+          if (direction == ScrollDirection.reverse) {
+            _showFab = false;
+          } else if (direction == ScrollDirection.forward) {
+            _showFab = true;
+          }
+        });
+        return true;
+      },
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              ListTile(
+                title: Text(
+                  '${rooms.length} Total Rooms',
+                  style: const TextStyle(fontSize: 22),
+                ),
+                subtitle: Text(
+                  '${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+                trailing: sortDropdown(),
               ),
-              subtitle: Text(
-                '${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
-                style: const TextStyle(fontSize: 12),
+              const Divider(),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: rooms.length,
+                  controller: _scrollController,
+                  padding: const EdgeInsets.only(bottom: 65),
+                  itemBuilder: (ctx, index) {
+                    var room = rooms[index];
+                    return RoomInfoCard(room: room);
+                  },
+                ),
               ),
-              trailing: sortDropdown(),
-            ),
-            const Divider(),
-            Expanded(
-              child: ListView.builder(
-                itemCount: rooms.length,
-                shrinkWrap: true,
-                controller: _scrollController,
-                key: const PageStorageKey('room-list'),
-                padding: const EdgeInsets.only(bottom: 65),
-                itemBuilder: (ctx, index) {
-                  var room = rooms[index];
-                  return RoomInfoCard(room: room);
-                },
-              ),
-            ),
-          ],
-        ),
-        Visibility(
-          visible: true,
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 150),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(scale: animation, child: child);
-                },
-                child: _showFab
-                    ? FloatingActionButton(
-                        onPressed: launchAddRoom,
-                        child: const Icon(Icons.add),
-                      )
-                    : null,
+            ],
+          ),
+          Visibility(
+            visible: true,
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    return ScaleTransition(scale: animation, child: child);
+                  },
+                  child: _showFab
+                      ? FloatingActionButton.extended(
+                          onPressed: launchAddRoom,
+                          label: const Text('ADD ROOM'),
+                          icon: const Icon(Icons.add),
+                          heroTag: 'RoomFab',
+                        )
+                      : null,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -141,6 +127,12 @@ class _RoomListState extends State<RoomList> {
     );
   }
 
+  void onSortSelected(RoomSortingValues result) {
+	  sortValue = result;
+	  setState(() {});
+	  context.read<RoomsProvider>().sortRooms(result);
+  }
+
   int totalTasks() {
     var sum = 0;
     for (var room in context.read<RoomsProvider>().rooms) {
@@ -164,9 +156,6 @@ class _RoomListState extends State<RoomList> {
     );
   }
 
-  void onSortSelected(RoomSortingValues result) {
-    sortValue = result;
-    setState(() {});
-    context.read<RoomsProvider>().sortRooms(result);
-  }
+  @override
+  bool get wantKeepAlive => true;
 }

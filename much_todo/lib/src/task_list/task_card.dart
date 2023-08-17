@@ -38,7 +38,7 @@ class _TaskCardState extends State<TaskCard> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
                 child: Text(
-                  getDueByDate(),
+                  getBottomLeftWidget(),
                   style: const TextStyle(fontSize: 11),
                 ),
               ),
@@ -58,13 +58,15 @@ class _TaskCardState extends State<TaskCard> {
     return widget.task.room.name;
   }
 
-  String getDueByDate() {
-    if (widget.task.completeBy == null) {
+  String getBottomLeftWidget() {
+    if (widget.task.isCompleted) {
+      return 'Completed';
+    } else if (widget.task.completeBy == null) {
       return '';
     } else {
       return 'Due ${DateFormat.yMd().format(widget.task.completeBy!)}';
     }
-    // todo bold when close to date?
+    // todo bold when close to date? if past date indicate?
   }
 
   String getTitle() {

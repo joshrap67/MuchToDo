@@ -86,9 +86,10 @@ class _UserPeopleState extends State<UserPeople> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: addPerson,
-          child: const Icon(Icons.add),
+          label: const Text('ADD PERSON'),
+          icon: const Icon(Icons.add),
         ),
       ),
     );
@@ -131,6 +132,7 @@ class _UserPeopleState extends State<UserPeople> {
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: ListTile(
                 title: Text(person.name),
+                subtitle: Text('Associated with ${person.tasks.length} ${person.tasks.length == 1 ? 'Task' : 'Tasks'}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),

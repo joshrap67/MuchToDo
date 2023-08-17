@@ -24,8 +24,21 @@ class TaskDetails extends StatefulWidget {
 
 enum TaskOptions { edit, duplicate, delete }
 
+enum StatusOptions {
+  notStarted(1, 'Not Started', Icon(Icons.cancel)),
+  started(2, 'Started', Icon(Icons.pending)),
+  completed(3, 'Completed', Icon(Icons.check));
+
+  const StatusOptions(this.value, this.label, this.icon);
+
+  final int value;
+  final String label;
+  final Icon icon;
+}
+
 class _TaskDetailsState extends State<TaskDetails> {
   late Task _task;
+  StatusOptions _status = StatusOptions.notStarted;
 
   @override
   void initState() {
@@ -109,31 +122,41 @@ class _TaskDetailsState extends State<TaskDetails> {
               ),
               Column(
                 children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.pending),
-                            label: const Text('START'),
-                            onPressed: () {},
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                                  labelText: 'Status',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<StatusOptions>(
+                                    value: _status,
+                                    onChanged: (StatusOptions? value) {
+                                      setState(() {
+                                        _status = value!;
+                                      });
+                                    },
+                                    // decoration: const InputDecoration(border: OutlineInputBorder()),
+                                    items: StatusOptions.values
+                                        .map<DropdownMenuItem<StatusOptions>>((StatusOptions value) {
+                                      return DropdownMenuItem<StatusOptions>(value: value, child: Text(value.label));
+                                    }).toList(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.check),
-                            label: const Text('COMPLETE'),
-                            onPressed: () {},
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Row(
                     children: [

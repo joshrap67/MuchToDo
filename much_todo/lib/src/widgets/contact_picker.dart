@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/person.dart';
-import 'package:much_todo/src/widgets/create_person.dart';
+import 'package:much_todo/src/domain/contact.dart';
+import 'package:much_todo/src/widgets/create_contact.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 
-class PeoplePicked {
+class ContactsPicked {
   // emitted to any parent consuming the result of this widget popping
-  final List<Person> selectedPeople;
+  final List<Contact> selectedContacts;
 
-  PeoplePicked(this.selectedPeople);
+  ContactsPicked(this.selectedContacts);
 }
 
-class PeoplePicker extends StatefulWidget {
-  final List<Person> selectedPeople;
+class ContactPicker extends StatefulWidget {
+  final List<Contact> selectedContacts;
   final bool showAdd;
 
-  const PeoplePicker({super.key, required this.selectedPeople, this.showAdd = true});
+  const ContactPicker({super.key, required this.selectedContacts, this.showAdd = true});
 
   @override
-  State<PeoplePicker> createState() => _PeoplePickerState();
+  State<ContactPicker> createState() => _ContactPickerState();
 }
 
-class _PeoplePickerState extends State<PeoplePicker> {
+class _ContactPickerState extends State<ContactPicker> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _newTagController = TextEditingController();
 
-  List<Person> _selectedPeople = [];
+  List<Contact> _selectedContacts = [];
 
   @override
   void initState() {
     super.initState();
-    _selectedPeople = [...widget.selectedPeople];
+    _selectedContacts = [...widget.selectedContacts];
   }
 
   @override
@@ -43,18 +43,18 @@ class _PeoplePickerState extends State<PeoplePicker> {
 
   @override
   Widget build(BuildContext context) {
-    var people = getPeople();
+    var contacts = getContacts();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text('Select People'),
+        title: const Text('Select Contacts'),
         scrolledUnderElevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, PeoplePicked(_selectedPeople));
+            Navigator.pop(context, ContactsPicked(_selectedContacts));
             return false;
           },
           child: Column(
@@ -64,7 +64,7 @@ class _PeoplePickerState extends State<PeoplePicker> {
                 child: SearchBar(
                   leading: const Icon(Icons.search),
                   controller: _searchController,
-                  hintText: 'Search People',
+                  hintText: 'Search Contacts',
                   // todo bug with flutter... if you close keyboard while focus is on this you can't open keyboard again
                   onChanged: (_) {
                     setState(() {});
@@ -85,22 +85,22 @@ class _PeoplePickerState extends State<PeoplePicker> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: people.length + 1,
+                  itemCount: contacts.length + 1,
                   // todo key?
                   itemBuilder: (BuildContext ctx, int index) {
-                    if (index < people.length) {
-                      var person = people[index];
+                    if (index < contacts.length) {
+                      var contact = contacts[index];
                       return CheckboxListTile(
-                          value: _selectedPeople.contains(person),
-                          title: Text(person.name),
+                          value: _selectedContacts.contains(contact),
+                          title: Text(contact.name),
                           onChanged: (val) {
-                            selectPerson(val!, person);
+                            selectContact(val!, contact);
                           });
                     } else if (widget.showAdd) {
                       // footer
                       return OutlinedButton.icon(
-                        label: const Text('DON\'T SEE A PERSON? CREATE ONE'),
-                        onPressed: addPerson,
+                        label: const Text('DON\'T SEE A CONTACT? CREATE ONE'),
+                        onPressed: addContact,
                         icon: const Icon(Icons.add),
                       );
                     }
@@ -115,41 +115,41 @@ class _PeoplePickerState extends State<PeoplePicker> {
     );
   }
 
-  List<Person> getPeople() {
+  List<Contact> getContacts() {
     if (_searchController.text.isNotEmpty) {
       var lowerCaseSearch = _searchController.text.toLowerCase();
       return context
           .read<UserProvider>()
-          .people
+          .contacts
           .where((element) => element.name.toLowerCase().contains(lowerCaseSearch))
           .toList();
     } else {
-      return context.watch<UserProvider>().people;
+      return context.watch<UserProvider>().contacts;
     }
   }
 
-  Future<void> addPerson() async {
+  Future<void> addContact() async {
     hideKeyboard();
-    Person? createdPerson = await Navigator.push(
+    Contact? createdContact = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CreatePerson(
+        builder: (context) => CreateContact(
           name: _searchController.text,
         ),
       ),
     );
-    if (createdPerson != null) {
+    if (createdContact != null) {
       setState(() {
-        _selectedPeople.add(createdPerson);
+        _selectedContacts.add(createdContact);
       });
     }
   }
 
-  void selectPerson(bool isSelected, Person person) {
+  void selectContact(bool isSelected, Contact contact) {
     if (isSelected) {
-      _selectedPeople.add(person);
+      _selectedContacts.add(contact);
     } else {
-      _selectedPeople.removeWhere((p) => p.id == person.id);
+      _selectedContacts.removeWhere((p) => p.id == contact.id);
     }
     hideKeyboard();
     setState(() {});

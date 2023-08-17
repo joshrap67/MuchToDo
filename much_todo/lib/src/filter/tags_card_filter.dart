@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/widgets/tags_picker.dart';
+import 'package:much_todo/src/widgets/tag_picker.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
@@ -62,7 +62,7 @@ class _TagsCardFilterState extends State<TagsCardFilter> {
     TagCreated result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TagsPicker(
+        builder: (context) => TagPicker(
           selectedTags: _selectedTags,
           showAdd: false,
         ),

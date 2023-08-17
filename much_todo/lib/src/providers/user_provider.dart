@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/domain/user.dart';
@@ -19,17 +19,17 @@ class UserProvider with ChangeNotifier {
       'binary0010productions@gmail.com',
       [],
       [
-        Person(const Uuid().v4(), 'Dennis Reynolds', 'example@gmail.com', '+18038675309'),
-        Person(const Uuid().v4(), 'Charlie Kelly', 'example@gmail.com', '+18038675309'),
-        Person(const Uuid().v4(), 'Frank Reynolds', 'example@gmail.com', '+18038675309'),
-        Person(const Uuid().v4(), 'Deandra Reynolds', 'example@gmail.com', '+18038675309'),
-        Person(const Uuid().v4(), 'Ronald MacDonald', 'example@gmail.com', '+18038675309'),
+        Contact(const Uuid().v4(), 'Dennis Reynolds', 'example@gmail.com', '+18038675309'),
+        Contact(const Uuid().v4(), 'Charlie Kelly', 'example@gmail.com', '+18038675309'),
+        Contact(const Uuid().v4(), 'Frank Reynolds', 'example@gmail.com', '+18038675309'),
+        Contact(const Uuid().v4(), 'Deandra Reynolds', 'example@gmail.com', '+18038675309'),
+        Contact(const Uuid().v4(), 'Ronald MacDonald', 'example@gmail.com', '+18038675309'),
       ]);
   final User _user = initialData;
 
   User? get user => _user;
 
-  List<Person> get people => [..._user.people];
+  List<Contact> get contacts => [..._user.contacts];
 
   List<Tag> get tags => [..._user.tags];
 
@@ -38,8 +38,8 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addPerson(Person person) {
-    _user.people.add(person);
+  void addContact(Contact contact) {
+    _user.contacts.add(contact);
     notifyListeners();
   }
 
@@ -51,10 +51,10 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePerson(Person person) {
-    var index = _user.people.indexWhere((p) => p.id == person.id);
+  void updateContact(Contact contact) {
+    var index = _user.contacts.indexWhere((p) => p.id == contact.id);
     if (index >= 0) {
-      _user.people[index] = person;
+      _user.contacts[index] = contact; // todo update method instead
     }
     notifyListeners();
   }
@@ -64,20 +64,20 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void deletePerson(Person person) {
-    _user.people.removeWhere((p) => p.id == person.id);
+  void deleteContact(Contact contact) {
+    _user.contacts.removeWhere((p) => p.id == contact.id);
     notifyListeners();
   }
 
   void addTasks(List<Task> createdTasks) {
     Map<String, Tag> tagIdToTag = {};
-    Map<String, Person> personIdToPerson = {};
+    Map<String, Contact> contactIdToContact = {};
     // for quicker lookup
     for (var tag in _user.tags) {
       tagIdToTag[tag.id] = tag;
     }
-    for (var person in _user.people) {
-      personIdToPerson[person.id] = person;
+    for (var contact in _user.contacts) {
+      contactIdToContact[contact.id] = contact;
     }
 
     for (var task in createdTasks) {
@@ -85,9 +85,9 @@ class UserProvider with ChangeNotifier {
         Tag? tag = tagIdToTag[taskTag.id];
         tag?.tasks.add(task.id);
       }
-      for (TaskPerson taskPerson in task.people) {
-        Person? person = personIdToPerson[taskPerson.id];
-        person?.tasks.add(task.id);
+      for (TaskContact taskContact in task.contacts) {
+        Contact? contact = contactIdToContact[taskContact.id];
+        contact?.tasks.add(task.id);
       }
     }
 
@@ -95,22 +95,22 @@ class UserProvider with ChangeNotifier {
   }
 
   void updateTask(Task task) {
-    for (var person in _user.people) {
-      person.tasks.removeWhere((t) => t == task.id);
+    for (var contact in _user.contacts) {
+      contact.tasks.removeWhere((t) => t == task.id);
     }
-    for (var person in _user.tags) {
-      person.tasks.removeWhere((t) => t == task.id);
+    for (var tag in _user.tags) {
+      tag.tasks.removeWhere((t) => t == task.id);
     }
-    // honestly easier to just assume the tag or person was removed from the task, then add it back instead of keeping track of old task
+    // honestly easier to just assume the tag or contact was removed from the task, then add it back instead of keeping track of old task
     addTasks([task]);
   }
 
   void removeTask(Task task) {
-    for (var person in _user.people) {
-      person.tasks.removeWhere((t) => t == task.id);
+    for (var contact in _user.contacts) {
+      contact.tasks.removeWhere((t) => t == task.id);
     }
-    for (var person in _user.tags) {
-      person.tasks.removeWhere((t) => t == task.id);
+    for (var tag in _user.tags) {
+      tag.tasks.removeWhere((t) => t == task.id);
     }
 
     notifyListeners();

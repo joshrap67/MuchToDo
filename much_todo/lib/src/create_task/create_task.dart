@@ -5,11 +5,11 @@ import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
-import 'package:much_todo/src/create_task/people_card.dart';
+import 'package:much_todo/src/create_task/contact_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
 import 'package:much_todo/src/create_task/room_card.dart';
 import 'package:much_todo/src/create_task/tags_card.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/utils/globals.dart';
@@ -44,7 +44,7 @@ class _CreateTaskState extends State<CreateTask> {
   List<XFile> _photos = [];
   List<Room> _selectedRooms = [];
   DateTime? _completeBy;
-  List<Person> _people = [];
+  List<Contact> _contacts = [];
   List<Tag> _tags = [];
 
   final _formKey = GlobalKey<FormState>();
@@ -77,8 +77,8 @@ class _CreateTaskState extends State<CreateTask> {
       }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _people =
-            context.read<UserProvider>().people.where((x) => widget.task!.people.any((y) => y.id == x.id)).toList();
+        _contacts =
+            context.read<UserProvider>().contacts.where((x) => widget.task!.contacts.any((y) => y.id == x.id)).toList();
         _tags = context.read<UserProvider>().tags.where((x) => widget.task!.tags.any((y) => y.id == x.id)).toList();
         setState(() {});
       });
@@ -166,11 +166,11 @@ class _CreateTaskState extends State<CreateTask> {
                             _tags = [...tags];
                           },
                         ),
-                        PeopleCard(
-                            people: _people,
-                            key: ValueKey(_people),
-                            onChange: (people) {
-                              _people = [...people];
+                        ContactCard(
+                            contacts: _contacts,
+                            key: ValueKey(_contacts),
+                            onChange: (contacts) {
+                              _contacts = [...contacts];
                             }),
                         LinksCard(
                           links: _links,
@@ -317,7 +317,7 @@ class _CreateTaskState extends State<CreateTask> {
         _noteController.text.isNotEmpty ||
         roomChanged() ||
         _tags.isNotEmpty ||
-        _people.isNotEmpty ||
+        _contacts.isNotEmpty ||
         _links.isNotEmpty ||
         _photos.isNotEmpty ||
         _completeByController.text.isNotEmpty;
@@ -384,7 +384,7 @@ class _CreateTaskState extends State<CreateTask> {
       var createdTasks = TaskService.createTasks(
           context, _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
           photos: _photos,
-          people: _people,
+          contacts: _contacts,
           note: _noteController.text.toString().trim(),
           links: _links,
           completeBy: _completeBy,

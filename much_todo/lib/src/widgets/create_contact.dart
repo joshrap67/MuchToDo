@@ -3,16 +3,16 @@ import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'loading_button.dart';
 
-class CreatePerson extends StatefulWidget {
+class CreateContact extends StatefulWidget {
   final String? name;
 
-  const CreatePerson({super.key, this.name});
+  const CreateContact({super.key, this.name});
 
   @override
-  State<CreatePerson> createState() => _CreatePersonState();
+  State<CreateContact> createState() => _CreateContactState();
 }
 
-class _CreatePersonState extends State<CreatePerson> {
+class _CreateContactState extends State<CreateContact> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -31,7 +31,7 @@ class _CreatePersonState extends State<CreatePerson> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Person'),
+        title: const Text('Create Contact'),
         scrolledUnderElevation: 0,
       ),
       body: Column(
@@ -129,11 +129,11 @@ class _CreatePersonState extends State<CreatePerson> {
       hideKeyboard();
       String email = _emailController.text.trim();
       String phone = _numberController.text.trim();
-      var person = await UserService.createPerson(
+      var contact = await UserService.createContact(
           context, _nameController.text.trim(), email.isNotEmpty ? email : null, phone.isNotEmpty ? phone : null);
 
       if (context.mounted) {
-        Navigator.pop(context, person);
+        Navigator.pop(context, contact);
       }
     }
   }

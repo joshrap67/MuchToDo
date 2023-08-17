@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
@@ -23,7 +23,7 @@ class TasksProvider with ChangeNotifier {
         'Items needed: hammer, paint, screwdriver, nails, wrench, painter\'s tape',
         ['https://www.amazon.com/Celebrity-Cutouts-Danny-DeVito-Cutout/dp/B01AACB8J4/'],
         ['https://upload.wikimedia.org/wikipedia/commons/0/0c/American_Shorthair.jpg', 'https://rb.gy/yk4ed'],
-        UserProvider.initialData.people
+        UserProvider.initialData.contacts
             .sublist((UserProvider.initialData.tags.length ~/ 2))
             .map((e) => e.convert())
             .toList(),
@@ -78,19 +78,19 @@ class TasksProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePersonForTasks(Person person) {
+  void updateContactForTasks(Contact contact) {
     for (var task in _tasks) {
-      var index = task.people.indexWhere((p) => p.id == person.id);
+      var index = task.contacts.indexWhere((p) => p.id == contact.id);
       if (index >= 0) {
-        task.people[index] = person.convert();
+        task.contacts[index] = contact.convert();
       }
     }
     notifyListeners();
   }
 
-  void removePersonFromTasks(Person person) {
+  void removeContactFromTasks(Contact contact) {
     for (var task in _tasks) {
-      task.people.removeWhere((p) => p.id == person.id);
+      task.contacts.removeWhere((p) => p.id == contact.id);
     }
     notifyListeners();
   }

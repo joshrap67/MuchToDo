@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:much_todo/src/widgets/create_person.dart';
-import 'package:much_todo/src/widgets/edit_person.dart';
+import 'package:much_todo/src/widgets/create_contact.dart';
+import 'package:much_todo/src/widgets/edit_contact.dart';
 import 'package:provider/provider.dart';
 
-class UserPeople extends StatefulWidget {
-  const UserPeople({super.key});
+class UserContacts extends StatefulWidget {
+  const UserContacts({super.key});
 
   @override
-  State<UserPeople> createState() => _UserPeopleState();
+  State<UserContacts> createState() => _UserContactsState();
 }
 
-class _UserPeopleState extends State<UserPeople> {
+class _UserContactsState extends State<UserContacts> {
   final TextEditingController _searchController = TextEditingController();
 
   bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    var people = getPeople();
+    var contacts = getContacts();
     return IgnorePointer(
       ignoring: _isLoading,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('People'),
+          title: const Text('Contacts'),
           scrolledUnderElevation: 0.0,
         ),
         body: Stack(
@@ -42,7 +42,7 @@ class _UserPeopleState extends State<UserPeople> {
                       child: SearchBar(
                         leading: const Icon(Icons.search),
                         controller: _searchController,
-                        hintText: 'Search People',
+                        hintText: 'Search Contacts',
                         onChanged: (_) {
                           setState(() {});
                         },
@@ -63,13 +63,13 @@ class _UserPeopleState extends State<UserPeople> {
                     Expanded(
                       child: Scrollbar(
                         child: ListView.builder(
-                          itemCount: people.length,
+                          itemCount: contacts.length,
                           itemBuilder: (BuildContext ctx, int index) {
-                            var person = people[index];
+                            var contact = contacts[index];
                             return Card(
                               child: ListTile(
-                                title: Text(person.name),
-                                onTap: () => showPersonInfo(person),
+                                title: Text(contact.name),
+                                onTap: () => showContactInfo(contact),
                               ),
                             );
                           },
@@ -87,40 +87,40 @@ class _UserPeopleState extends State<UserPeople> {
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: addPerson,
-          label: const Text('ADD PERSON'),
+          onPressed: addContact,
+          label: const Text('ADD CONTACT'),
           icon: const Icon(Icons.add),
         ),
       ),
     );
   }
 
-  List<Person> getPeople() {
+  List<Contact> getContacts() {
     if (_searchController.text.isNotEmpty) {
       var lowerCaseSearch = _searchController.text.toLowerCase();
       return context
           .read<UserProvider>()
-          .people
+          .contacts
           .where((element) => element.name.toLowerCase().contains(lowerCaseSearch))
           .toList();
     } else {
-      return context.watch<UserProvider>().people;
+      return context.watch<UserProvider>().contacts;
     }
   }
 
-  Future<void> addPerson() async {
+  Future<void> addContact() async {
     hideKeyboard();
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CreatePerson(
+        builder: (context) => CreateContact(
           name: _searchController.text,
         ),
       ),
     );
   }
 
-  void showPersonInfo(Person person) {
+  void showContactInfo(Contact contact) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -131,8 +131,8 @@ class _UserPeopleState extends State<UserPeople> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: ListTile(
-                title: Text(person.name),
-                subtitle: Text('Associated with ${person.tasks.length} ${person.tasks.length == 1 ? 'Task' : 'Tasks'}'),
+                title: Text(contact.name),
+                subtitle: Text('Associated with ${contact.tasks.length} ${contact.tasks.length == 1 ? 'Task' : 'Tasks'}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -144,7 +144,7 @@ class _UserPeopleState extends State<UserPeople> {
               leading: const Icon(Icons.edit),
               onTap: () {
                 Navigator.pop(context);
-                editPerson(person);
+                editContact(contact);
               },
             ),
             ListTile(
@@ -152,7 +152,7 @@ class _UserPeopleState extends State<UserPeople> {
               leading: const Icon(Icons.delete),
               onTap: () {
                 Navigator.pop(context);
-                promptDeletePerson(person);
+                promptDeleteContact(contact);
               },
             ),
             const Padding(padding: EdgeInsets.all(16))
@@ -162,7 +162,7 @@ class _UserPeopleState extends State<UserPeople> {
     );
   }
 
-  void promptDeletePerson(Person person) {
+  void promptDeleteContact(Contact contact) {
     showDialog<void>(
         context: context,
         builder: (ctx) {
@@ -175,34 +175,34 @@ class _UserPeopleState extends State<UserPeople> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  deletePerson(person);
+                  deleteContact(contact);
                 },
                 child: const Text('DELETE'),
               )
             ],
-            title: const Text('Delete Person'),
+            title: const Text('Delete Contact'),
             content: const Text(
-                'Are you sure you wish to delete this person? This person will be removed from ALL tasks that have them!'),
+                'Are you sure you wish to delete this contact? This contact will be removed from ALL tasks that have them!'),
           );
         });
   }
 
-  Future<void> editPerson(Person person) async {
+  Future<void> editContact(Contact contact) async {
     hideKeyboard();
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditPerson(person: person),
+        builder: (context) => EditContact(contact: contact),
       ),
     );
   }
 
-  Future<void> deletePerson(Person person) async {
+  Future<void> deleteContact(Contact contact) async {
     setState(() {
       _isLoading = true;
     });
 
-    await UserService.deletePerson(context, person);
+    await UserService.deleteContact(context, contact);
 
     if (context.mounted) {
       setState(() {

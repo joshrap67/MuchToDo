@@ -36,9 +36,10 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
   }
 
   String getSubtitle() {
+	  // todo "incomplete tasks" instead of active
     return widget.room.tasks.isEmpty
-        ? '${widget.room.tasks.length} Active Tasks'
-        : '${widget.room.tasks.length} Active Tasks | ${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())}';
+        ? '${widget.room.tasks.length} Incomplete Tasks'
+        : '${widget.room.tasks.length} Incomplete Tasks | ${NumberFormat.currency(symbol: '\$').format(widget.room.totalCost())}';
   }
 
   // todo have a completed indicator

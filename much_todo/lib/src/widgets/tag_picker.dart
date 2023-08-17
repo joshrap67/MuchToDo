@@ -12,17 +12,17 @@ class TagCreated {
   TagCreated(this.selectedTags);
 }
 
-class TagsPicker extends StatefulWidget {
+class TagPicker extends StatefulWidget {
   final List<Tag> selectedTags;
   final bool showAdd;
 
-  const TagsPicker({super.key, required this.selectedTags, this.showAdd = true});
+  const TagPicker({super.key, required this.selectedTags, this.showAdd = true});
 
   @override
-  State<TagsPicker> createState() => _TagsPickerState();
+  State<TagPicker> createState() => _TagPickerState();
 }
 
-class _TagsPickerState extends State<TagsPicker> {
+class _TagPickerState extends State<TagPicker> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _newTagController = TextEditingController();
 

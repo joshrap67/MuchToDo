@@ -6,7 +6,7 @@ import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 
@@ -18,7 +18,7 @@ class TaskService {
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
-      List<Person> people = const [],
+      List<Contact> contacts = const [],
       List<XFile> photos = const []}) {
     // todo upload photos to cloud
     var task = Task.named(
@@ -34,7 +34,7 @@ class TaskService {
         isCompleted: false,
         links: links,
         note: note,
-        people: people.map((e) => e.convert()).toList(),
+        contacts: contacts.map((e) => e.convert()).toList(),
         room: room.convert(),
         creationDate: DateTime.now().toUtc());
     context.read<TasksProvider>().updateTask(task);
@@ -51,7 +51,7 @@ class TaskService {
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
-      List<Person> people = const [],
+      List<Contact> contacts = const [],
       List<XFile> photos = const []}) {
     // todo upload photos to cloud
     // todo grab userid here instead of requiring it in method
@@ -74,7 +74,7 @@ class TaskService {
           isCompleted: false,
           links: links,
           note: note,
-          people: people.map((e) => e.convert()).toList(),
+          contacts: contacts.map((e) => e.convert()).toList(),
           room: room.convert(),
           creationDate: DateTime.now().toUtc());
       createdTasks.add(task);

@@ -1,9 +1,9 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/filter/people_card_filter.dart';
+import 'package:much_todo/src/filter/contact_card_filter.dart';
 import 'package:much_todo/src/filter/tags_card_filter.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -103,7 +103,7 @@ class _FilterTasksState extends State<FilterTasks> {
   bool _includeInactive = false;
   bool _showOnlyInProgress = false;
   List<Tag> _selectedTags = [];
-  List<Person> _selectedPeople = [];
+  List<Contact> _selectedContacts = [];
   String? _roomIdFilter;
 
   final List<DropdownMenuItem<SortOptions>> _sortEntries = <DropdownMenuItem<SortOptions>>[];
@@ -439,11 +439,11 @@ class _FilterTasksState extends State<FilterTasks> {
                             _selectedTags = tags;
                           });
                         }),
-                    PeopleCardFilter(
-                        people: _selectedPeople,
-                        onChange: (people) {
+                    ContactCardFilter(
+                        contacts: _selectedContacts,
+                        onChange: (contacts) {
                           setState(() {
-                            _selectedPeople = people;
+                            _selectedContacts = contacts;
                           });
                         }),
                     CheckboxListTile(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:much_todo/src/widgets/tags_picker.dart';
+import 'package:much_todo/src/widgets/tag_picker.dart';
 
 class TagsCard extends StatefulWidget {
   final List<Tag> tags;
@@ -65,7 +65,7 @@ class _TagsCardState extends State<TagsCard> {
   Future<void> launchAddTag() async {
     TagCreated result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TagsPicker(selectedTags: _selectedTags)),
+      MaterialPageRoute(builder: (context) => TagPicker(selectedTags: _selectedTags)),
     );
     hideKeyboard();
     setState(() {

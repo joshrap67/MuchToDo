@@ -4,7 +4,7 @@ import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 
 class UserService {
   static Future<Tag> createTag(BuildContext context, String name) async {
@@ -16,14 +16,14 @@ class UserService {
     return tag;
   }
 
-  static Future<Person> createPerson(BuildContext context, String name, String? email, String? number) async {
-    Person? person;
+  static Future<Contact> createContact(BuildContext context, String name, String? email, String? number) async {
+    Contact? contact;
     await Future.delayed(const Duration(seconds: 2), () {
-      person = Person(const Uuid().v4(), name, email, number);
-      context.read<UserProvider>().addPerson(person!);
+      contact = Contact(const Uuid().v4(), name, email, number);
+      context.read<UserProvider>().addContact(contact!);
     });
 
-    return person!;
+    return contact!;
   }
 
   static Future<void> deleteTag(BuildContext context, Tag tag) async {
@@ -40,17 +40,17 @@ class UserService {
     });
   }
 
-  static Future<void> deletePerson(BuildContext context, Person person) async {
+  static Future<void> deleteContact(BuildContext context, Contact contact) async {
     await Future.delayed(const Duration(seconds: 2), () {
-      context.read<UserProvider>().deletePerson(person);
-      context.read<TasksProvider>().removePersonFromTasks(person);
+      context.read<UserProvider>().deleteContact(contact);
+      context.read<TasksProvider>().removeContactFromTasks(contact);
     });
   }
 
-  static Future<void> updatePerson(BuildContext context, Person person) async {
+  static Future<void> updateContact(BuildContext context, Contact contact) async {
     await Future.delayed(const Duration(seconds: 2), () {
-      context.read<UserProvider>().updatePerson(person);
-      context.read<TasksProvider>().updatePersonForTasks(person);
+      context.read<UserProvider>().updateContact(contact);
+      context.read<TasksProvider>().updateContactForTasks(contact);
     });
   }
 }

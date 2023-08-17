@@ -3,34 +3,34 @@ import 'package:much_todo/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:much_todo/src/domain/task.dart';
 
-class PeopleCardReadOnly extends StatefulWidget {
-  final List<TaskPerson> people;
+class ContactCardReadOnly extends StatefulWidget {
+  final List<TaskContact> contacts;
 
-  const PeopleCardReadOnly({super.key, required this.people});
+  const ContactCardReadOnly({super.key, required this.contacts});
 
   @override
-  State<PeopleCardReadOnly> createState() => _PeopleCardReadOnlyState();
+  State<ContactCardReadOnly> createState() => _ContactCardReadOnlyState();
 }
 
-class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
+class _ContactCardReadOnlyState extends State<ContactCardReadOnly> {
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Column(
         children: [
-          const ListTile(title: Text('People'), contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0)),
+          const ListTile(title: Text('Contacts'), contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0)),
           Wrap(
             spacing: 8.0, // gap between adjacent chips
             runSpacing: 4.0, // gap between lines
             children: [
-              for (var i = 0; i < widget.people.length; i++)
+              for (var i = 0; i < widget.contacts.length; i++)
                 ActionChip(
-                  label: Text(widget.people[i].name),
+                  label: Text(widget.contacts[i].name),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   onPressed: () {
-                    var person = widget.people[i];
-                    if (person.email != null || person.phoneNumber != null) {
-                      showPersonInfo(widget.people[i]);
+                    var contact = widget.contacts[i];
+                    if (contact.email != null || contact.phoneNumber != null) {
+                      showContactInfo(widget.contacts[i]);
                     }
                   },
                 ),
@@ -42,7 +42,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  void showPersonInfo(TaskPerson person) {
+  void showContactInfo(TaskContact contact) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -53,7 +53,7 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: ListTile(
-                title: Text(person.name),
+                title: Text(contact.name),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -61,22 +61,22 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
               ),
             ),
             ListTile(
-              title: Text(person.email != null ? person.email! : 'No email'),
+              title: Text(contact.email != null ? contact.email! : 'No email'),
               subtitle: const Text(
                 'Email',
                 style: TextStyle(fontSize: 12),
               ),
               leading: const Icon(Icons.email),
-              onTap: () => launchEmail(person),
+              onTap: () => launchEmail(contact),
             ),
             ListTile(
-              title: Text(person.phoneNumber != null ? person.phoneNumber! : 'No phone number'),
+              title: Text(contact.phoneNumber != null ? contact.phoneNumber! : 'No phone number'),
               subtitle: const Text(
                 'Phone Number',
                 style: TextStyle(fontSize: 12),
               ),
               leading: const Icon(Icons.phone),
-              onTap: () => launchPhone(person),
+              onTap: () => launchPhone(contact),
             ),
             const Padding(padding: EdgeInsets.all(16))
           ],
@@ -85,12 +85,12 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     );
   }
 
-  Future<void> launchEmail(TaskPerson person) async {
-    if (person.email == null) {
+  Future<void> launchEmail(TaskContact contact) async {
+    if (contact.email == null) {
       showSnackbar('Email is empty.', context);
     }
 
-    final Uri uri = Uri(scheme: 'mailto', path: person.email);
+    final Uri uri = Uri(scheme: 'mailto', path: contact.email);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
@@ -100,12 +100,12 @@ class _PeopleCardReadOnlyState extends State<PeopleCardReadOnly> {
     }
   }
 
-  Future<void> launchPhone(TaskPerson person) async {
-    if (person.phoneNumber == null) {
+  Future<void> launchPhone(TaskContact contact) async {
+    if (contact.phoneNumber == null) {
       showSnackbar('Phone number is empty.', context);
     }
 
-    final Uri uri = Uri(scheme: 'tel', path: person.phoneNumber);
+    final Uri uri = Uri(scheme: 'tel', path: contact.phoneNumber);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {

@@ -1,11 +1,11 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
-import 'package:much_todo/src/create_task/people_card.dart';
+import 'package:much_todo/src/create_task/contact_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
 import 'package:much_todo/src/create_task/tags_card.dart';
 import 'package:much_todo/src/domain/room.dart';
@@ -42,7 +42,7 @@ class _EditTaskState extends State<EditTask> {
   List<XFile> _photos = [];
   Room? _selectedRoom;
   DateTime? _completeBy;
-  List<Person> _people = [];
+  List<Contact> _contacts = [];
   List<Tag> _tags = [];
 
   final _formKey = GlobalKey<FormState>();
@@ -77,7 +77,7 @@ class _EditTaskState extends State<EditTask> {
           .rooms
           .cast<Room?>()
           .firstWhere((element) => element?.id == widget.task.room.id, orElse: () => null);
-      _people = context.read<UserProvider>().people.where((x) => widget.task.people.any((y) => y.id == x.id)).toList();
+      _contacts = context.read<UserProvider>().contacts.where((x) => widget.task.contacts.any((y) => y.id == x.id)).toList();
       _tags = context.read<UserProvider>().tags.where((x) => widget.task.tags.any((y) => y.id == x.id)).toList();
       setState(() {});
     });
@@ -164,11 +164,11 @@ class _EditTaskState extends State<EditTask> {
                             _tags = [...tags];
                           },
                         ),
-                        PeopleCard(
-                          people: _people,
-                          key: ValueKey(_people),
-                          onChange: (people) {
-                            _people = [...people];
+                        ContactCard(
+                          contacts: _contacts,
+                          key: ValueKey(_contacts),
+                          onChange: (contacts) {
+                            _contacts = [...contacts];
                           },
                         ),
                         LinksCard(
@@ -308,7 +308,7 @@ class _EditTaskState extends State<EditTask> {
         _noteController.text != widget.task.note ||
         _selectedRoom?.id != widget.task.room.id;
     // _tags.isNotEmpty ||
-    // _people.isNotEmpty ||
+    // _contacts.isNotEmpty ||
     // _links.isNotEmpty ||
     // _photos.isNotEmpty ||
     // _completeByController.text.isNotEmpty;
@@ -367,7 +367,7 @@ class _EditTaskState extends State<EditTask> {
       var task = TaskService.editTask(context, widget.task.id, _nameController.text.toString().trim(), _priority,
           _effort, 'createdBy', _selectedRoom!,
           photos: _photos,
-          people: _people,
+          contacts: _contacts,
           note: _noteController.text.toString().trim(),
           links: _links,
           completeBy: _completeBy,

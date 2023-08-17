@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/person.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'loading_button.dart';
 
-class EditPerson extends StatefulWidget {
-  final Person person;
+class EditContact extends StatefulWidget {
+  final Contact contact;
 
-  const EditPerson({super.key, required this.person});
+  const EditContact({super.key, required this.contact});
 
   @override
-  State<EditPerson> createState() => _EditPersonState();
+  State<EditContact> createState() => _EditContactState();
 }
 
-class _EditPersonState extends State<EditPerson> {
+class _EditContactState extends State<EditContact> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -23,16 +23,16 @@ class _EditPersonState extends State<EditPerson> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.person.name;
-    _emailController.text = widget.person.email ?? '';
-    _numberController.text = widget.person.phoneNumber ?? '';
+    _nameController.text = widget.contact.name;
+    _emailController.text = widget.contact.email ?? '';
+    _numberController.text = widget.contact.phoneNumber ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Person'),
+        title: const Text('Edit Contact'),
         scrolledUnderElevation: 0,
       ),
       body: Column(
@@ -127,11 +127,11 @@ class _EditPersonState extends State<EditPerson> {
       String phone = _numberController.text.trim();
       hideKeyboard();
 
-      Person person = Person(widget.person.id, _nameController.text.trim(), email.isNotEmpty ? email : null,
+      Contact contact = Contact(widget.contact.id, _nameController.text.trim(), email.isNotEmpty ? email : null,
           phone.isNotEmpty ? phone : null);
-      await UserService.updatePerson(context, person);
+      await UserService.updateContact(context, contact);
       if (context.mounted) {
-        showSnackbar('Person updated.', context);
+        showSnackbar('Contact updated.', context);
       }
     }
   }

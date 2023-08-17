@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/user.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
-import 'package:much_todo/src/user/user_people.dart';
+import 'package:much_todo/src/user/user_contacts.dart';
 import 'package:much_todo/src/user/user_tags.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -72,8 +72,8 @@ class _SettingsState extends State<Settings> {
           ),
           Card(
             child: ListTile(
-              title: Text(user.people.isNotEmpty ? '${user.people.length} People' : 'No people'),
-              onTap: launchPeople,
+              title: Text(user.contacts.isNotEmpty ? '${user.contacts.length} Contacts' : 'No contacts'),
+              onTap: launchContacts,
               trailing: const Icon(Icons.arrow_forward),
               leading: const Icon(Icons.person),
             ),
@@ -176,11 +176,11 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void launchPeople() {
+  void launchContacts() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const UserPeople(),
+        builder: (context) => const UserContacts(),
       ),
     );
   }

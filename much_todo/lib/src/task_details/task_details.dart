@@ -6,7 +6,7 @@ import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/edit_task/edit_task.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/task_details/links_card_read_only.dart';
-import 'package:much_todo/src/task_details/people_card_read_only.dart';
+import 'package:much_todo/src/task_details/contacts_card_read_only.dart';
 import 'package:much_todo/src/task_details/photos_card_read_only.dart';
 import 'package:much_todo/src/task_details/room_card_read_only.dart';
 import 'package:much_todo/src/task_details/tags_card_read_only.dart';
@@ -142,9 +142,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     onChanged: (StatusOptions? value) {
                                       setState(() {
                                         _status = value!;
+										// todo launch popup to select date
                                       });
                                     },
-                                    // decoration: const InputDecoration(border: OutlineInputBorder()),
                                     items: StatusOptions.values
                                         .map<DropdownMenuItem<StatusOptions>>((StatusOptions value) {
                                       return DropdownMenuItem<StatusOptions>(value: value, child: Text(value.label));
@@ -207,7 +207,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     ],
                   ),
                   if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
-                  if (_task.people.isNotEmpty) PeopleCardReadOnly(people: _task.people),
+                  if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
                   if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
                   if (_task.photos.isNotEmpty) PhotosCardReadOnly(photos: _task.photos),
                 ],

@@ -53,12 +53,12 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                   style: const TextStyle(fontSize: 22),
                 ),
                 subtitle: Text(
-                  '${totalTasks()} Total Active Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
+                  '${totalTasks()} Total Incomplete Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
                   style: const TextStyle(fontSize: 12),
                 ),
                 trailing: sortDropdown(),
               ),
-              const Divider(),
+              const Divider (),
               Expanded(
                 child: ListView.builder(
                   itemCount: rooms.length,

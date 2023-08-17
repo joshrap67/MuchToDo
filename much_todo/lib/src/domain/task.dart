@@ -18,7 +18,7 @@ class Task {
   List<TaskTag> tags;
   List<String> links = [];
   List<String> photos = [];
-  List<TaskPerson> people;
+  List<TaskContact> contacts;
   bool isCompleted = false;
   bool inProgress = false;
   DateTime? completeBy;
@@ -37,7 +37,7 @@ class Task {
       this.note,
       this.links,
       this.photos,
-      this.people,
+      this.contacts,
       this.isCompleted,
       this.inProgress,
       this.completeBy,
@@ -55,7 +55,7 @@ class Task {
       this.note,
       this.links = const [],
       this.photos = const [],
-      this.people = const [],
+      this.contacts = const [],
       this.isCompleted = false,
       this.inProgress = false,
       this.completeBy,
@@ -65,7 +65,7 @@ class Task {
   String toString() {
     return 'Task{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
         'room: $room, estimatedCost: $estimatedCost, note: $note, links: $links, photos: $photos, '
-        'people: $people, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
+        'contacts: $contacts, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
   }
 
   RoomTask convert(){
@@ -85,17 +85,17 @@ class TaskRoom {
   }
 }
 
-class TaskPerson {
+class TaskContact {
   String id;
   String name;
   String? email;
   String? phoneNumber;
 
-  TaskPerson(this.id, this.name, this.email, this.phoneNumber);
+  TaskContact(this.id, this.name, this.email, this.phoneNumber);
 
   @override
   String toString() {
-    return 'TaskPerson{id: $id, name: $name, email: $email, phoneNumber: $phoneNumber}';
+    return 'TaskContact{id: $id, name: $name, email: $email, phoneNumber: $phoneNumber}';
   }
 }
 

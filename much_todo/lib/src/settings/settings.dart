@@ -55,7 +55,7 @@ class _SettingsState extends State<Settings> {
                 ],
               ),
               ListTile(
-                title: Text('Logged in as'),
+                title: const Text('Signed in as'),
                 subtitle: Text(user.email),
                 trailing: accountDropdown(),
               ),
@@ -82,9 +82,8 @@ class _SettingsState extends State<Settings> {
             child: ListTile(
               title: const Text('Theme'),
               leading: const Icon(Icons.brush),
-              trailing: IconButton(
-                onPressed: () {},
-                icon: DropdownButton<ThemeMode>(
+              trailing: DropdownButtonHideUnderline(
+                child: DropdownButton<ThemeMode>(
                   value: widget.controller.themeMode,
                   onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
                   items: const [
@@ -130,7 +129,7 @@ class _SettingsState extends State<Settings> {
   Widget accountDropdown() {
     return PopupMenuButton(
       icon: const Icon(Icons.more_vert),
-      tooltip: 'Sort Media',
+      tooltip: 'Account Options',
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(15.0),
@@ -140,7 +139,7 @@ class _SettingsState extends State<Settings> {
         return <PopupMenuEntry<AccountOptions>>[
           const PopupMenuItem<AccountOptions>(
             value: AccountOptions.logout,
-            child: Text('Logout'),
+            child: Text('Sign-out'),
           ),
           PopupMenuItem<AccountOptions>(
             value: AccountOptions.delete,

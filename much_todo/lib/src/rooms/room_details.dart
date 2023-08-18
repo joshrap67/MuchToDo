@@ -36,7 +36,7 @@ class _RoomDetailsState extends State<RoomDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const AutoSizeText('Room Details'),
+        title: AutoSizeText(_room.name),
         scrolledUnderElevation: 0,
         actions: [
           PopupMenuButton(
@@ -72,32 +72,36 @@ class _RoomDetailsState extends State<RoomDetails> {
           )
         ],
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: AutoSizeText(
-              _room.name,
-              style: const TextStyle(fontSize: 22),
-            ),
-            subtitle: _room.note != null ? Text(_room.note!) : null,
-          ),
-          FutureBuilder<List<Task>>(
-            future: _tasks,
-            builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
-              if (snapshot.hasData) {
-                return Expanded(
+      body: FutureBuilder<List<Task>>(
+        future: _tasks,
+        builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Visibility(
+                  visible: _room.note.isNotNullOrEmpty(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      _room.note!,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                ),
+                Expanded(
                   child: RoomsListTasks(
                     tasks: snapshot.data!,
-                    room: widget.room,
+                    room: _room,
                   ),
-                );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
-          )
-        ],
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
@@ -106,7 +110,7 @@ class _RoomDetailsState extends State<RoomDetails> {
     List<Task> tasks = [];
     // todo use a separate provider for this?
     await Future.delayed(const Duration(seconds: 2), () {
-      tasks = context.read<TasksProvider>().tasks.where((element) => element.room.id == widget.room.id).toList();
+      tasks = context.read<TasksProvider>().tasks.where((element) => element.room.id == _room.id).toList();
     });
     setState(() {});
     return tasks;
@@ -127,7 +131,7 @@ class _RoomDetailsState extends State<RoomDetails> {
     Room? room = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditRoom(room: widget.room),
+        builder: (context) => EditRoom(room: _room),
       ),
     );
     if (room != null && context.mounted) {
@@ -163,7 +167,7 @@ class _RoomDetailsState extends State<RoomDetails> {
   }
 
   Future<void> deleteRoom() async {
-    await RoomsService.deleteRoom(context, widget.room);
+    await RoomsService.deleteRoom(context, _room);
     if (context.mounted) {
       Navigator.of(context).pop();
     }

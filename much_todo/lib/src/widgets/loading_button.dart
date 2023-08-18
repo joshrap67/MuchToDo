@@ -17,9 +17,14 @@ class _LoadingButtonState extends State<LoadingButton> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
+    return OutlinedButton.icon(
       onPressed: _isLoading ? null : onSubmit,
-      style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16.0)),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.all(16.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32.0),
+        ),
+      ),
       icon: _isLoading
           ? Container(
               width: 24,

@@ -52,7 +52,6 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(),
         ListTile(
           title: Text(
             getTitle(),

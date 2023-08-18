@@ -112,6 +112,7 @@ class _CreateTaskState extends State<CreateTask> {
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Flexible(
                           child: Padding(
@@ -159,6 +160,13 @@ class _CreateTaskState extends State<CreateTask> {
                           },
                         ),
                         const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                          child: Text(
+                            'Optional Fields',
+                            style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 20),
+                          ),
+                        ),
                         TagsCard(
                           tags: _tags,
                           key: ValueKey(_tags),
@@ -184,7 +192,6 @@ class _CreateTaskState extends State<CreateTask> {
                             _photos = [...photos];
                           },
                         ),
-                        const Divider(),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
                           child: Row(

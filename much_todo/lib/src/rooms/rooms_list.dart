@@ -58,7 +58,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                 ),
                 trailing: sortDropdown(),
               ),
-              const Divider (),
+              const Divider(),
               Expanded(
                 child: ListView.builder(
                   itemCount: rooms.length,
@@ -121,6 +121,22 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
             value: RoomSortingValues.alphaDescending,
             child: Text('Room Name (Z-A)'),
           ),
+          const PopupMenuItem<RoomSortingValues>(
+            value: RoomSortingValues.taskCountAscending,
+            child: Text('Task Count (Ascending)'),
+          ),
+          const PopupMenuItem<RoomSortingValues>(
+            value: RoomSortingValues.taskCountDescending,
+            child: Text('Task Count (Descending)'),
+          ),
+          const PopupMenuItem<RoomSortingValues>(
+            value: RoomSortingValues.estimateCostAscending,
+            child: Text('Estimated Cost (Ascending)'),
+          ),
+          const PopupMenuItem<RoomSortingValues>(
+            value: RoomSortingValues.estimatedCostDescending,
+            child: Text('Estimated Cost (Descending)'),
+          ),
         ];
       },
       onSelected: (RoomSortingValues result) => onSortSelected(result),
@@ -128,9 +144,9 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
   }
 
   void onSortSelected(RoomSortingValues result) {
-	  sortValue = result;
-	  setState(() {});
-	  context.read<RoomsProvider>().sortRooms(result);
+    sortValue = result;
+    setState(() {});
+    context.read<RoomsProvider>().sortRooms(result);
   }
 
   int totalTasks() {

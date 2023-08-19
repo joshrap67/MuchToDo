@@ -46,6 +46,20 @@ String? validRoomName(String? name, List<Room> rooms) {
   return null;
 }
 
+String? validRoomEditName(String? name, String originalName, List<Room> rooms) {
+  if (name != null && name == originalName) {
+    return null;
+  }
+
+  if (name == null || name.isEmpty) {
+    return 'Required';
+  }
+  if (rooms.any((r) => r.name == name)) {
+    return 'Room name already exists';
+  }
+  return null;
+}
+
 String? validRoomNote(String? note) {
   if (note != null && note.length > Constants.maxRoomNoteLength) {
     return 'Note too large';

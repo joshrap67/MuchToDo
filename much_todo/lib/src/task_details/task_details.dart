@@ -104,19 +104,20 @@ class _TaskDetailsState extends State<TaskDetails> {
                     title: AutoSizeText(_task.name),
                     subtitle: _task.note != null ? Text(_task.note!) : null,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: _task.completeBy != null
-                            ? Text(
-                                getDueByDate(),
-                                style: const TextStyle(fontSize: 11),
-                              )
-                            : const Text(''),
-                      ),
-                    ],
+                  Visibility(
+                    visible: _task.completeBy != null,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            getDueByDate(),
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -142,7 +143,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     onChanged: (StatusOptions? value) {
                                       setState(() {
                                         _status = value!;
-										// todo launch popup to select date
+                                        // todo launch popup to select date
                                       });
                                     },
                                     items: StatusOptions.values

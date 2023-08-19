@@ -53,7 +53,8 @@ class _EditRoomState extends State<EditRoom> {
                         ),
                         keyboardType: TextInputType.name,
                         controller: _nameController,
-                        validator: (val) => validRoomName(val, context.read<RoomsProvider>().rooms),
+                        validator: (val) =>
+                            validRoomEditName(val, widget.room.name, context.read<RoomsProvider>().rooms),
                       ),
                       const Padding(padding: EdgeInsets.all(12)),
                       TextFormField(

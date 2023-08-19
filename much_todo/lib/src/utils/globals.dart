@@ -3,5 +3,5 @@ class Constants {
   static const int maxRoomNoteLength = 1000;
 }
 
-enum RoomSortingValues { alphaDescending, alphaAscending }
+enum RoomSortingValues { alphaDescending, alphaAscending, taskCountDescending, taskCountAscending, estimatedCostDescending, estimateCostAscending }
 

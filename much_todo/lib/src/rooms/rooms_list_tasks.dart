@@ -77,7 +77,13 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton.icon(
+          child: OutlinedButton.icon(
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.all(16.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0),
+              ),
+            ),
             onPressed: launchAddTask,
             icon: const Icon(Icons.add),
             label: const Text('CREATE NEW TASK'),
@@ -153,50 +159,44 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
                     children: [
                       Row(
                         children: [
-                          const Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Sort By',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Flexible(
-                            flex: 3,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _sortEntries,
-                                isExpanded: true,
-                                value: _sortByValue,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _sortByValue = value!;
-                                  });
-                                },
+                          Expanded(
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                                labelText: 'Sort By',
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<SortOptions>(
+                                  value: _sortByValue,
+                                  onChanged: (SortOptions? value) {
+                                    setState(() {
+                                      _sortByValue = value!;
+                                      // todo launch popup to select date
+                                    });
+                                  },
+                                  items: SortOptions.values.map<DropdownMenuItem<SortOptions>>((SortOptions value) {
+                                    return DropdownMenuItem<SortOptions>(value: value, child: Text(value.label));
+                                  }).toList(),
+                                ),
                               ),
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: IconButton(
-                                icon: _sortDirectionValue == SortDirection.descending
-                                    ? const Icon(Icons.arrow_downward_sharp)
-                                    : const Icon(Icons.arrow_upward_sharp),
-                                tooltip: _sortDirectionValue == SortDirection.descending ? 'Descending' : 'Ascending',
-                                onPressed: () {
-                                  if (_sortDirectionValue == SortDirection.descending) {
-                                    _sortDirectionValue = SortDirection.ascending;
-                                  } else {
-                                    _sortDirectionValue = SortDirection.descending;
-                                  }
-                                  setState(() {});
-                                },
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: IconButton(
+                              icon: _sortDirectionValue == SortDirection.descending
+                                  ? const Icon(Icons.arrow_downward_sharp)
+                                  : const Icon(Icons.arrow_upward_sharp),
+                              tooltip: _sortDirectionValue == SortDirection.descending ? 'Descending' : 'Ascending',
+                              onPressed: () {
+                                if (_sortDirectionValue == SortDirection.descending) {
+                                  _sortDirectionValue = SortDirection.ascending;
+                                } else {
+                                  _sortDirectionValue = SortDirection.descending;
+                                }
+                                setState(() {});
+                              },
                             ),
                           ),
                         ],
@@ -208,7 +208,7 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
                             _includeInactive = value ?? false;
                           });
                         },
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                        contentPadding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
                         title: const Text('Include Completed Tasks'),
                       ),
                     ],

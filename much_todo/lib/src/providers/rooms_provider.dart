@@ -43,6 +43,18 @@ class RoomsProvider with ChangeNotifier {
       case RoomSortingValues.alphaDescending:
         _rooms.sort((a, b) => b.name.compareTo(a.name));
         break;
+      case RoomSortingValues.taskCountAscending:
+        _rooms.sort((a, b) => a.tasks.length.compareTo(b.tasks.length));
+        break;
+      case RoomSortingValues.taskCountDescending:
+        _rooms.sort((a, b) => b.tasks.length.compareTo(a.tasks.length));
+        break;
+      case RoomSortingValues.estimateCostAscending:
+        _rooms.sort((a, b) => a.totalCost().compareTo(b.totalCost()));
+        break;
+      case RoomSortingValues.estimatedCostDescending:
+        _rooms.sort((a, b) => b.totalCost().compareTo(a.totalCost()));
+        break;
     }
     notifyListeners();
   }

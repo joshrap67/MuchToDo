@@ -42,16 +42,28 @@ class _HomeState extends State<Home> {
           controller: _pageController,
           children: _screens,
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.sticky_note_2_rounded), label: 'Tasks'),
-            BottomNavigationBarItem(icon: Icon(Icons.house), label: 'Rooms'),
-            BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
+        bottomNavigationBar: NavigationBar(
+          destinations: const <Widget>[
+            NavigationDestination(
+              icon: Icon(Icons.sticky_note_2_outlined),
+              selectedIcon: Icon(Icons.sticky_note_2_rounded),
+              label: 'Tasks',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.house_outlined),
+              selectedIcon: Icon(Icons.house),
+              label: 'Rooms',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.more_horiz_outlined),
+              selectedIcon: Icon(Icons.more_horiz),
+              label: 'More',
+            ),
           ],
-          currentIndex: _selectedIndex,
-          onTap: onItemTapped,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          elevation: 12.0,
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: onItemTapped,
+          elevation: 15,
+          surfaceTintColor: const Color(0x00000000),
         ),
       ),
     );

@@ -81,12 +81,11 @@ class _RoomDetailsState extends State<RoomDetails> {
               children: [
                 Visibility(
                   visible: _room.note.isNotNullOrEmpty(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      _room.note!,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      textAlign: TextAlign.start,
+                  child: ListTile(
+                    title: Text(_room.note!),
+                    subtitle: const Text(
+                      'Note',
+                      style: TextStyle(fontSize: 11),
                     ),
                   ),
                 ),

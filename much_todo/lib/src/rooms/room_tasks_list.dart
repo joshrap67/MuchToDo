@@ -1,45 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
-import 'package:uuid/uuid.dart';
+import 'package:much_todo/src/filter/filter_task_options.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:much_todo/src/create_task/create_task.dart';
 import 'package:much_todo/src/domain/task.dart';
-import 'package:much_todo/src/filter/filter_tasks.dart';
 import 'package:much_todo/src/task_list/task_card.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
-class RoomsListTasks extends StatefulWidget {
-  final List<Task> tasks;
+class RoomTasksList extends StatefulWidget {
   final Room room;
 
-  const RoomsListTasks({super.key, required this.room, required this.tasks});
+  const RoomTasksList({super.key, required this.room});
 
   @override
-  State<RoomsListTasks> createState() => _RoomsListTasksState();
+  State<RoomTasksList> createState() => _RoomTasksListState();
 }
 
-class _RoomsListTasksState extends State<RoomsListTasks> {
+class _RoomTasksListState extends State<RoomTasksList> {
   late List<Task> _tasks;
 
   SortOptions _sortByValue = SortOptions.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
-  bool _includeInactive = false;
   final List<DropdownMenuItem<SortOptions>> _sortEntries = <DropdownMenuItem<SortOptions>>[];
 
   @override
   void initState() {
     super.initState();
-    // for testing purposes todo remove
-    widget.tasks.add(Task.named(
-        id: const Uuid().v4(),
-        name: 'Inactive',
-        priority: 1,
-        effort: 1,
-        createdBy: 'createdBy',
-        isCompleted: true,
-        room: TaskRoom('id', 'Name')));
-    _tasks = [...widget.tasks];
-    sortAndFilterTasks();
     for (var value in SortOptions.values) {
       _sortEntries.add(DropdownMenuItem<SortOptions>(
         value: value,
@@ -50,6 +38,7 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
 
   @override
   Widget build(BuildContext context) {
+    getRoomTasks();
     return Column(
       children: [
         ListTile(
@@ -59,8 +48,8 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
           ),
           subtitle: getSubTitle(),
           trailing: IconButton(
-            onPressed: filterTasks,
-            icon: const Icon(Icons.filter_list_sharp),
+            onPressed: promptSortTasks,
+            icon: const Icon(Icons.sort),
           ),
           contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
         ),
@@ -103,10 +92,14 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
     );
     if (result != null && result.isNotEmpty) {
       setState(() {
-        _tasks.addAll(result);
         showSnackbar('${result.length} Tasks created.', context);
       });
     }
+  }
+
+  void getRoomTasks() {
+    _tasks = context.watch<TasksProvider>().allTasks.where((element) => element.room.id == widget.room.id).toList();
+	sortRoomTasks(); // todo this will be called too often
   }
 
   String getTitle() {
@@ -114,7 +107,6 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
   }
 
   Widget? getSubTitle() {
-    // todo need to make clear on task list that it only includes aggregated cost of non completed ones
     var totalCost = 0.0;
     for (var e in _tasks) {
       if (e.estimatedCost != null) {
@@ -129,7 +121,7 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
         : null;
   }
 
-  void filterTasks() {
+  void promptSortTasks() {
     showDialog<void>(
         context: context,
         builder: (ctx) {
@@ -142,14 +134,13 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, 'OK');
-                  sortAndFilterTasks();
+				  sortRoomTasks();
                   setState(() {});
                 },
                 child: const Text('APPLY'),
               )
             ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Filter & Sort'),
+            title: const Text('Sort Tasks'),
             content: StatefulBuilder(
               builder: (statefulContext, setState) {
                 return SizedBox(
@@ -201,16 +192,6 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
                           ),
                         ],
                       ),
-                      CheckboxListTile(
-                        value: _includeInactive,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _includeInactive = value ?? false;
-                          });
-                        },
-                        contentPadding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-                        title: const Text('Include Completed Tasks'),
-                      ),
                     ],
                   ),
                 );
@@ -220,53 +201,9 @@ class _RoomsListTasksState extends State<RoomsListTasks> {
         });
   }
 
-  void sortAndFilterTasks() {
-    var tasks = widget.tasks.where((element) => _includeInactive || !element.isCompleted).toList();
-    // initially ascending
-    switch (_sortByValue) {
-      case SortOptions.name:
-        tasks.sort((a, b) => a.name.compareTo(b.name));
-        break;
-      case SortOptions.priority:
-        tasks.sort((a, b) => a.priority.compareTo(b.priority));
-        break;
-      case SortOptions.effort:
-        tasks.sort((a, b) => a.effort.compareTo(b.effort));
-        break;
-      case SortOptions.room:
-        tasks.sort((a, b) => a.room.name.compareTo(b.room.name));
-        break;
-      case SortOptions.cost:
-        tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1); // todo ugh
-        break;
-      case SortOptions.creationDate:
-        tasks.sort((a, b) => a.creationDate?.compareTo(b.creationDate ?? DateTime(1970)) ?? -1); // todo ugh
-        break;
-      case SortOptions.dueBy:
-        tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1); // todo ugh
-        break;
-      case SortOptions.inProgress:
-        tasks.sort((a, b) {
-          if (b.inProgress) {
-            // ones that are in progress are on top in ascending
-            return 1;
-          }
-          return -1;
-        });
-        break;
-      case SortOptions.completed:
-        tasks.sort((a, b) {
-          if (b.isCompleted) {
-            // ones that are completed are on top in ascending
-            return 1;
-          }
-          return -1;
-        });
-        break;
-    }
-    if (_sortDirectionValue == SortDirection.descending) {
-      tasks = tasks.reversed.toList();
-    }
+  void sortRoomTasks() {
+    var tasks = _tasks;
+    sortTasks(tasks, _sortByValue, _sortDirectionValue);
 
     _tasks = tasks;
   }

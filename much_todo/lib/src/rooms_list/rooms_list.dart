@@ -3,7 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/rooms/create_room.dart';
-import 'package:much_todo/src/rooms/room_info_card.dart';
+import 'package:much_todo/src/rooms_list/room_info_card.dart';
+import 'package:much_todo/src/skeletons/rooms_list_skeleton.dart';
 import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -31,73 +32,78 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
   Widget build(BuildContext context) {
     super.build(context);
     var rooms = context.watch<RoomsProvider>().rooms;
-    return NotificationListener<UserScrollNotification>(
-      onNotification: (notification) {
-        var direction = notification.direction;
-        setState(() {
-          if (direction == ScrollDirection.reverse) {
-            _showFab = false;
-          } else if (direction == ScrollDirection.forward) {
-            _showFab = true;
-          }
-        });
-        return true;
-      },
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              ListTile(
-                title: Text(
-                  '${rooms.length} Total Rooms',
-                  style: const TextStyle(fontSize: 22),
+	print(rooms);
+    if (context.watch<RoomsProvider>().isLoading) {
+      return const RoomsListSkeleton();
+    } else {
+      return NotificationListener<UserScrollNotification>(
+        onNotification: (notification) {
+          var direction = notification.direction;
+          setState(() {
+            if (direction == ScrollDirection.reverse) {
+              _showFab = false;
+            } else if (direction == ScrollDirection.forward) {
+              _showFab = true;
+            }
+          });
+          return true;
+        },
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    '${rooms.length} Total Rooms',
+                    style: const TextStyle(fontSize: 22),
+                  ),
+                  subtitle: Text(
+                    '${totalTasks()} Total Incomplete Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  trailing: sortDropdown(),
                 ),
-                subtitle: Text(
-                  '${totalTasks()} Total Incomplete Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
-                  style: const TextStyle(fontSize: 12),
+                const Divider(),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: rooms.length,
+                    controller: _scrollController,
+                    padding: const EdgeInsets.only(bottom: 65),
+                    itemBuilder: (ctx, index) {
+                      var room = rooms[index];
+                      return RoomInfoCard(room: room);
+                    },
+                  ),
                 ),
-                trailing: sortDropdown(),
-              ),
-              const Divider(),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: rooms.length,
-                  controller: _scrollController,
-                  padding: const EdgeInsets.only(bottom: 65),
-                  itemBuilder: (ctx, index) {
-                    var room = rooms[index];
-                    return RoomInfoCard(room: room);
-                  },
-                ),
-              ),
-            ],
-          ),
-          Visibility(
-            visible: true,
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
-                    return ScaleTransition(scale: animation, child: child);
-                  },
-                  child: _showFab
-                      ? FloatingActionButton.extended(
-                          onPressed: launchAddRoom,
-                          label: const Text('ADD ROOM'),
-                          icon: const Icon(Icons.add),
-                          heroTag: 'RoomFab',
-                        )
-                      : null,
+              ],
+            ),
+            Visibility(
+              visible: true,
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 150),
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: _showFab
+                        ? FloatingActionButton.extended(
+                            onPressed: launchAddRoom,
+                            label: const Text('ADD ROOM'),
+                            icon: const Icon(Icons.add),
+                            heroTag: 'RoomFab',
+                          )
+                        : null,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 
   Widget sortDropdown() {

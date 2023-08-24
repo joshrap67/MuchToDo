@@ -77,7 +77,7 @@ class _ContactCardFilterState extends State<ContactCardFilter> {
 
   void onDeleteContact(String id) {
     setState(() {
-      _selectedContacts.removeWhere((element) => element.name == id);
+      _selectedContacts.removeWhere((element) => element.id == id);
       widget.onChange(_selectedContacts);
     });
   }

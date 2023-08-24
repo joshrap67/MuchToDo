@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -52,5 +54,12 @@ class UserService {
       context.read<UserProvider>().updateContact(contact);
       context.read<TasksProvider>().updateContactForTasks(contact);
     });
+  }
+
+  static Future<void> signOut(BuildContext context) async {
+    context.read<RoomsProvider>().clearRooms();
+    context.read<TasksProvider>().clearTasks();
+    context.read<UserProvider>().clearUser();
+    await FirebaseAuth.instance.signOut();
   }
 }

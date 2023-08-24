@@ -1,26 +1,26 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/user.dart' as domain_user;
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/sign_in/sign_in_screen.dart';
+import 'package:much_todo/src/skeletons/more_screen_skeleton.dart';
 import 'package:much_todo/src/user/user_contacts.dart';
 import 'package:much_todo/src/user/user_tags.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/providers/settings_provider.dart';
 
-class Settings extends StatefulWidget {
-  const Settings({super.key, required this.controller});
+class MoreScreen extends StatefulWidget {
+  const MoreScreen({super.key, required this.controller});
 
   final SettingsProvider controller;
 
   @override
-  State<Settings> createState() => _SettingsState();
+  State<MoreScreen> createState() => _MoreScreenState();
 }
 
 enum AccountOptions { logout, delete }
 
-class _SettingsState extends State<Settings> {
+class _MoreScreenState extends State<MoreScreen> {
   String? _version;
 
   @override
@@ -31,7 +31,10 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    domain_user.User user = context.watch<UserProvider>().user!;
+    var user = context.watch<UserProvider>().user;
+    if (user == null || context.watch<UserProvider>().isLoading) {
+      return const MoreScreenSkeleton();
+    }
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -196,10 +199,11 @@ class _SettingsState extends State<Settings> {
 
   void launchTermsAndConditions() {}
 
-  void signOut() {
-    // todo need to clear out providers
-    FirebaseAuth.instance.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, SignInScreen.routeName, (route) => false);
+  Future<void> signOut() async {
+    await UserService.signOut(context);
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, SignInScreen.routeName, (route) => false);
+    }
   }
 
   void promptDeleteAccount() {}

@@ -1,13 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/rooms/edit_room.dart';
-import 'package:much_todo/src/rooms/rooms_list_tasks.dart';
+import 'package:much_todo/src/rooms/room_completed_tasks.dart';
+import 'package:much_todo/src/rooms/room_tasks_list.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:provider/provider.dart';
 import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/domain/task.dart';
 
 class RoomDetails extends StatefulWidget {
   final Room room;
@@ -18,18 +16,15 @@ class RoomDetails extends StatefulWidget {
   State<RoomDetails> createState() => _RoomDetailsState();
 }
 
-enum TaskOptions { edit, delete }
+enum TaskOptions { edit, delete, showCompletedTasks }
 
 class _RoomDetailsState extends State<RoomDetails> {
   late Room _room;
-
-  late Future<List<Task>> _tasks;
 
   @override
   void initState() {
     super.initState();
     _room = widget.room;
-    _tasks = getRoomTasks();
   }
 
   @override
@@ -66,53 +61,41 @@ class _RoomDetailsState extends State<RoomDetails> {
                     contentPadding: EdgeInsets.all(0),
                   ),
                 ),
+                const PopupMenuItem<TaskOptions>(
+                  value: TaskOptions.showCompletedTasks,
+                  child: ListTile(
+                    title: Text('Completed Tasks'),
+                    leading: Icon(Icons.done),
+                    contentPadding: EdgeInsets.all(0),
+                  ),
+                ),
               ];
             },
             onSelected: (TaskOptions result) => onOptionSelected(result),
           )
         ],
       ),
-      body: FutureBuilder<List<Task>>(
-        future: _tasks,
-        builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
-          if (snapshot.hasData) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Visibility(
-                  visible: _room.note.isNotNullOrEmpty(),
-                  child: ListTile(
-                    title: Text(_room.note!),
-                    subtitle: const Text(
-                      'Note',
-                      style: TextStyle(fontSize: 11),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: RoomsListTasks(
-                    tasks: snapshot.data!,
-                    room: _room,
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Visibility(
+            visible: _room.note.isNotNullOrEmpty(),
+            child: ListTile(
+              title: Text(_room.note!),
+              subtitle: const Text(
+                'Note',
+                style: TextStyle(fontSize: 11),
+              ),
+            ),
+          ),
+          Expanded(
+            child: RoomTasksList(
+              room: _room,
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  Future<List<Task>> getRoomTasks() async {
-    List<Task> tasks = [];
-    // todo use a separate provider for this?
-    await Future.delayed(const Duration(seconds: 2), () {
-      tasks = context.read<TasksProvider>().tasks.where((element) => element.room.id == _room.id).toList();
-    });
-    setState(() {});
-    return tasks;
   }
 
   onOptionSelected(TaskOptions result) {
@@ -122,6 +105,9 @@ class _RoomDetailsState extends State<RoomDetails> {
         break;
       case TaskOptions.delete:
         promptDeleteRoom();
+        break;
+      case TaskOptions.showCompletedTasks:
+        showCompletedRooms();
         break;
     }
   }
@@ -138,6 +124,15 @@ class _RoomDetailsState extends State<RoomDetails> {
         _room = room;
       });
     }
+  }
+
+  void showCompletedRooms() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RoomCompletedTasks(room: _room),
+      ),
+    );
   }
 
   void promptDeleteRoom() {

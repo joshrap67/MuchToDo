@@ -4,8 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/filter/contact_card_filter.dart';
+import 'package:much_todo/src/filter/filter_task_options.dart';
 import 'package:much_todo/src/filter/tags_card_filter.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:provider/provider.dart';
@@ -15,70 +18,6 @@ class FilterTasks extends StatefulWidget {
 
   @override
   State<FilterTasks> createState() => _FilterTasksState();
-}
-
-enum SortOptions {
-  name(0, 'Name'),
-  priority(1, 'Priority'),
-  effort(2, 'Effort'),
-  room(2, 'Room Name'),
-  cost(2, 'Estimated Cost'),
-  creationDate(2, 'Creation Date'),
-  dueBy(2, 'Due By'),
-  completed(2, 'Completed'),
-  inProgress(2, 'In Progress');
-
-  const SortOptions(this.value, this.label);
-
-  final int value; // using since i will probably want to store these in local prefs
-  final String label;
-}
-
-enum SortDirection {
-  descending(0, Icon(Icons.arrow_downward)),
-  ascending(1, Icon(Icons.arrow_upward));
-
-  const SortDirection(this.value, this.widget);
-
-  final int value; // using since i will probably want to store these in local prefs
-  final Widget widget;
-}
-
-enum EqualityComparisons {
-  greaterThan(0, '>'),
-  greaterThanOrEqualTo(1, '≥'),
-  equalTo(2, '='),
-  lessThan(3, '<'),
-  lessThanOrEqualTo(4, '≤');
-
-  const EqualityComparisons(this.value, this.label);
-
-  final int value; // using since i will probably want to store these in local prefs
-  final String label;
-}
-
-enum PriorityFilter {
-  one(1, '1'),
-  two(2, '2'),
-  three(3, '3'),
-  four(4, '4'),
-  five(5, '5');
-
-  const PriorityFilter(this.value, this.label);
-
-  final int value; // using since i will probably want to store these in local prefs
-  final String label;
-}
-
-enum EffortFilter {
-  one(1, 'Low'),
-  two(2, 'Medium'),
-  three(3, 'High');
-
-  const EffortFilter(this.value, this.label);
-
-  final int value; // using since i will probably want to store these in local prefs
-  final String label;
 }
 
 class _FilterTasksState extends State<FilterTasks> {
@@ -92,15 +31,14 @@ class _FilterTasksState extends State<FilterTasks> {
   EqualityComparisons _costEquality = EqualityComparisons.equalTo;
 
   DateTime? _completeByFilter;
-  EqualityComparisons _completeByEquality = EqualityComparisons.equalTo;
+  DateEqualityComparisons _completeByEquality = DateEqualityComparisons.equalTo;
 
   DateTime? _creationDateFilter;
-  EqualityComparisons _creationDateEquality = EqualityComparisons.equalTo;
+  DateEqualityComparisons _creationDateEquality = DateEqualityComparisons.equalTo;
 
   DateTime? _completionDateFilter;
-  EqualityComparisons _completionDateEquality = EqualityComparisons.equalTo;
+  DateEqualityComparisons _completionDateEquality = DateEqualityComparisons.equalTo;
 
-  bool _includeInactive = false;
   bool _showOnlyInProgress = false;
   List<Tag> _selectedTags = [];
   List<Contact> _selectedContacts = [];
@@ -108,6 +46,8 @@ class _FilterTasksState extends State<FilterTasks> {
 
   final List<DropdownMenuItem<SortOptions>> _sortEntries = <DropdownMenuItem<SortOptions>>[];
   final List<DropdownMenuItem<EqualityComparisons>> _equalityEntries = <DropdownMenuItem<EqualityComparisons>>[];
+  final List<DropdownMenuItem<DateEqualityComparisons>> _dateEqualityEntries =
+      <DropdownMenuItem<DateEqualityComparisons>>[];
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
   final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
   final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
@@ -132,6 +72,12 @@ class _FilterTasksState extends State<FilterTasks> {
         child: Text(value.label),
       ));
     }
+    for (var value in DateEqualityComparisons.values) {
+      _dateEqualityEntries.add(DropdownMenuItem<DateEqualityComparisons>(
+        value: value,
+        child: Text(value.label),
+      ));
+    }
     for (var value in PriorityFilter.values) {
       _priorityEntries.add(DropdownMenuItem<PriorityFilter>(
         value: value,
@@ -143,6 +89,41 @@ class _FilterTasksState extends State<FilterTasks> {
         value: value,
         child: Text(value.label),
       ));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FilterTaskOptions filters = context.read<TasksProvider>().filters;
+        _sortByValue = filters.sortByValue;
+        _sortDirectionValue = filters.sortDirectionValue;
+        _priorityFilter = filters.priorityFilter;
+        _priorityEquality = filters.priorityEquality;
+        _effortFilter = filters.effortFilter;
+        _roomIdFilter = filters.roomIdFilter;
+        _costFilterController.text = filters.estimatedCost?.toString() ?? '';
+        _costEquality = filters.costEquality;
+        _selectedContacts =
+            context.read<UserProvider>().contacts.where((x) => filters.selectedContacts.any((y) => y == x.id)).toList();
+        _selectedTags =
+            context.read<UserProvider>().tags.where((x) => filters.selectedTags.any((y) => y == x.id)).toList();
+        _showOnlyInProgress = filters.showOnlyInProgress;
+        _completeByFilter = filters.completeBy;
+        _completeByEquality = filters.completeByEquality;
+        if (_completeByFilter != null) {
+          _completeByFilterController.text = DateFormat('yyyy-MM-dd').format(_completeByFilter!);
+        }
+
+        _creationDateFilter = filters.creationDate;
+        _creationDateEquality = filters.creationDateEquality;
+        if (_creationDateFilter != null) {
+          _creationDateFilterController.text = DateFormat('yyyy-MM-dd').format(_creationDateFilter!);
+        }
+
+        _completionDateFilter = filters.completionDate;
+        _completionDateEquality = filters.completionDateEquality;
+        if (_completionDateFilter != null) {
+          _completionDateFilterController.text = DateFormat('yyyy-MM-dd').format(_completionDateFilter!);
+        }
+
+        setState(() {});
+      });
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -434,6 +415,7 @@ class _FilterTasksState extends State<FilterTasks> {
                     ),
                     TagsCardFilter(
                         tags: _selectedTags,
+                        key: ValueKey(_selectedTags),
                         onChange: (tags) {
                           setState(() {
                             _selectedTags = tags;
@@ -441,20 +423,12 @@ class _FilterTasksState extends State<FilterTasks> {
                         }),
                     ContactCardFilter(
                         contacts: _selectedContacts,
+                        key: ValueKey(_selectedContacts),
                         onChange: (contacts) {
                           setState(() {
                             _selectedContacts = contacts;
                           });
                         }),
-                    CheckboxListTile(
-                      value: _includeInactive,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _includeInactive = value ?? false;
-                        });
-                      },
-                      title: const Text('Include Completed Tasks'),
-                    ),
                     CheckboxListTile(
                       value: _showOnlyInProgress,
                       onChanged: (bool? value) {
@@ -481,7 +455,7 @@ class _FilterTasksState extends State<FilterTasks> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: DropdownButtonFormField(
-                                items: _equalityEntries,
+                                items: _dateEqualityEntries,
                                 isExpanded: true,
                                 value: _completeByEquality,
                                 onChanged: (value) {
@@ -507,6 +481,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                       ? IconButton(
                                           onPressed: () {
                                             setState(() {
+                                              _completeByFilter = null;
                                               _completeByFilterController.clear();
                                             });
                                           },
@@ -552,7 +527,7 @@ class _FilterTasksState extends State<FilterTasks> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: DropdownButtonFormField(
-                                items: _equalityEntries,
+                                items: _dateEqualityEntries,
                                 isExpanded: true,
                                 value: _creationDateEquality,
                                 onChanged: (value) {
@@ -578,6 +553,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                       ? IconButton(
                                           onPressed: () {
                                             setState(() {
+                                              _creationDateFilter = null;
                                               _creationDateFilterController.clear();
                                             });
                                           },
@@ -623,7 +599,7 @@ class _FilterTasksState extends State<FilterTasks> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: DropdownButtonFormField(
-                                items: _equalityEntries,
+                                items: _dateEqualityEntries,
                                 isExpanded: true,
                                 value: _completionDateEquality,
                                 onChanged: (value) {
@@ -649,6 +625,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                       ? IconButton(
                                           onPressed: () {
                                             setState(() {
+                                              _completionDateFilter = null;
                                               _completionDateFilterController.clear();
                                             });
                                           },
@@ -695,5 +672,27 @@ class _FilterTasksState extends State<FilterTasks> {
     );
   }
 
-  Future<void> onSubmit() async {}
+  Future<void> onSubmit() async {
+    FilterTaskOptions options = FilterTaskOptions.named(
+      sortByValue: _sortByValue,
+      sortDirectionValue: _sortDirectionValue,
+      priorityEquality: _priorityEquality,
+      priorityFilter: _priorityFilter,
+      effortFilter: _effortFilter,
+      roomIdFilter: _roomIdFilter,
+      costEquality: _costEquality,
+      estimatedCost: _costFilterController.text.isNotEmpty ? double.parse(_costFilterController.text) : null,
+      selectedTags: _selectedTags.map((t) => t.id).toList(),
+      selectedContacts: _selectedContacts.map((c) => c.id).toList(),
+      showOnlyInProgress: _showOnlyInProgress,
+      completeByEquality: _completeByEquality,
+      completeBy: _completeByFilter,
+      creationDateEquality: _creationDateEquality,
+      creationDate: _creationDateFilter,
+      completionDateEquality: _completionDateEquality,
+      completionDate: _completionDateFilter,
+    );
+    context.read<TasksProvider>().setFilters(options);
+    Navigator.pop(context, true);
+  }
 }

@@ -10,9 +10,21 @@ class RoomsProvider with ChangeNotifier {
     Room('C', 'Kitchen', 'Note', []),
     Room('D', 'Unspecified Room', 'Note', []),
   ];
-  final List<Room> _rooms = initialData;
+  List<Room> _rooms = [...initialData];
+  bool _isLoading = true;
 
   List<Room> get rooms => [..._rooms]; // spread since otherwise widgets could bypass mutation methods
+  bool get isLoading => _isLoading;
+
+  Future<void> loadRooms() async {
+    _isLoading = true;
+    notifyListeners();
+    await Future.delayed(const Duration(seconds: 4), () {
+      _rooms = [...initialData];
+    });
+    _isLoading = false;
+    notifyListeners();
+  }
 
   void addRoom(Room room) {
     _rooms.add(room);
@@ -88,6 +100,11 @@ class RoomsProvider with ChangeNotifier {
     for (var room in _rooms) {
       room.tasks.removeWhere((element) => element.id == task.id);
     }
+    notifyListeners();
+  }
+
+  void clearRooms() {
+    _rooms = [];
     notifyListeners();
   }
 }

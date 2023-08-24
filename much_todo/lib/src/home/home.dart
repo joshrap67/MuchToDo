@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/rooms/rooms_list.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/rooms_list/rooms_list.dart';
 import 'package:much_todo/src/providers/settings_provider.dart';
-import 'package:much_todo/src/settings/settings.dart';
+import 'package:much_todo/src/home/more_screen.dart';
 import 'package:much_todo/src/task_list/task_list.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   final SettingsProvider controller;
@@ -25,8 +29,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _screens = <Widget>[const TaskList(), const RoomList(), Settings(controller: widget.controller)];
+    _screens = <Widget>[const TaskList(), const RoomList(), MoreScreen(controller: widget.controller)];
     _navStack.add(_selectedIndex);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TasksProvider>().loadTasks();
+      context.read<RoomsProvider>().loadRooms();
+      context.read<UserProvider>().loadUser('id');
+    });
   }
 
   @override

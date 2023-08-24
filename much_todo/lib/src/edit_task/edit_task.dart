@@ -77,7 +77,8 @@ class _EditTaskState extends State<EditTask> {
           .rooms
           .cast<Room?>()
           .firstWhere((element) => element?.id == widget.task.room.id, orElse: () => null);
-      _contacts = context.read<UserProvider>().contacts.where((x) => widget.task.contacts.any((y) => y.id == x.id)).toList();
+      _contacts =
+          context.read<UserProvider>().contacts.where((x) => widget.task.contacts.any((y) => y.id == x.id)).toList();
       _tags = context.read<UserProvider>().tags.where((x) => widget.task.tags.any((y) => y.id == x.id)).toList();
       setState(() {});
     });
@@ -361,7 +362,7 @@ class _EditTaskState extends State<EditTask> {
       return;
     }
 
-	hideKeyboard();
+    hideKeyboard();
     await Future.delayed(const Duration(seconds: 2), () {
       double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
       var task = TaskService.editTask(context, widget.task.id, _nameController.text.toString().trim(), _priority,

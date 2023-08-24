@@ -1,5 +1,8 @@
 import 'package:much_todo/src/domain/room.dart';
 
+// todo should i use the decimal package for this? idk i mean this are approximate anyway so im not too concerned with small floating point errors
+// todo list of steps?
+// todo date last updated?
 class Task {
   static const lowEffort = 1;
   static const mediumEffort = 2;
@@ -11,8 +14,6 @@ class Task {
   int priority;
   int effort;
   TaskRoom room;
-
-  // todo should i use the decimal package for this? idk i mean this are approximate anyway so im not too concerned with small floating point errors
   double? estimatedCost;
   String? note;
   List<TaskTag> tags;
@@ -22,7 +23,8 @@ class Task {
   bool isCompleted = false;
   bool inProgress = false;
   DateTime? completeBy;
-  DateTime? creationDate; // todo shouldn't be nullable
+  DateTime creationDate;
+
   // todo completionDate? could just have that replace isCompleted and make isCompleted a function
 
   Task(
@@ -43,23 +45,24 @@ class Task {
       this.completeBy,
       this.creationDate);
 
-  Task.named(
-      {required this.id,
-      required this.name,
-      required this.priority,
-      required this.effort,
-      required this.createdBy,
-      required this.room,
-      this.tags = const [],
-      this.estimatedCost,
-      this.note,
-      this.links = const [],
-      this.photos = const [],
-      this.contacts = const [],
-      this.isCompleted = false,
-      this.inProgress = false,
-      this.completeBy,
-      this.creationDate});
+  Task.named({
+    required this.id,
+    required this.name,
+    required this.priority,
+    required this.effort,
+    required this.createdBy,
+    required this.room,
+    required this.creationDate,
+    this.tags = const [],
+    this.estimatedCost,
+    this.note,
+    this.links = const [],
+    this.photos = const [],
+    this.contacts = const [],
+    this.isCompleted = false,
+    this.inProgress = false,
+    this.completeBy,
+  });
 
   @override
   String toString() {
@@ -68,8 +71,8 @@ class Task {
         'contacts: $contacts, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
   }
 
-  RoomTask convert(){
-	  return RoomTask(id, name, estimatedCost);
+  RoomTask convert() {
+    return RoomTask(id, name, estimatedCost);
   }
 }
 

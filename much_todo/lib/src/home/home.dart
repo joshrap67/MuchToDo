@@ -8,6 +8,8 @@ import 'package:much_todo/src/utils/utils.dart';
 class Home extends StatefulWidget {
   final SettingsProvider controller;
 
+  static const routeName = '/home';
+
   const Home({super.key, required this.controller});
 
   @override

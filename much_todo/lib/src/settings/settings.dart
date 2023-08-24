@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/user.dart';
+import 'package:much_todo/src/domain/user.dart' as domain_user;
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/user/user_contacts.dart';
 import 'package:much_todo/src/user/user_tags.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -9,8 +11,6 @@ import 'package:much_todo/src/providers/settings_provider.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key, required this.controller});
-
-  static const routeName = '/settings';
 
   final SettingsProvider controller;
 
@@ -31,7 +31,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    User user = context.watch<UserProvider>().user!;
+    domain_user.User user = context.watch<UserProvider>().user!;
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -150,12 +150,20 @@ class _SettingsState extends State<Settings> {
           ),
         ];
       },
-      onSelected: (AccountOptions result) => onSortSelected(result),
+      onSelected: (AccountOptions result) => onAccountOptionSelected(result),
     );
   }
 
-  void onSortSelected(AccountOptions result) {
+  void onAccountOptionSelected(AccountOptions result) {
     // todo log out or prompt delete
+    switch (result) {
+      case AccountOptions.logout:
+        signOut();
+        break;
+      case AccountOptions.delete:
+        promptDeleteAccount();
+        break;
+    }
     setState(() {});
   }
 
@@ -187,4 +195,12 @@ class _SettingsState extends State<Settings> {
   void launchPrivacyPolicy() {}
 
   void launchTermsAndConditions() {}
+
+  void signOut() {
+    // todo need to clear out providers
+    FirebaseAuth.instance.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, SignInScreen.routeName, (route) => false);
+  }
+
+  void promptDeleteAccount() {}
 }

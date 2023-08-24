@@ -9,6 +9,7 @@ void hideKeyboard() {
 
 extension StringExtensions on String? {
   bool isNullOrEmpty() {
+    // todo makes no sense as extension since null would throw exception trying to invoke this method
     return this == null || this!.isEmpty;
   }
 

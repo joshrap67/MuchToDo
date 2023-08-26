@@ -12,6 +12,7 @@ class RoomsService {
     await Future.delayed(const Duration(seconds: 2), () {
       room = Room(const Uuid().v4(), name.trim(), note == null || note.isEmpty ? null : note, []);
       context.read<RoomsProvider>().addRoom(room!);
+	  // todo update rooms list on user
     });
     return room!;
   }
@@ -20,6 +21,7 @@ class RoomsService {
     await Future.delayed(const Duration(seconds: 2), () {
       context.read<RoomsProvider>().removeRoom(room);
       context.read<TasksProvider>().removeTasksFromRoomId(room.id);
+	  // todo use provider remove reoom
     });
   }
 

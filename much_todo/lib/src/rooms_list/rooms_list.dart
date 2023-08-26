@@ -32,7 +32,6 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
   Widget build(BuildContext context) {
     super.build(context);
     var rooms = context.watch<RoomsProvider>().rooms;
-	print(rooms);
     if (context.watch<RoomsProvider>().isLoading) {
       return const RoomsListSkeleton();
     } else {

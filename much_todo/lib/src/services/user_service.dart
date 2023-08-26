@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 import 'package:much_todo/src/domain/contact.dart';
 
 class UserService {
+  // todo in get method, if 404 push and replace route to the screen where accounts are created
   static Future<Tag> createTag(BuildContext context, String name) async {
     Tag? tag;
     tag = Tag(const Uuid().v4(), name);

@@ -71,11 +71,17 @@ class RoomsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTask(Task task) {
+  void updateTask(Task updatedTask, String oldRoomId) {
+    if (updatedTask.room.id == oldRoomId) {
+      return;
+    }
+    var oldRoom = _rooms.firstWhere((element) => element.id == oldRoomId);
+    oldRoom.tasks.removeWhere((element) => element.id == updatedTask.id);
+
     for (var room in _rooms) {
-      for (var roomTask in room.tasks) {
-        if (roomTask.id == task.id) {
-          roomTask.update(task.name, task.estimatedCost);
+      for (var task in room.tasks) {
+        if (task.id == updatedTask.id) {
+          task.update(updatedTask.name, updatedTask.estimatedCost);
           notifyListeners();
           return;
         }

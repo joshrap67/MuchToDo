@@ -1,71 +1,67 @@
-import mongoose, {Schema, Types, model} from 'mongoose';
-import {roomsCollection, tasksCollection} from "./utils/collections";
+import {Schema, Types, model} from 'mongoose';
+import {completedTasksCollection, roomsCollection} from "./utils/collections";
 
-export interface ITask {
+export interface ICompletedTask {
     _id: Types.ObjectId,
     name: string,
     createdBy: string,
     priority: number,
     effort: number,
-    room: ITaskRoom,
+    room: ICompletedTaskRoom,
     estimatedCost: number,
     note: string,
-    tags: ITaskTag[],
-    contacts: ITaskContact[],
-    links: string[],
-    photos: string[],
-    inProgress: boolean,
-    completeBy: Date,
+    tags: ICompletedTaskTag[],
+    contacts: ICompletedTaskContact[],
+    links: string[], // todo delete?
+    photos: string[], // todo delete?
 }
 
-export interface ITaskRoom {
+export interface ICompletedTaskRoom {
     id: Types.ObjectId,
     name: string
 }
 
-export interface ITaskTag {
+export interface ICompletedTaskTag {
     id: string,
     name: string
 }
 
-export interface ITaskContact {
+export interface ICompletedTaskContact {
     id: string,
     name: string,
     email: string,
     phoneNumber: string
 }
 
-const RoomSchema = new Schema<ITaskRoom>({
+const RoomSchema = new Schema<ICompletedTaskRoom>({
     id: {type: Schema.Types.ObjectId, ref: roomsCollection, required: true},
     name: {type: String, required: true},
-}, {_id: false});
+});
 
-const TagSchema = new Schema<ITaskTag>({
+const TagSchema = new Schema<ICompletedTaskTag>({
     id: {type: String, required: true},
     name: {type: String, required: true},
-}, {_id: false});
+});
 
-const ContactSchema = new Schema<ITaskContact>({
+const ContactSchema = new Schema<ICompletedTaskContact>({
     id: {type: String, required: true},
     name: {type: String, required: true},
     email: {type: String},
     phoneNumber: {type: String},
-}, {_id: false});
+});
 
-const TaskSchema = new Schema<ITask>({
+const CompletedTaskSchema = new Schema<ICompletedTask>({
     name: {type: String, required: true},
-    createdBy: {type: String, required: true, index: true},
+    createdBy: {type: String, required: true},
     priority: {type: Number, required: true},
     effort: {type: Number, required: true},
-    room: RoomSchema,
+    room: {RoomSchema, required: true},
     estimatedCost: {type: Number},
     note: {type: String},
     tags: [TagSchema],
     contacts: [ContactSchema],
     links: [{type: String}],
-    photos: [{type: String}],
-    inProgress: {type: Boolean},
-    completeBy: {type: Date}
+    photos: [{type: String}]
 });
 
-export const TaskModel = model<ITask>(tasksCollection, TaskSchema);
+export const CompletedTaskModel = model<ICompletedTask>(completedTasksCollection, CompletedTaskSchema);

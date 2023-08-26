@@ -21,6 +21,7 @@ class TaskService {
       List<Contact> contacts = const [],
       List<XFile> photos = const []}) {
     // todo upload photos to cloud
+    var oldTask = context.read<TasksProvider>().allTasks.firstWhere((element) => element.id == id);
     var task = Task.named(
         id: id,
         name: name.trim(),
@@ -37,9 +38,9 @@ class TaskService {
         contacts: contacts.map((e) => e.convert()).toList(),
         room: room.convert(),
         creationDate: DateTime.now().toUtc());
-	// todo pass in original
+    // todo pass in original
     context.read<TasksProvider>().updateTask(task);
-    context.read<RoomsProvider>().updateTask(task);
+    context.read<RoomsProvider>().updateTask(task, oldTask.room.id);
     context.read<UserProvider>().updateTask(task);
 
     return task;

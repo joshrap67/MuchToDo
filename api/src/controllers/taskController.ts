@@ -38,14 +38,12 @@ export const createTasks = async (req: express.Request<{}, {}, ICreateTaskReques
     }
 }
 
-export const updateTask = async (req: express.Request<{
-    id: string
-}, {}, IUpdateTaskRequest>, res: express.Response) => {
+export const updateTask = async (req: express.Request<{ id: string }, {}, IUpdateTaskRequest>, res: express.Response) => {
     try {
         const userId = res.locals.firebaseId;
-        const tasks = await taskService.updateTask(req.params.id, req.body, userId);
+        const task = await taskService.updateTask(req.params.id, req.body, userId);
 
-        return res.status(201).json(tasks);
+        return res.status(201).json(task);
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
@@ -57,7 +55,7 @@ export const deleteTask = async (req: express.Request<{ id: string }, {}, {}>, r
         const userId = res.locals.firebaseId;
         await taskService.deleteTask(req.params.id, userId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);

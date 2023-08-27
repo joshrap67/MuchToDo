@@ -5,7 +5,7 @@ import {TaskModel} from "../domain/task";
 import {maxRoomCount} from "../utils/constants";
 
 export async function getRoomsByUser(userId: string): Promise<IRoom[]> {
-    return RoomModel.find({'createdBy': {userId}});
+    return RoomModel.find({'createdBy': userId});
 }
 
 export async function getRoomById(id: string, userId: string): Promise<IRoom> {

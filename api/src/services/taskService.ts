@@ -86,6 +86,7 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
                 const userContact = contactIdToContact[contact.id];
                 userContact.tasks.push(task._id);
             }
+            user.tasks.push(task._id);
             await user.save({session});
         }
 
@@ -113,7 +114,7 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
     try {
         session.startTransaction();
 
-        const user = await UserModel.findOne({'_id': userId}).session(session);
+        const user = await UserModel.findOne({'firebaseId': userId}).session(session);
         const room = await RoomModel.findOne({'_id': request.roomId}).session(session);
         const task = await TaskModel.findOne({'_id': taskId}).session(session);
         const oldRoom = await RoomModel.findOne({'_id': task.room.id}).session(session);
@@ -156,14 +157,20 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         task.completeBy = request.completeBy;
         await task.save({session});
 
-        // update tags/contacts of user now that we have an id
-        for (const tagId of request.tagIds) {
-            const tag = tagIdToTag[tagId];
-            tag.tasks.push(task._id);
+        // update tags/contacts of user
+        for (const tag of task.tags) {
+            const userTag = tagIdToTag[tag.id];
+            if (!userTag.tasks.some(x => x.equals(task._id))) {
+                // task is not associated with this tag so add it
+                userTag.tasks.push(task._id);
+            }
         }
-        for (const contactId of request.contactIds) {
-            const contact = contactIdToContact[contactId];
-            contact.tasks.push(task._id);
+        for (const contact of task.contacts) {
+            const userContact = contactIdToContact[contact.id];
+            if (!userContact.tasks.some(x => x.equals(task._id))) {
+                // task is not associated with this tag so add it
+                userContact.tasks.push(task._id);
+            }
         }
         await user.save({session});
 
@@ -190,7 +197,7 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
     try {
         session.startTransaction();
 
-        const user = await UserModel.findOne({'_id': userId}).session(session);
+        const user = await UserModel.findOne({'firebaseId': userId}).session(session);
         const task = await TaskModel.findOne({'_id': taskId}).session(session);
         const room = await RoomModel.findOne({'_id': task.room.id}).session(session);
         room.tasks = room.tasks.filter(x => !x.id.equals(task.id));
@@ -201,8 +208,9 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
         for (const contact of user.contacts) {
             contact.tasks = contact.tasks.filter(x => !x.equals(task.id));
         }
+        user.tasks = user.tasks.filter(x => !x.equals(task.id))
         await user.save({session});
-        await TaskModel.deleteOne({'_id': taskId});
+        await TaskModel.deleteOne({'_id': taskId}).session(session);
 
         await session.commitTransaction();
     } catch (e) {
@@ -211,5 +219,4 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
     } finally {
         await session.endSession();
     }
-
 }

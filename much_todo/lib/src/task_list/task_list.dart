@@ -200,6 +200,9 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
 
   Future<void> pickRandomTask() async {
     var tasks = context.read<TasksProvider>().allTasks;
+    if (tasks.isEmpty) {
+      return;
+    }
     hideKeyboard();
     setState(() {
       _bounceDice = true;
@@ -211,6 +214,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
       _bounceDice = false;
     });
 
+    // todo only pick ones not in progress
     var random = Random();
     var index = random.nextInt(tasks.length);
 

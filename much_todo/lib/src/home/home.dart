@@ -5,6 +5,9 @@ import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/rooms_list/rooms_list.dart';
 import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/home/more_screen.dart';
+import 'package:much_todo/src/services/rooms_service.dart';
+import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/task_list/task_list.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -32,9 +35,12 @@ class _HomeState extends State<Home> {
     _screens = <Widget>[const TaskList(), const RoomList(), MoreScreen(controller: widget.controller)];
     _navStack.add(_selectedIndex);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TasksProvider>().loadTasks();
-      context.read<RoomsProvider>().loadRooms();
-      context.read<UserProvider>().loadUser('id');
+      // context.read<TasksProvider>().loadTasks();
+      // context.read<RoomsProvider>().loadRooms();
+      UserService.loadUser(context);
+	  RoomsService.getAllRooms(context);
+	  TaskService.getAllTasks(context);
+      // context.read<UserProvider>().loadUser('id');
     });
   }
 

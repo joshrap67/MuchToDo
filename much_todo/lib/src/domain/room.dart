@@ -2,18 +2,26 @@ import 'package:much_todo/src/domain/task.dart';
 
 class Room {
   // todo rename to something generic like "Space"? Just since if you had outside areas they really aren't rooms
-  String id;
-  String name;
+  late String id;
+  late String name;
   String? note;
   List<RoomTask> tasks = [];
 
-  // todo generic note
-
   Room(this.id, this.name, this.note, this.tasks);
 
-  void update(String name, String? note){
-	  this.name = name;
-	  this.note = note;
+  Room.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    note = json['note'];
+    tasks = <RoomTask>[];
+    for (var task in json['tasks']) {
+      tasks.add(RoomTask.fromJson(task));
+    }
+  }
+
+  void update(String name, String? note) {
+    this.name = name;
+    this.note = note;
   }
 
   @override
@@ -38,16 +46,21 @@ class Room {
 }
 
 class RoomTask {
-  String id;
-  String name;
+  late String id;
+  late String name;
   double? estimatedCost;
-  // todo isActive?
 
   RoomTask(this.id, this.name, this.estimatedCost);
 
-  void update(String name, double? estimatedCost){
-	  this.name = name;
-	  this.estimatedCost = estimatedCost;
+  RoomTask.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    estimatedCost = json['estimatedCost'];
+  }
+
+  void update(String name, double? estimatedCost) {
+    this.name = name;
+    this.estimatedCost = estimatedCost;
   }
 
   @override

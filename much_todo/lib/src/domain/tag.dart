@@ -1,11 +1,20 @@
 import 'package:much_todo/src/domain/task.dart';
 
 class Tag {
-  String id;
-  String name;
+  late String id;
+  late String name;
   List<String> tasks = [];
 
   Tag(this.id, this.name);
+
+  Tag.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    tasks = <String>[];
+    for (var task in json['tasks']) {
+      tasks.add(task);
+    }
+  }
 
   TaskTag convert() {
     return TaskTag(id, name);

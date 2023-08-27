@@ -8,22 +8,22 @@ class Task {
   static const mediumEffort = 2;
   static const highEffort = 3;
 
-  String id;
-  String createdBy;
-  String name;
-  int priority;
-  int effort;
-  TaskRoom room;
+  late String id;
+  late String createdBy;
+  late String name;
+  late int priority;
+  late int effort;
+  late TaskRoom room;
   double? estimatedCost;
   String? note;
-  List<TaskTag> tags;
+  List<TaskTag> tags = [];
   List<String> links = [];
   List<String> photos = [];
-  List<TaskContact> contacts;
+  List<TaskContact> contacts = [];
   bool isCompleted = false;
   bool inProgress = false;
-  DateTime? completeBy;
-  DateTime creationDate;
+  late DateTime? completeBy;
+  late DateTime creationDate;
 
   // todo completionDate? could just have that replace isCompleted and make isCompleted a function
 
@@ -63,6 +63,51 @@ class Task {
     this.inProgress = false,
     this.completeBy,
   });
+
+  Task.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    priority = json['priority'];
+    effort = json['effort'];
+    createdBy = json['createdBy'];
+
+    var rawRoom = json['room'];
+    room = TaskRoom(rawRoom['id'], rawRoom['name']);
+
+    creationDate = DateTime.parse(json['creationDate']);
+
+    var rawTags = json['tags'] as List<dynamic>;
+    var tags = <TaskTag>[];
+    for (var rawTag in rawTags) {
+      tags.add(TaskTag(rawTag['id'], rawTag['name']));
+    }
+    this.tags = tags;
+
+    var rawContacts = json['contacts'] as List<dynamic>;
+    var contacts = <TaskContact>[];
+    for (var rawContact in rawContacts) {
+      contacts.add(TaskContact(rawContact['id'], rawContact['name'], rawContact['email'], rawContact['phoneNumber']));
+    }
+    this.contacts = contacts;
+
+    estimatedCost = json['estimatedCost'];
+    note = json['note'];
+
+    var links = <String>[];
+    for (var link in json['links']) {
+      links.add(link);
+    }
+    this.links = links;
+
+    var photos = <String>[];
+    for (var photo in json['photos']) {
+      photos.add(photo);
+    }
+    this.photos = photos;
+
+    inProgress = json['inProgress'];
+    completeBy = json['completeBy'] != null ? DateTime.parse(json['completeBy']) : null;
+  }
 
   @override
   String toString() {

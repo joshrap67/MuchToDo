@@ -303,12 +303,12 @@ class _UserTagsState extends State<UserTags> {
     setState(() {
       _isLoading = true;
     });
+    hideKeyboard();
 
     await UserService.createTag(context, tagName.trim());
 
     setState(() {
       _isLoading = false;
-      hideKeyboard();
       _searchController.clear();
     });
   }

@@ -43,7 +43,7 @@ export const updateRoom = async (req: express.Request<{ id: string }, {}, IUpdat
         const firebaseId = res.locals.firebaseId;
         await roomService.updateRoom(req.params.id, req.body.name, req.body.note, firebaseId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
@@ -55,7 +55,7 @@ export const deleteRoom = async (req: express.Request<{ id: string }, {}, {}>, r
         const firebaseId = res.locals.firebaseId;
         await roomService.deleteRoom(req.params.id, firebaseId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);

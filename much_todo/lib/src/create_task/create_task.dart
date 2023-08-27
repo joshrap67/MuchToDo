@@ -385,20 +385,19 @@ class _CreateTaskState extends State<CreateTask> {
       return;
     }
 
-    await Future.delayed(const Duration(seconds: 2), () {
-      hideKeyboard();
-      double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-      var createdTasks = TaskService.createTasks(
-          context, _nameController.text.toString().trim(), _priority, _effort, 'createdBy', _selectedRooms,
-          photos: _photos,
-          contacts: _contacts,
-          note: _noteController.text.toString().trim(),
-          links: _links,
-          completeBy: _completeBy,
-          estimatedCost: estimatedCost,
-          tags: _tags);
-
+    hideKeyboard();
+    double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
+    var createdTasks = await TaskService.createTasks(
+        context, _nameController.text.toString().trim(), _priority, _effort, _selectedRooms,
+        photos: _photos,
+        contacts: _contacts,
+        note: _noteController.text.toString().trim(),
+        links: _links,
+        completeBy: _completeBy,
+        estimatedCost: estimatedCost,
+        tags: _tags);
+    if (context.mounted && createdTasks != null) {
       Navigator.of(context).pop(createdTasks);
-    });
+    }
   }
 }

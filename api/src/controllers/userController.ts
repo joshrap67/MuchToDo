@@ -1,16 +1,20 @@
 import express from 'express';
 import * as userService from '../services/userService';
 import {ICreateUserRequest} from './requests/userRequests/createUserRequest';
-import {ICreateTagRequest} from "./requests/userRequests/createTagRequest";
+import {ISetTagRequest} from "./requests/userRequests/setTagRequest";
 import {IContact, ITag} from "../domain/user";
-import {ICreateContactRequest} from "./requests/userRequests/createContactRequest";
+import {ISetContactRequest} from "./requests/userRequests/setContactRequest";
 
 export const getUser = async (req: express.Request<{}, {}, {}>, res: express.Response) => {
     try {
         const id = res.locals.firebaseId;
         const user = await userService.getUserByFirebaseId(id);
-
-        return res.status(200).json(user);
+        if (!user) {
+            console.log('wtf');
+            return res.sendStatus(404);
+        } else {
+            return res.status(200).json(user);
+        }
     } catch (error) {
         console.log(error);
         return res.sendStatus(400); // todo 404
@@ -30,7 +34,7 @@ export const createUser = async (req: express.Request<{}, {}, ICreateUserRequest
     }
 }
 
-export const createTag = async (req: express.Request<{}, {}, ICreateTagRequest>, res: express.Response) => {
+export const createTag = async (req: express.Request<{}, {}, ISetTagRequest>, res: express.Response) => {
     try {
         const firebaseId = res.locals.firebaseId;
         const tag = await userService.createTag(req.body.name, firebaseId);
@@ -42,13 +46,12 @@ export const createTag = async (req: express.Request<{}, {}, ICreateTagRequest>,
     }
 }
 
-export const updateTag = async (req: express.Request<{ id: string }, {}, ITag>, res: express.Response) => {
+export const updateTag = async (req: express.Request<{ id: string }, {}, ISetTagRequest>, res: express.Response) => {
     try {
-        // todo have requests for these instead of reusing domain
         const firebaseId = res.locals.firebaseId;
-        await userService.updateTag(req.body, firebaseId);
+        await userService.updateTag(req.params.id, req.body, firebaseId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
@@ -57,18 +60,17 @@ export const updateTag = async (req: express.Request<{ id: string }, {}, ITag>, 
 
 export const deleteTag = async (req: express.Request<{ id: string }, {}, {}>, res: express.Response) => {
     try {
-        // todo have requests for these instead of reusing domain
         const firebaseId = res.locals.firebaseId;
         await userService.deleteTag(req.params.id, firebaseId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
     }
 }
 
-export const createContact = async (req: express.Request<{}, {}, ICreateContactRequest>, res: express.Response) => {
+export const createContact = async (req: express.Request<{}, {}, ISetContactRequest>, res: express.Response) => {
     try {
         const firebaseId = res.locals.firebaseId;
         const contact = await userService.createContact(req.body.name, req.body.email, req.body.phoneNumber, firebaseId);
@@ -80,13 +82,14 @@ export const createContact = async (req: express.Request<{}, {}, ICreateContactR
     }
 }
 
-export const updateContact = async (req: express.Request<{ id: String }, {}, IContact>, res: express.Response) => {
+export const updateContact = async (req: express.Request<{
+    id: string
+}, {}, ISetContactRequest>, res: express.Response) => {
     try {
-        // todo have requests for these instead of reusing domain
         const firebaseId = res.locals.firebaseId;
-        await userService.updateContact(req.body, firebaseId);
+        await userService.updateContact(req.params.id, req.body, firebaseId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
@@ -95,11 +98,10 @@ export const updateContact = async (req: express.Request<{ id: String }, {}, ICo
 
 export const deleteContact = async (req: express.Request<{ id: string }, {}, {}>, res: express.Response) => {
     try {
-        // todo have requests for these instead of reusing domain
         const firebaseId = res.locals.firebaseId;
         await userService.deleteContact(req.params.id, firebaseId);
 
-        return res.status(204);
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);

@@ -287,8 +287,10 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> deleteTask() async {
-    TaskService.deleteTask(context, widget.task);
-    Navigator.of(context).pop();
+    var deleted = await TaskService.deleteTask(context, widget.task);
+    if (context.mounted && deleted) {
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> editTask() async {

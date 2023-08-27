@@ -26,6 +26,16 @@ class RoomsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setRooms(List<Room> rooms) {
+    _rooms = rooms;
+    notifyListeners(); // todo sort too?
+  }
+
+  void setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
   void addRoom(Room room) {
     _rooms.add(room);
     notifyListeners();

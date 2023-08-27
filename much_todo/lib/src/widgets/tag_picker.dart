@@ -174,14 +174,15 @@ class _TagPickerState extends State<TagPicker> {
     if (tagName.isEmpty) {
       return;
     }
+    hideKeyboard();
 
     var tag = await UserService.createTag(context, tagName.trim());
-
-    setState(() {
-      _selectedTags.add(tag);
-      hideKeyboard();
-      _searchController.clear();
-    });
+    if (tag != null) {
+      setState(() {
+        _selectedTags.add(tag);
+        _searchController.clear();
+      });
+    }
   }
 
   void selectTag(bool isSelected, Tag tag) {

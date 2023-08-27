@@ -10,13 +10,12 @@ import {
 import express from 'express';
 
 export default (router: express.Router) => {
-    // todo 'self' instead of 'user'?
-    router.get('/user', (req, res) => getUser(req, res));
-    router.post('/user', (req, res) => createUser(req, res));
-    router.post('/user/tags', (req, res) => createTag(req, res));
-    router.put('/user/tags/:id', (req, res) => updateTag(req, res));
-    router.delete('/user/tags/:id', (req, res) => deleteTag(req, res));
-    router.post('/user/contacts', (req, res) => createContact(req, res));
-    router.put('/user/contacts/:id', (req, res) => updateContact(req, res));
-    router.delete('/user/contacts/:id', (req, res) => deleteContact(req, res));
+    router.get('/users', (req, res) => getUser(req, res));
+    router.post('/users', (req, res) => createUser(req, res));
+    router.post('/users/tags', (req, res) => createTag(req, res));
+    router.put('/users/tags/:id', (req, res) => updateTag(req, res));
+    router.delete('/users/tags/:id', (req, res) => deleteTag(req, res));
+    router.post('/users/contacts', (req, res) => createContact(req, res));
+    router.put('/users/contacts/:id', (req, res) => updateContact(req, res));
+    router.delete('/users/contacts/:id', (req, res) => deleteContact(req, res));
 };

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
@@ -85,8 +86,8 @@ class _CreateRoomState extends State<CreateRoom> {
   Future<void> onSubmit() async {
     if (_formKey.currentState!.validate()) {
       hideKeyboard();
-      var room = await RoomsService.createRoom(context, _nameController.text, note: _noteController.text);
-      if (context.mounted) {
+      Room? room = await RoomsService.createRoom(context, _nameController.text, note: _noteController.text);
+      if (context.mounted && room != null) {
         Navigator.pop(context, room);
       }
     }

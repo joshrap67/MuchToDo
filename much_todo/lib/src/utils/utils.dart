@@ -20,7 +20,7 @@ extension StringExtensions on String? {
   }
 }
 
-void showSnackbar(String message, BuildContext context, {int milliseconds = 1500}) {
+void showSnackbar(String message, BuildContext context, {int milliseconds = 3000}) {
   ScaffoldMessenger.of(context).removeCurrentSnackBar();
   final snackBar = SnackBar(
     content: Text(message),
@@ -44,6 +44,7 @@ String? validRoomName(String? name, List<Room> rooms) {
     return 'Required';
   }
   if (rooms.any((r) => r.name == name)) {
+	  // todo don't do this?
     return 'Room name already exists';
   }
   return null;

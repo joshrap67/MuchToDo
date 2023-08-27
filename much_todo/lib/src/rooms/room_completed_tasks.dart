@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/services/completed_tasks_service.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/skeletons/completed_tasks_skeleton.dart';
 import 'package:much_todo/src/task_list/task_card.dart';
@@ -67,7 +68,7 @@ class _RoomCompletedTasksState extends State<RoomCompletedTasks> {
   }
 
   Future<List<Task>> getRoomTasks() async {
-    List<Task> tasks = await RoomsService.getCompletedTasks(context, widget.room);
+    List<Task> tasks = await CompletedTaskService.getCompletedTasks(context, widget.room);
     setState(() {});
     return tasks;
   }

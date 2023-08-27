@@ -12,7 +12,8 @@ class TasksProvider with ChangeNotifier {
   List<Task> _allTasks = [];
   List<Task> _filteredTasks = [];
   bool _isLoading = true;
-  FilterTaskOptions _filters = FilterTaskOptions.named(sortByValue: SortOptions.creationDate, sortDirectionValue: SortDirection.descending);
+  FilterTaskOptions _filters =
+      FilterTaskOptions.named(sortByValue: SortOptions.creationDate, sortDirectionValue: SortDirection.descending);
 
   List<Task> get allTasks => [..._allTasks]; // spread since otherwise widgets could bypass mutation methods
   List<Task> get filteredTasks => [..._filteredTasks];
@@ -55,7 +56,17 @@ class TasksProvider with ChangeNotifier {
       },
     );
     _isLoading = false;
-	filterAndNotify();
+    filterAndNotify();
+  }
+
+  void setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void setTasks(List<Task> tasks) {
+    _allTasks = tasks;
+    filterAndNotify();
   }
 
   void addTask(Task task) {
@@ -70,7 +81,6 @@ class TasksProvider with ChangeNotifier {
 
   void updateTask(Task task) {
     var index = _allTasks.indexWhere((element) => element.id == task.id);
-	print(index);
     if (index >= 0) {
       _allTasks[index] = task;
     }
@@ -201,7 +211,7 @@ class TasksProvider with ChangeNotifier {
         }
       }
       if (_filters.creationDate != null) {
-        bool match = equalityCheckDate(_filters.creationDateEquality, _filters.creationDate!, task.creationDate!);
+        bool match = equalityCheckDate(_filters.creationDateEquality, _filters.creationDate!, task.creationDate);
         if (!match) {
           return false;
         }

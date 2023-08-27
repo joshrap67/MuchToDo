@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:much_todo/src/domain/contact.dart';
+import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/domain/user.dart';
@@ -7,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 class UserProvider with ChangeNotifier {
   static User initialData = User(
+      const Uuid().v4(),
       const Uuid().v4(),
       [
         Tag(const Uuid().v4(), 'Decoration'),
@@ -17,6 +19,7 @@ class UserProvider with ChangeNotifier {
         Tag(const Uuid().v4(), 'Structural')
       ],
       'binary0010productions@gmail.com',
+      [],
       [],
       [
         Contact(const Uuid().v4(), 'Dennis Reynolds', 'example@gmail.com', '+18038675309'),
@@ -43,6 +46,16 @@ class UserProvider with ChangeNotifier {
       _user = initialData;
     });
     _isLoading = false;
+    notifyListeners();
+  }
+
+  void setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void setUser(User user) {
+    _user = user;
     notifyListeners();
   }
 
@@ -86,6 +99,7 @@ class UserProvider with ChangeNotifier {
     if (_user == null) {
       return;
     }
+    _user!.tasks.addAll(createdTasks.map((e) => e.id));
     Map<String, Tag> tagIdToTag = {};
     Map<String, Contact> contactIdToContact = {};
     // for quicker lookup
@@ -140,6 +154,24 @@ class UserProvider with ChangeNotifier {
 
   void clearUser() {
     _user = null;
-	notifyListeners();
+    notifyListeners();
+  }
+
+  void addRoom(Room room) {
+    if (_user == null) {
+      return;
+    }
+
+    _user!.rooms.add(room.id);
+    notifyListeners();
+  }
+
+  void removeRoom(Room room) {
+    if (_user == null) {
+      return;
+    }
+
+    _user!.rooms.removeWhere((r) => r == room.id);
+    notifyListeners();
   }
 }

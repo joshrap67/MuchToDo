@@ -363,19 +363,18 @@ class _EditTaskState extends State<EditTask> {
     }
 
     hideKeyboard();
-    await Future.delayed(const Duration(seconds: 2), () {
-      double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-      var task = TaskService.editTask(context, widget.task.id, _nameController.text.toString().trim(), _priority,
-          _effort, 'createdBy', _selectedRoom!,
-          photos: _photos,
-          contacts: _contacts,
-          note: _noteController.text.toString().trim(),
-          links: _links,
-          completeBy: _completeBy,
-          estimatedCost: estimatedCost,
-          tags: _tags);
-
+    double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
+    Task? task = await TaskService.editTask(
+        context, widget.task, _nameController.text.toString().trim(), _priority, _effort, _selectedRoom!,
+        photos: _photos,
+        contacts: _contacts,
+        note: _noteController.text.toString().trim(),
+        links: _links,
+        completeBy: _completeBy,
+        estimatedCost: estimatedCost,
+        tags: _tags);
+    if (context.mounted && task != null) {
       Navigator.of(context).pop(task);
-    });
+    }
   }
 }

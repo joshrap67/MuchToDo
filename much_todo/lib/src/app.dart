@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:much_todo/src/home/home.dart';
+import 'package:much_todo/src/sign_in/create_account.dart';
 import 'package:much_todo/src/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/sign_in/unverified_screen.dart';
 import 'package:much_todo/src/theme/themes.dart';
@@ -79,6 +80,8 @@ class MyApp extends StatelessWidget {
                 return signInWidget(context);
               case UnverifiedScreen.routeName:
                 return unverifiedWidget(context);
+              case CreateAccountScreen.routeName:
+                return const CreateAccountScreen();
               default:
                 return homeWidget(context);
             }

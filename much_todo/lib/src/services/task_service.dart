@@ -4,93 +4,130 @@ import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/repositories/tasks/requests/create_tasks_request.dart';
+import 'package:much_todo/src/repositories/tasks/requests/update_task_request.dart';
+import 'package:much_todo/src/repositories/tasks/task_repository.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 
 class TaskService {
-  static Task editTask(
-      BuildContext context, String id, String name, int priority, int effort, String createdBy, Room room,
-      {double? estimatedCost,
-      String? note,
-      DateTime? completeBy,
-      List<String> links = const [],
-      List<Tag> tags = const [],
-      List<Contact> contacts = const [],
-      List<XFile> photos = const []}) {
-    // todo upload photos to cloud
-    var oldTask = context.read<TasksProvider>().allTasks.firstWhere((element) => element.id == id);
-    var task = Task.named(
-        id: id,
-        name: name.trim(),
-        priority: priority,
-        effort: effort,
-        createdBy: createdBy,
-        tags: tags.map((e) => e.convert()).toList(),
-        estimatedCost: estimatedCost,
-        completeBy: completeBy,
-        inProgress: false,
-        isCompleted: false,
-        links: links,
-        note: note,
-        contacts: contacts.map((e) => e.convert()).toList(),
-        room: room.convert(),
-        creationDate: DateTime.now().toUtc());
-    // todo pass in original
-    context.read<TasksProvider>().updateTask(task);
-    context.read<RoomsProvider>().updateTask(task, oldTask.room.id);
-    context.read<UserProvider>().updateTask(task);
-
-    return task;
+  static Future<void> getAllTasks(BuildContext context) async {
+    try {
+      context.read<TasksProvider>().setLoading(true);
+      var tasks = await TaskRepository.getAllTasksByUser();
+      if (context.mounted) {
+        context.read<TasksProvider>().setTasks(tasks);
+      }
+    } on Exception {
+      if (context.mounted) {
+        showSnackbar('There was a problem loading tasks', context);
+      }
+    } finally {
+      if (context.mounted) {
+        context.read<TasksProvider>().setLoading(false);
+      }
+    }
   }
 
-  static List<Task> createTasks(
-      BuildContext context, String name, int priority, int effort, String createdBy, List<Room> rooms,
+  static Future<Task?> editTask(
+      BuildContext context, Task originalTask, String name, int priority, int effort, Room room,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
       List<Contact> contacts = const [],
-      List<XFile> photos = const []}) {
-    // todo upload photos to cloud
-    // todo grab userid here instead of requiring it in method
-    List<Task> createdTasks = [];
-    if (rooms.isEmpty) {
-      throw Exception('Room cannot be empty');
+      List<XFile> photos = const []}) async {
+    // todo pass in original
+
+    Task? updatedTask;
+    try {
+      // todo upload photos to cloud
+      updatedTask = await TaskRepository.updateTask(
+          originalTask.id,
+          UpdateTaskRequest(
+            name,
+            priority,
+            effort,
+            estimatedCost,
+            tags.map((e) => e.id).toList(),
+            contacts.map((e) => e.id).toList(),
+            room.id,
+            note,
+            links,
+            [],
+            completeBy,
+          ));
+      if (context.mounted) {
+        context.read<TasksProvider>().updateTask(updatedTask);
+        context.read<RoomsProvider>().updateTask(updatedTask, originalTask.room.id);
+        context.read<UserProvider>().updateTask(updatedTask);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem updating the task', context);
+      }
     }
 
-    for (var room in rooms) {
-      var task = Task.named(
-          id: const Uuid().v4(),
-          name: name.trim(),
-          priority: priority,
-          effort: effort,
-          createdBy: createdBy,
-          tags: tags.map((e) => e.convert()).toList(),
-          estimatedCost: estimatedCost,
-          completeBy: completeBy,
-          inProgress: false,
-          isCompleted: false,
-          links: links,
-          note: note,
-          contacts: contacts.map((e) => e.convert()).toList(),
-          room: room.convert(),
-          creationDate: DateTime.now().toUtc());
-      createdTasks.add(task);
+    return updatedTask;
+  }
+
+  static Future<List<Task>?> createTasks(BuildContext context, String name, int priority, int effort, List<Room> rooms,
+      {double? estimatedCost,
+      String? note,
+      DateTime? completeBy,
+      List<String> links = const [],
+      List<Tag> tags = const [],
+      List<Contact> contacts = const [],
+      List<XFile> photos = const []}) async {
+    List<Task>? createdTasks;
+    try {
+      // todo upload photos to cloud
+      createdTasks = await TaskRepository.createTasks(CreateTasksRequest(
+        name,
+        priority,
+        effort,
+        tags.map((e) => e.id).toList(),
+        contacts.map((e) => e.id).toList(),
+        rooms.map((e) => e.id).toList(),
+        estimatedCost,
+        note,
+        links,
+        [],
+        false,
+        completeBy,
+      ));
+      if (context.mounted) {
+        context.read<TasksProvider>().addTasks(createdTasks);
+        context.read<RoomsProvider>().addTasks(createdTasks);
+        context.read<UserProvider>().addTasks(createdTasks);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        showSnackbar('There was a problem creating tasks', context);
+      }
     }
-    context.read<TasksProvider>().addTasks(createdTasks);
-    context.read<RoomsProvider>().addTasks(createdTasks);
-    context.read<UserProvider>().addTasks(createdTasks);
 
     return createdTasks;
   }
 
-  static void deleteTask(BuildContext context, Task task) {
-    context.read<TasksProvider>().removeTask(task);
-    context.read<RoomsProvider>().removeTask(task);
-    context.read<UserProvider>().removeTask(task);
+  static Future<bool> deleteTask(BuildContext context, Task task) async {
+    try {
+      await TaskRepository.deleteTask(task.id);
+      if (context.mounted) {
+        context.read<TasksProvider>().removeTask(task);
+        context.read<RoomsProvider>().removeTask(task);
+        context.read<UserProvider>().removeTask(task);
+      }
+      return true;
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem deleting the task', context);
+      }
+      return false;
+    }
   }
 }

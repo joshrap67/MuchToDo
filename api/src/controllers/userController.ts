@@ -2,15 +2,13 @@ import express from 'express';
 import * as userService from '../services/userService';
 import {ICreateUserRequest} from './requests/userRequests/createUserRequest';
 import {ISetTagRequest} from "./requests/userRequests/setTagRequest";
-import {IContact, ITag} from "../domain/user";
 import {ISetContactRequest} from "./requests/userRequests/setContactRequest";
 
-export const getUser = async (req: express.Request<{}, {}, {}>, res: express.Response) => {
+export const getUser = async (_req: express.Request<{}, {}, {}>, res: express.Response) => {
     try {
         const id = res.locals.firebaseId;
         const user = await userService.getUserByFirebaseId(id);
         if (!user) {
-            console.log('wtf');
             return res.sendStatus(404);
         } else {
             return res.status(200).json(user);

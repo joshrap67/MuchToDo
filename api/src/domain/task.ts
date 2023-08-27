@@ -2,37 +2,37 @@ import mongoose, {Schema, Types, model} from 'mongoose';
 import {roomsCollection, tasksCollection} from "./utils/collections";
 
 export interface ITask {
-    _id: Types.ObjectId,
-    name: string,
-    createdBy: string,
-    priority: number,
-    effort: number,
-    room: ITaskRoom,
-    estimatedCost: number,
-    note: string,
-    tags: ITaskTag[],
-    contacts: ITaskContact[],
-    links: string[],
-    photos: string[],
-    inProgress: boolean,
-    completeBy: Date,
+    _id: Types.ObjectId;
+    name: string;
+    createdBy: string;
+    priority: number;
+    effort: number;
+    room: ITaskRoom;
+    estimatedCost: number;
+    note: string;
+    tags: ITaskTag[];
+    contacts: ITaskContact[];
+    links: string[];
+    photos: string[];
+    inProgress: boolean;
+    completeBy: Date;
 }
 
 export interface ITaskRoom {
-    id: Types.ObjectId,
-    name: string
+    id: Types.ObjectId;
+    name: string;
 }
 
 export interface ITaskTag {
-    id: string,
-    name: string
+    id: string;
+    name: string;
 }
 
 export interface ITaskContact {
-    id: string,
-    name: string,
-    email: string,
-    phoneNumber: string
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
 }
 
 const RoomSchema = new Schema<ITaskRoom>({

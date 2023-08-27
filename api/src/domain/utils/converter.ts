@@ -11,9 +11,9 @@ export const convertRoomToTaskRoom = (room: IRoom): ITaskRoom => {
 }
 
 export const convertTagToTaskTag = (tag: ITag): ITaskTag => {
-    return {...tag};
+    return {id: tag.id, name: tag.name};
 }
 
 export const convertContactToTaskContact = (contact: IContact): ITaskContact => {
-    return {...contact};
+    return {id: contact.id, name: contact.name, email: contact.email, phoneNumber: contact.phoneNumber};
 }

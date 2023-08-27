@@ -1,3 +1,3 @@
 export interface ISetTagRequest {
-    name: string
+    name: string;
 }

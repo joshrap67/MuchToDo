@@ -21,7 +21,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
             const signingKey = await jwksClient.getSigningKey(decodedToken.header.kid);
             jwt.verify(encodedToken, signingKey.getPublicKey(), {
                 algorithms: ["RS256"],
-                issuer: 'https://securetoken.google.com/muchtodo-42777' // no need to keep this secret as its in the payload which is not encrypted
+                issuer: 'https://securetoken.google.com/muchtodo-42777' // no need to keep this secret as it's in the payload which is not encrypted
             }, function (error, decoded: JwtPayload) {
                 if (error) {
                     console.log(error);

@@ -2,17 +2,17 @@ import {Schema, Types, model} from 'mongoose';
 import {roomsCollection, tasksCollection} from "./utils/collections";
 
 export interface IRoom {
-    _id: Types.ObjectId,
-    name: string,
-    note: string,
-    createdBy: string,
-    tasks: IRoomTask[]
+    _id: Types.ObjectId;
+    name: string;
+    note: string;
+    createdBy: string;
+    tasks: IRoomTask[];
 }
 
 export interface IRoomTask {
-    id: Types.ObjectId,
-    name: string,
-    estimatedCost: number
+    id: Types.ObjectId;
+    name: string;
+    estimatedCost: number;
 }
 
 const TaskSchema = new Schema<IRoomTask>({

@@ -90,7 +90,7 @@ class Task {
     }
     this.contacts = contacts;
 
-    estimatedCost = json['estimatedCost'];
+    estimatedCost = json['estimatedCost']?.toDouble();
     note = json['note'];
 
     var links = <String>[];

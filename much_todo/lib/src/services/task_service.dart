@@ -66,7 +66,9 @@ class TaskService {
         context.read<RoomsProvider>().updateTask(updatedTask, originalTask.room.id);
         context.read<UserProvider>().updateTask(updatedTask);
       }
-    } catch (e) {
+    } catch (e, stack) {
+		print(e);
+		print(stack);
       if (context.mounted) {
         showSnackbar('There was a problem updating the task', context);
       }
@@ -105,7 +107,7 @@ class TaskService {
         context.read<RoomsProvider>().addTasks(createdTasks);
         context.read<UserProvider>().addTasks(createdTasks);
       }
-    } catch (_) {
+    } catch (e) {
       if (context.mounted) {
         showSnackbar('There was a problem creating tasks', context);
       }

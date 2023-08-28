@@ -55,7 +55,7 @@ class RoomTask {
   RoomTask.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    estimatedCost = json['estimatedCost'];
+    estimatedCost = json['estimatedCost']?.toDouble();
   }
 
   void update(String name, double? estimatedCost) {

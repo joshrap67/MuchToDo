@@ -25,13 +25,20 @@ class UserRepository {
   }
 
   static Future<User> createUser(CreateUserRequest request) async {
-	  print(request);
     final apiResult = await ApiGateway.post(basePath, request);
     if (apiResult.success) {
       var decodedUser = jsonDecode(apiResult.data);
       return User.fromJson(decodedUser);
     } else {
       throw Exception('There was a problem creating the user.');
+    }
+  }
+
+  static Future<void> deleteUser() async {
+    // todo delete firebase account
+    final apiResult = await ApiGateway.delete(basePath);
+    if (!apiResult.success) {
+      throw Exception('There was a problem deleting the user.');
     }
   }
 

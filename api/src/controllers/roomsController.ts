@@ -1,13 +1,11 @@
 import express from "express";
 import * as roomService from "../services/roomService";
-import {ICreateRoomRequest} from "./requests/roomRequests/createRoomRequest";
-import {mapRoomToResponse} from "../services/mappers/roomMapper";
-import {IUpdateRoomRequest} from "./requests/roomRequests/updateRoomRequest";
+import {ISetRoomRequest} from "./requests/roomRequests/setRoomRequest";
 
 export const getAllRoomsByUser = async (_req: express.Request, res: express.Response) => {
     try {
         const rooms = await roomService.getRoomsByUser(res.locals.firebaseId);
-        return res.status(200).json(rooms.map(x => mapRoomToResponse(x)));
+        return res.status(200).json(rooms);
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
@@ -19,26 +17,26 @@ export const getRoomById = async (req: express.Request<{ id: string }, {}, {}>, 
         const firebaseId = res.locals.firebaseId;
         const room = await roomService.getRoomById(req.params.id, firebaseId);
 
-        return res.status(200).json(mapRoomToResponse(room));
+        return res.status(200).json(room);
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
     }
 }
 
-export const createRoom = async (req: express.Request<{}, {}, ICreateRoomRequest>, res: express.Response) => {
+export const createRoom = async (req: express.Request<{}, {}, ISetRoomRequest>, res: express.Response) => {
     try {
         const firebaseId = res.locals.firebaseId;
         const room = await roomService.createRoom(req.body.name, req.body.note, firebaseId);
 
-        return res.status(200).json(mapRoomToResponse(room));
+        return res.status(200).json(room);
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);
     }
 }
 
-export const updateRoom = async (req: express.Request<{ id: string }, {}, IUpdateRoomRequest>, res: express.Response) => {
+export const updateRoom = async (req: express.Request<{ id: string }, {}, ISetRoomRequest>, res: express.Response) => {
     try {
         const firebaseId = res.locals.firebaseId;
         await roomService.updateRoom(req.params.id, req.body.name, req.body.note, firebaseId);

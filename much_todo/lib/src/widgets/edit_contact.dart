@@ -130,9 +130,6 @@ class _EditContactState extends State<EditContact> {
       Contact contact = Contact(widget.contact.id, _nameController.text.trim(), email.isNotEmpty ? email : null,
           phone.isNotEmpty ? phone : null);
       await UserService.updateContact(context, contact);
-      if (context.mounted) {
-        showSnackbar('Contact updated.', context);
-      }
     }
   }
 }

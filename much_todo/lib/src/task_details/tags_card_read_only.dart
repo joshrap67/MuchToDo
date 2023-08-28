@@ -18,13 +18,16 @@ class TagsCardReadOnly extends StatelessWidget {
               contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
             ),
             Wrap(
-              spacing: 8.0, // gap between adjacent chips
+              spacing: 4.0, // gap between adjacent chips
               runSpacing: 4.0, // gap between lines
               children: [
                 for (var i = 0; i < tags.length; i++)
                   Chip(
-                    label: Text(tags[i].name),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    label: Text(
+                      tags[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
                   ),
               ],
             )

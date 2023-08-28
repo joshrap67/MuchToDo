@@ -29,6 +29,7 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
 
     try {
         session.startTransaction();
+
         const user = await UserModel.findOne({'firebaseId': userId}).session(session);
         const rooms = await RoomModel.find({'_id': {$in: request.roomIds}}).session(session);
 
@@ -98,7 +99,6 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
         }
         await session.commitTransaction();
     } catch (e) {
-        console.log(e);
         await session.abortTransaction();
         throw (e);
     } finally {
@@ -115,10 +115,10 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         session.startTransaction();
 
         const user = await UserModel.findOne({'firebaseId': userId}).session(session);
-        const room = await RoomModel.findOne({'_id': request.roomId}).session(session);
         const task = await TaskModel.findOne({'_id': taskId}).session(session);
+        const newRoom = await RoomModel.findOne({'_id': request.roomId}).session(session);
         const oldRoom = await RoomModel.findOne({'_id': task.room.id}).session(session);
-        if (!(room._id.equals(oldRoom.id))) {
+        if (!(newRoom._id.equals(oldRoom.id))) {
             // room changed, so we need to update old room to delete this task
             oldRoom.tasks = oldRoom.tasks.filter(x => !x.id.equals(task.id));
             await oldRoom.save({session});
@@ -147,7 +147,7 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         task.name = request.name;
         task.priority = request.priority;
         task.effort = request.effort;
-        task.room = convertRoomToTaskRoom(room);
+        task.room = convertRoomToTaskRoom(newRoom);
         task.tags = taskTags;
         task.contacts = taskContacts;
         task.links = request.links;
@@ -158,26 +158,27 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         await task.save({session});
 
         // update tags/contacts of user
+        // it's easier to just remove this task for every contact/tag and then add it back if needed
+        for (const contact of user.contacts) {
+            contact.tasks = contact.tasks.filter(t => !t.equals(task._id));
+        }
+        for (const tag of user.tags) {
+            tag.tasks = tag.tasks.filter(t => !t.equals(task._id));
+        }
+
         for (const tag of task.tags) {
             const userTag = tagIdToTag[tag.id];
-            if (!userTag.tasks.some(x => x.equals(task._id))) {
-                // task is not associated with this tag so add it
-                userTag.tasks.push(task._id);
-            }
+            userTag.tasks.push(task._id);
         }
         for (const contact of task.contacts) {
             const userContact = contactIdToContact[contact.id];
-            if (!userContact.tasks.some(x => x.equals(task._id))) {
-                // task is not associated with this tag so add it
-                userContact.tasks.push(task._id);
-            }
+            userContact.tasks.push(task._id);
         }
         await user.save({session});
 
-
         // update room with denormalized task data
-        room.tasks.push(convertTaskToRoomTask(task));
-        await room.save({session});
+        newRoom.tasks.push(convertTaskToRoomTask(task));
+        await newRoom.save({session});
         await session.commitTransaction();
 
         taskResponse = mapTaskToResponse(task);
@@ -198,10 +199,10 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
         session.startTransaction();
 
         const user = await UserModel.findOne({'firebaseId': userId}).session(session);
-        const task = await TaskModel.findOne({'_id': taskId}).session(session);
-        const room = await RoomModel.findOne({'_id': task.room.id}).session(session);
-        room.tasks = room.tasks.filter(x => !x.id.equals(task.id));
-        await room.save({session});
+        const task = await TaskModel.findOneAndDelete({'_id': taskId, 'createdBy': userId}).session(session);
+        // remove task from its room
+        await RoomModel.updateOne({'_id': task.room.id}, {$pull: {'tasks': {'id': taskId}}}).session(session);
+
         for (const tag of user.tags) {
             tag.tasks = tag.tasks.filter(x => !x.equals(task.id));
         }
@@ -210,7 +211,6 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
         }
         user.tasks = user.tasks.filter(x => !x.equals(task.id))
         await user.save({session});
-        await TaskModel.deleteOne({'_id': taskId}).session(session);
 
         await session.commitTransaction();
     } catch (e) {

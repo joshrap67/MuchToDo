@@ -43,7 +43,7 @@ class CreateTasksRequest implements ApiRequest {
       'contactIds': contactIds,
       'roomIds': roomIds,
       'inProgress': inProgress,
-      'completeBy': completeBy,
+      'completeBy': completeBy?.toIso8601String(),
     };
   }
 

@@ -81,7 +81,7 @@ class _RoomDetailsState extends State<RoomDetails> {
           Visibility(
             visible: _room.note.isNotNullOrEmpty(),
             child: ListTile(
-              title: Text(_room.note!),
+              title: Text(_room.note ?? ''),
               subtitle: const Text(
                 'Note',
                 style: TextStyle(fontSize: 11),

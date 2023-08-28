@@ -206,5 +206,36 @@ class _MoreScreenState extends State<MoreScreen> {
     }
   }
 
-  void promptDeleteAccount() {}
+  Future<void> deleteAccount() async {
+    await UserService.deleteUser(context);
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, SignInScreen.routeName, (route) => false);
+    }
+  }
+
+  void promptDeleteAccount() {
+    // todo prompt credentials/type to confirm
+    showDialog<void>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  deleteAccount();
+                },
+                child: const Text('DELETE'),
+              )
+            ],
+            title: const Text('Delete Account'),
+            content: const Text(
+                'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'),
+          );
+        });
+  }
 }

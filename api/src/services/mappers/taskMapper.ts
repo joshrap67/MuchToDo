@@ -1,7 +1,7 @@
 import {ITask} from "../../domain/task";
 import {
     ITaskContactResponse,
-    ITaskResponse,
+    ITaskResponse, ITaskRoomResponse,
     ITaskTagResponse
 } from "../../controllers/responses/taskResponse";
 
@@ -11,7 +11,7 @@ export const mapTaskToResponse = (task: ITask): ITaskResponse => {
         name: task.name,
         createdBy: task.createdBy,
         note: task.note,
-        room: {id: task.room.id.toHexString(), name: task.room.name},
+        room: {id: task.room.id.toHexString(), name: task.room.name} as ITaskRoomResponse,
         priority: task.priority,
         effort: task.effort,
         contacts: task.contacts,

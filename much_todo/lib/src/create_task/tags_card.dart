@@ -31,7 +31,7 @@ class _TagsCardState extends State<TagsCard> {
           children: [
             ListTile(
               title: Text(getTitle()),
-			  leading: const Icon(Icons.tag),
+              leading: const Icon(Icons.tag),
               contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
               trailing: IconButton(onPressed: launchAddTag, icon: const Icon(Icons.add)),
             ),
@@ -40,9 +40,13 @@ class _TagsCardState extends State<TagsCard> {
               runSpacing: 4.0, // gap between lines
               children: [
                 for (var i = 0; i < _selectedTags.length; i++)
-                  // todo allow for custom colors for each tag? problem would be text color
                   Chip(
-                    label: Text(_selectedTags[i].name),
+                    label: Text(
+                      _selectedTags[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     onDeleted: () {
                       onDeleteTag(_selectedTags[i]);

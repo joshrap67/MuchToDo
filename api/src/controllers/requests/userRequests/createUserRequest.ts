@@ -1,5 +1,5 @@
-import { ICreateRoomRequest } from "../roomRequests/createRoomRequest";
+import { ISetRoomRequest } from "../roomRequests/setRoomRequest";
 
 export interface ICreateUserRequest {
-    rooms: ICreateRoomRequest[];
+    rooms: ISetRoomRequest[];
 }

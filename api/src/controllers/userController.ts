@@ -80,9 +80,7 @@ export const createContact = async (req: express.Request<{}, {}, ISetContactRequ
     }
 }
 
-export const updateContact = async (req: express.Request<{
-    id: string
-}, {}, ISetContactRequest>, res: express.Response) => {
+export const updateContact = async (req: express.Request<{ id: string }, {}, ISetContactRequest>, res: express.Response) => {
     try {
         const firebaseId = res.locals.firebaseId;
         await userService.updateContact(req.params.id, req.body, firebaseId);
@@ -106,3 +104,14 @@ export const deleteContact = async (req: express.Request<{ id: string }, {}, {}>
     }
 }
 
+export const deleteUser = async (_req: express.Request<{}, {}, {}>, res: express.Response) => {
+    try {
+        const firebaseId = res.locals.firebaseId;
+        await userService.deleteUser(firebaseId);
+
+        return res.status(204).send();
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(400);
+    }
+}

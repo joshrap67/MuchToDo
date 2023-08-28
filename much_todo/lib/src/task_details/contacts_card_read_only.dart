@@ -25,7 +25,11 @@ class _ContactCardReadOnlyState extends State<ContactCardReadOnly> {
             children: [
               for (var i = 0; i < widget.contacts.length; i++)
                 ActionChip(
-                  label: Text(widget.contacts[i].name),
+                  label: Text(
+                    widget.contacts[i].name,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                  ),
+                  backgroundColor: Theme.of(context).colorScheme.tertiary,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   onPressed: () {
                     var contact = widget.contacts[i];

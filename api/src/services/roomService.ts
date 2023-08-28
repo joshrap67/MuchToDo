@@ -3,16 +3,20 @@ import {UserModel} from "../domain/user";
 import mongoose from "mongoose";
 import {TaskModel} from "../domain/task";
 import {maxRoomCount} from "../utils/constants";
+import {IRoomResponse} from "../controllers/responses/roomResponse";
+import {mapRoomToResponse} from "./mappers/roomMapper";
 
-export async function getRoomsByUser(userId: string): Promise<IRoom[]> {
-    return RoomModel.find({'createdBy': userId});
+export async function getRoomsByUser(userId: string): Promise<IRoomResponse[]> {
+    const rooms = await RoomModel.find({'createdBy': userId});
+    return rooms ? rooms.map((r) => mapRoomToResponse(r)) : [];
 }
 
-export async function getRoomById(id: string, userId: string): Promise<IRoom> {
-    return RoomModel.findOne({'_id': id, 'createdBy': userId});
+export async function getRoomById(id: string, userId: string): Promise<IRoomResponse> {
+    const room = await RoomModel.findOne({'_id': id, 'createdBy': userId});
+    return mapRoomToResponse(room);
 }
 
-export async function createRoom(name: string, note: string, firebaseId: string): Promise<IRoom> {
+export async function createRoom(name: string, note: string, firebaseId: string): Promise<IRoomResponse> {
     const session = await mongoose.startSession();
     let room;
     try {
@@ -31,7 +35,7 @@ export async function createRoom(name: string, note: string, firebaseId: string)
             } as IRoom
         );
         await room.save({session});
-        user.rooms.push(room.id);
+        user.rooms.push(room._id);
         await user.save({session});
 
         await session.commitTransaction();
@@ -42,7 +46,7 @@ export async function createRoom(name: string, note: string, firebaseId: string)
         await session.endSession();
     }
 
-    return room;
+    return mapRoomToResponse(room);
 }
 
 export async function updateRoom(roomId: string, name: string, note: string, firebaseId: string): Promise<void> {
@@ -50,16 +54,13 @@ export async function updateRoom(roomId: string, name: string, note: string, fir
     try {
         session.startTransaction();
 
-        const room = await RoomModel.findById(roomId);
+        const room = await RoomModel.findOne({'_id': roomId, 'createdBy': firebaseId});
         room.name = name;
         room.note = note;
         await room.save({session});
 
-        const tasks = await TaskModel.find({'room.id': roomId, 'createdBy': firebaseId}).session(session);
-        for (const task of tasks) {
-            task.room.name = name;
-            await task.save({session});
-        }
+        const taskIds = room.tasks.map(x => x.id);
+        await TaskModel.updateMany({'_id': {$in: taskIds}}, {$set: {'room.name': name}}).session(session);
 
         await session.commitTransaction();
     } catch (e) {
@@ -75,21 +76,21 @@ export async function deleteRoom(roomId: string, firebaseId: string): Promise<vo
     try {
         session.startTransaction();
 
-        const user = await UserModel.findOne({'firebaseId': firebaseId}).session(session);
-        const roomDeleted = await RoomModel.deleteOne({'_id': roomId, 'createdBy': firebaseId}).session(session);
-        if (roomDeleted.deletedCount !== 1) {
-            await session.abortTransaction();
-            return;
-        }
+        const room = await RoomModel.findOneAndDelete({'_id': roomId, 'createdBy': firebaseId}).session(session);
+
         // task cannot have null room. delete all tasks that contained this room
-        await TaskModel.deleteMany({'room.id': roomId, 'createdBy': firebaseId}).session(session);
-        // remove room from user
-        user.rooms = user.rooms.filter(x => !x.equals(roomId));
+        const taskIds = room.tasks.map(x => x.id);
+        await TaskModel.deleteMany({'_id': {$in: taskIds}}).session(session);
+
+        await UserModel.updateOne(
+            {'firebaseId': firebaseId},
+            {$pull: {'rooms': roomId, 'tasks': {$in: taskIds}}}
+        ).session(session);
+
         await session.commitTransaction();
     } catch (e) {
         await session.abortTransaction();
         throw e;
-
     } finally {
         await session.endSession();
     }

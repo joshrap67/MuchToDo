@@ -3,6 +3,7 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
+import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 import 'package:much_todo/src/repositories/rooms/room_repository.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,6 @@ class RoomsService {
         context.read<RoomsProvider>().setRooms(rooms);
       }
     } on Exception catch (e) {
-      print(e);
       if (context.mounted) {
         showSnackbar('There was a problem loading rooms', context);
       }
@@ -46,10 +46,18 @@ class RoomsService {
 
   static Future<Room?> editRoom(BuildContext context, String id, String name, String? note) async {
     Room? room;
-    await Future.delayed(const Duration(seconds: 2), () {
-      room = context.read<RoomsProvider>().updateRoom(id, name, note);
-      context.read<TasksProvider>().updateRoom(id, name);
-    });
+
+    try {
+      await RoomRepository.updateRoom(id, UpdateRoomRequest(name, note));
+      if (context.mounted) {
+        room = context.read<RoomsProvider>().updateRoom(id, name, note);
+        context.read<TasksProvider>().updateRoom(id, name);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem updating the room', context);
+      }
+    }
     return room;
   }
 

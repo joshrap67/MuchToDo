@@ -40,7 +40,12 @@ class _TagsCardFilterState extends State<TagsCardFilter> {
               children: [
                 for (var i = 0; i < _selectedTags.length; i++)
                   Chip(
-                    label: Text(_selectedTags[i].name),
+                    label: Text(
+                      _selectedTags[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     onDeleted: () {
                       onDeleteTag(_selectedTags[i]);

@@ -32,12 +32,9 @@ class RoomRepository {
     }
   }
 
-  static Future<Room> updateRoom(String roomId, UpdateRoomRequest request) async {
+  static Future<void> updateRoom(String roomId, UpdateRoomRequest request) async {
     final apiResult = await ApiGateway.put('$basePath/$roomId', request);
-    if (apiResult.success) {
-      var decodedJson = jsonDecode(apiResult.data);
-      return Room.fromJson(decodedJson);
-    } else {
+    if (!apiResult.success) {
       throw Exception('There was a problem updating the room.');
     }
   }

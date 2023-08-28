@@ -40,8 +40,13 @@ class _ContactCardFilterState extends State<ContactCardFilter> {
               children: [
                 for (var i = 0; i < _selectedContacts.length; i++)
                   Chip(
-                    label: Text(_selectedContacts[i].name),
+                    label: Text(
+                      _selectedContacts[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                    ),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
                     onDeleted: () {
                       onDeleteContact(_selectedContacts[i].id);
                     },

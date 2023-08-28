@@ -39,7 +39,12 @@ class _RoomCardState extends State<RoomCard> {
                 children: [
                   for (var i = 0; i < widget.selectedRooms.length; i++)
                     Chip(
-                      label: Text(widget.selectedRooms[i].name),
+                      label: Text(
+                        widget.selectedRooms[i].name,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      deleteIconColor: Theme.of(context).colorScheme.onTertiary,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       onDeleted: () {
                         onDeleteRoom(widget.selectedRooms[i]);

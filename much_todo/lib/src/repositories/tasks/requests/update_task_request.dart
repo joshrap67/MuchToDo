@@ -40,7 +40,7 @@ class UpdateTaskRequest implements ApiRequest {
       'tagIds': tagIds,
       'contactIds': contactIds,
       'roomId': roomId,
-      'completeBy': completeBy,
+      'completeBy': completeBy?.toIso8601String(),
     };
   }
 

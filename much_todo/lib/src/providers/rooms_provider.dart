@@ -4,27 +4,11 @@ import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/utils/globals.dart';
 
 class RoomsProvider with ChangeNotifier {
-  static final List<Room> initialData = [
-    Room('A', 'Bedroom', 'Note', []),
-    Room('B', 'Bathroom', 'Note', []),
-    Room('C', 'Kitchen', 'Note', []),
-    Room('D', 'Unspecified Room', 'Note', []),
-  ];
-  List<Room> _rooms = [...initialData];
+  List<Room> _rooms = [];
   bool _isLoading = true;
 
   List<Room> get rooms => [..._rooms]; // spread since otherwise widgets could bypass mutation methods
   bool get isLoading => _isLoading;
-
-  Future<void> loadRooms() async {
-    _isLoading = true;
-    notifyListeners();
-    await Future.delayed(const Duration(seconds: 4), () {
-      _rooms = [...initialData];
-    });
-    _isLoading = false;
-    notifyListeners();
-  }
 
   void setRooms(List<Room> rooms) {
     _rooms = rooms;
@@ -82,21 +66,13 @@ class RoomsProvider with ChangeNotifier {
   }
 
   void updateTask(Task updatedTask, String oldRoomId) {
-    if (updatedTask.room.id == oldRoomId) {
-      return;
-    }
-    var oldRoom = _rooms.firstWhere((element) => element.id == oldRoomId);
-    oldRoom.tasks.removeWhere((element) => element.id == updatedTask.id);
+    // task changed room, need to remove this task from the old room
+    var oldRoom = _rooms.firstWhere((r) => r.id == oldRoomId);
+    oldRoom.tasks.removeWhere((t) => t.id == updatedTask.id);
 
-    for (var room in _rooms) {
-      for (var task in room.tasks) {
-        if (task.id == updatedTask.id) {
-          task.update(updatedTask.name, updatedTask.estimatedCost);
-          notifyListeners();
-          return;
-        }
-      }
-    }
+    var newRoom = _rooms.firstWhere((r) => r.id == updatedTask.room.id);
+    newRoom.tasks.add(updatedTask.convert());
+    notifyListeners();
   }
 
   void addTasks(List<Task> createdTasks) {

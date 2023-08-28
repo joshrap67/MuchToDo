@@ -53,6 +53,19 @@ class UserService {
     }
   }
 
+  static Future<void> deleteUser(BuildContext context) async {
+    try {
+      await UserRepository.deleteUser();
+      if (context.mounted) {
+        signOut(context);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem creating the account', context);
+      }
+    }
+  }
+
   static Future<Tag?> createTag(BuildContext context, String name) async {
     Tag? tag;
     try {
@@ -133,6 +146,7 @@ class UserService {
       if (context.mounted) {
         context.read<UserProvider>().updateContact(contact);
         context.read<TasksProvider>().updateContactForTasks(contact);
+		showSnackbar('Contact updated.', context);
       }
     } catch (e) {
       if (context.mounted) {

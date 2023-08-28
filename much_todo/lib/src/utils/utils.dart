@@ -29,6 +29,34 @@ void showSnackbar(String message, BuildContext context, {int milliseconds = 3000
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+void showLoadingDialog(BuildContext context, {String msg = 'Loading...', bool dismissible = false}) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) {
+      return WillPopScope(
+        onWillPop: () async => dismissible,
+        child: AlertDialog(
+          title: Text(msg),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: LinearProgressIndicator(),
+              )
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void closePopup(BuildContext context) {
+	Navigator.of(context, rootNavigator: true).pop('dialog');
+}
+
 String? validNewTag(String? tagName, List<Tag> tags) {
   if (tagName == null || tagName.isEmpty) {
     return 'Name is required.';
@@ -44,7 +72,7 @@ String? validRoomName(String? name, List<Room> rooms) {
     return 'Required';
   }
   if (rooms.any((r) => r.name == name)) {
-	  // todo don't do this?
+    // todo don't do this?
     return 'Room name already exists';
   }
   return null;

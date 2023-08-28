@@ -26,8 +26,7 @@ enum TaskOptions { edit, duplicate, delete }
 
 enum StatusOptions {
   notStarted(1, 'Not Started', Icon(Icons.cancel)),
-  started(2, 'Started', Icon(Icons.pending)),
-  completed(3, 'Completed', Icon(Icons.check));
+  started(2, 'In Progress', Icon(Icons.pending));
 
   const StatusOptions(this.value, this.label, this.icon);
 
@@ -50,7 +49,11 @@ class _TaskDetailsState extends State<TaskDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const AutoSizeText('Task Details'),
+        title: AutoSizeText(
+          _task.name,
+          minFontSize: 10,
+          maxLines: 1,
+        ),
         scrolledUnderElevation: 0,
         actions: [
           PopupMenuButton(
@@ -94,128 +97,159 @@ class _TaskDetailsState extends State<TaskDetails> {
           )
         ],
       ),
-      body: Scrollbar(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Column(
-                children: [
-                  ListTile(
-                    title: AutoSizeText(_task.name),
-                    subtitle: _task.note != null ? Text(_task.note!) : null,
-                  ),
-                  Visibility(
-                    visible: _task.completeBy != null,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            getDueByDate(),
-                            style: const TextStyle(fontSize: 11),
+      body: Column(
+        children: [
+          Expanded(
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Column(
+                      children: [
+                        // ListTile(
+                        //   title: AutoSizeText(_task.name),
+                        //   subtitle: _task.note != null ? Text(_task.note!) : null,
+                        // ),
+                        Visibility(
+                          visible: _task.completeBy != null,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  getDueByDate(),
+                                  style: const TextStyle(fontSize: 11),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Column(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: InputDecorator(
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                                        labelText: 'Status',
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                                      ),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<StatusOptions>(
+                                          value: _status,
+                                          onChanged: (StatusOptions? value) {
+                                            setState(() {
+                                              _status = value!;
+                                              // todo launch popup to select date
+                                            });
+                                          },
+                                          items: StatusOptions.values
+                                              .map<DropdownMenuItem<StatusOptions>>((StatusOptions value) {
+                                            return DropdownMenuItem<StatusOptions>(
+                                                value: value, child: Text(value.label));
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                         Row(
                           children: [
-                            Expanded(
-                              child: InputDecorator(
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                                  labelText: 'Status',
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<StatusOptions>(
-                                    value: _status,
-                                    onChanged: (StatusOptions? value) {
-                                      setState(() {
-                                        _status = value!;
-                                        // todo launch popup to select date
-                                      });
-                                    },
-                                    items: StatusOptions.values
-                                        .map<DropdownMenuItem<StatusOptions>>((StatusOptions value) {
-                                      return DropdownMenuItem<StatusOptions>(value: value, child: Text(value.label));
-                                    }).toList(),
+                            Flexible(
+                              child: Card(
+                                child: ListTile(
+                                  title: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: PriorityIndicator(task: widget.task),
+                                  ),
+                                  contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+                                  subtitle: const Text(
+                                    'Priority',
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ),
                               ),
                             ),
+                            Flexible(
+                              child: Card(
+                                child: ListTile(
+                                  title: Text(getEffortTitle()),
+                                  contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+                                  subtitle: const Text(
+                                    'Effort',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Card(
-                          child: ListTile(
-                            title: Align(
-                              alignment: Alignment.topLeft,
-                              child: PriorityIndicator(task: widget.task),
-                            ),
-                            contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-                            subtitle: const Text(
-                              'Priority',
-                              style: TextStyle(fontSize: 12),
-                            ),
+                        if (_task.note != null)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Card(
+                                  child: ListTile(
+                                    title: Text(_task.note!),
+                                    subtitle: const Text(
+                                      'Note',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
-                        ),
-                      ),
-                      Flexible(
-                        child: Card(
-                          child: ListTile(
-                            title: Text(getEffortTitle()),
-                            contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-                            subtitle: const Text(
-                              'Effort',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      if (_task.estimatedCost != null)
-                        Flexible(
-                          child: Card(
-                            child: ListTile(
-                              title: Text(NumberFormat.currency(symbol: '\$').format(_task.estimatedCost)),
-                              subtitle: const Text(
-                                'Estimated Cost',
-                                style: TextStyle(fontSize: 12),
+                        Row(
+                          children: [
+                            if (_task.estimatedCost != null)
+                              Flexible(
+                                child: Card(
+                                  child: ListTile(
+                                    title: Text(NumberFormat.currency(symbol: '\$').format(_task.estimatedCost)),
+                                    subtitle: const Text(
+                                      'Estimated Cost',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            Flexible(child: RoomCardReadOnly(selectedRoom: _task.room)),
+                          ],
                         ),
-                      Flexible(child: RoomCardReadOnly(selectedRoom: _task.room)),
-                    ],
-                  ),
-                  if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
-                  if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
-                  if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
-                  if (_task.photos.isNotEmpty) PhotosCardReadOnly(photos: _task.photos),
-                ],
-              )
-            ],
+                        if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
+                        if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
+                        if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
+                        if (_task.photos.isNotEmpty) PhotosCardReadOnly(photos: _task.photos),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+            child: ElevatedButton.icon(
+              onPressed: promptCompleteTask,
+              icon: const Icon(Icons.done),
+              label: const Text('COMPLETE'),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -284,6 +318,58 @@ class _TaskDetailsState extends State<TaskDetails> {
             content: const Text('Are you sure you wish to delete this task?'),
           );
         });
+  }
+
+  void promptCompleteTask() {
+    showDialog<void>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Navigator.pop(context);
+                  completeTask();
+                },
+                child: const Text('COMPLETE'),
+              )
+            ],
+            title: const Text('Complete Task'),
+            content: const Text.rich(
+              TextSpan(children: <TextSpan>[
+                TextSpan(text: 'Congratulations on completing your task! Completing a task is '),
+                TextSpan(text: 'irreversible ', style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: 'and moves the completed task to the details page of its room.'
+					'\n\nDo you still wish to complete this task?'),
+              ]),
+            ),
+          );
+        });
+  }
+
+  Future<void> completeTask() async {
+    DateTime? pickDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1800),
+        helpText: 'Select Completion Date',
+        lastDate: DateTime(2100));
+    if (pickDate != null) {
+      if (context.mounted) {
+        showLoadingDialog(context, msg: 'Completing...');
+      }
+
+      // todo complete api call
+      await Future.delayed(const Duration(seconds: 2));
+      if (context.mounted) {
+        closePopup(context);
+        Navigator.of(context).pop;
+      }
+    }
   }
 
   Future<void> deleteTask() async {

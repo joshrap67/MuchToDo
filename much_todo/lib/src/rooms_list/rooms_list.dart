@@ -64,14 +64,16 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                 ),
                 const Divider(),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: rooms.length,
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 65),
-                    itemBuilder: (ctx, index) {
-                      var room = rooms[index];
-                      return RoomInfoCard(room: room);
-                    },
+                  child: Scrollbar(
+                    child: ListView.builder(
+                      itemCount: rooms.length,
+                      controller: _scrollController,
+                      padding: const EdgeInsets.only(bottom: 65),
+                      itemBuilder: (ctx, index) {
+                        var room = rooms[index];
+                        return RoomInfoCard(room: room);
+                      },
+                    ),
                   ),
                 ),
               ],

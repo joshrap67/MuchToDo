@@ -127,15 +127,17 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                 ),
                 tasks.isNotEmpty
                     ? Expanded(
-                        child: ListView.builder(
-                          itemCount: tasks.length,
-                          padding: const EdgeInsets.only(bottom: 65),
-                          controller: _scrollController,
-                          itemBuilder: (ctx, index) {
-                            var task = tasks[index];
-                            // todo swipe left to delete, swipe right to edit?
-                            return TaskCard(task: task);
-                          },
+                        child: Scrollbar(
+                          child: ListView.builder(
+                            itemCount: tasks.length,
+                            padding: const EdgeInsets.only(bottom: 65),
+                            controller: _scrollController,
+                            itemBuilder: (ctx, index) {
+                              var task = tasks[index];
+                              // todo swipe left to delete, swipe right to edit?
+                              return TaskCard(task: task);
+                            },
+                          ),
                         ),
                       )
                     : const Padding(

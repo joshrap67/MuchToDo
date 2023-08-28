@@ -82,6 +82,8 @@ export async function deleteRoom(roomId: string, firebaseId: string): Promise<vo
         const taskIds = room.tasks.map(x => x.id);
         await TaskModel.deleteMany({'_id': {$in: taskIds}}).session(session);
 
+        //TODO should completed tasks get removed too?
+
         await UserModel.updateOne(
             {'firebaseId': firebaseId},
             {$pull: {'rooms': roomId, 'tasks': {$in: taskIds}}}

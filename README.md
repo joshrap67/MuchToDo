@@ -17,6 +17,9 @@ Below environment variables must be set
 - MuchToDo_Mongo__ConnectionString
 - MuchToDo_Firebase__ProjectId
 - MuchToDo_Firebase__TaskPhotoBucket
+- MuchToDo_Api__Port
+- MuchToDo_Microservice__DeletePhotosPort
+- MuchToDo_Urls__DeletePhotos
 - GOOGLE_APPLICATION_CREDENTIALS
 
 Ensure environment variable GOOGLE_APPLICATION_CREDENTIALS is pointed to `%APPDATA%\gcloud\application_default_credentials.json`

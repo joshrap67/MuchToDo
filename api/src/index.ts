@@ -3,7 +3,7 @@ import http from 'http';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
-import router from './router';
+import router from './router/router';
 import mongoose from 'mongoose';
 import {authenticateJWT} from "./utils/httpUtils";
 import admin, {credential} from "firebase-admin";
@@ -22,8 +22,9 @@ mongoose
     .connect(MONGO_URL)
     .then(() => {
         const server = http.createServer(app);
-        server.listen(process.env.MuchToDo_ApiPort || 8080, () => {
-            console.log('Server running on http://localhost:8080/');
+        const port = process.env.MuchToDo_Api__Port || 8080
+        server.listen(port, () => {
+            console.log(`Server running on http://localhost:${port}/`);
         });
     });
 

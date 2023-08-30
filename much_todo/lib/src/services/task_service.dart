@@ -3,8 +3,10 @@ import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/repositories/tasks/requests/complete_task_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/create_tasks_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/set_task_photos_request.dart';
+import 'package:much_todo/src/repositories/tasks/requests/set_task_progress_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/update_task_request.dart';
 import 'package:much_todo/src/repositories/tasks/task_repository.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -61,9 +63,7 @@ class TaskService {
         context.read<RoomsProvider>().updateTask(updatedTask, originalTask.room.id);
         context.read<UserProvider>().updateTask(updatedTask);
       }
-    } catch (e, stack) {
-      print(e);
-      print(stack);
+    } catch (e) {
       if (context.mounted) {
         showSnackbar('There was a problem updating the task', context);
       }
@@ -125,6 +125,36 @@ class TaskService {
       }
     }
     return task;
+  }
+
+  static Future<void> setTaskProgress(BuildContext context, String taskId, bool inProgress) async {
+    try {
+      // blind send
+      context.read<TasksProvider>().updateTaskProgress(taskId, inProgress);
+      await TaskRepository.setTaskProgress(
+        taskId,
+        SetTaskProgressRequest(inProgress: inProgress),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem setting the task\'s progress', context);
+      }
+    }
+  }
+
+  static Future<void> completeTask(BuildContext context, Task task, DateTime completionDate) async {
+    try {
+      await TaskRepository.completeTask(task.id, CompleteTaskRequest(completeDate: completionDate));
+      if (context.mounted) {
+        context.read<TasksProvider>().removeTask(task);
+        context.read<RoomsProvider>().removeTask(task);
+        context.read<UserProvider>().removeTask(task);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem completing the task', context);
+      }
+    }
   }
 
   static Future<bool> deleteTask(BuildContext context, Task task) async {

@@ -41,29 +41,51 @@ class _RoomTasksListState extends State<RoomTasksList> {
     getRoomTasks();
     return Column(
       children: [
-        ListTile(
-          title: Text(
-            getTitle(),
-            style: const TextStyle(fontSize: 22),
+        if (_tasks.isNotEmpty)
+          ListTile(
+            title: Text(
+              getTitle(),
+              style: const TextStyle(fontSize: 22),
+            ),
+            subtitle: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                getSubTitle(),
+                if (widget.room.note != null && widget.room.note!.isNotEmpty)
+                  Text(
+                    widget.room.note!,
+                    style: const TextStyle(fontSize: 12),
+                  )
+              ],
+            ),
+            trailing: IconButton(
+              onPressed: promptSortTasks,
+              icon: const Icon(Icons.sort),
+            ),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
           ),
-          subtitle: getSubTitle(),
-          trailing: IconButton(
-            onPressed: promptSortTasks,
-            icon: const Icon(Icons.sort),
-          ),
-          contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
-        ),
-        Expanded(
-          child: Scrollbar(
-            child: ListView.builder(
-              itemCount: _tasks.length,
-              itemBuilder: (ctx, index) {
-                var task = _tasks[index];
-                return TaskCard(task: task, showRoom: false);
-              },
+        if (_tasks.isNotEmpty)
+          Expanded(
+            child: Scrollbar(
+              child: ListView.builder(
+                itemCount: _tasks.length,
+                itemBuilder: (ctx, index) {
+                  var task = _tasks[index];
+                  return TaskCard(task: task, showRoom: false);
+                },
+              ),
             ),
           ),
-        ),
+        if (_tasks.isEmpty)
+          const Expanded(
+            child: Center(
+              child: Text(
+                'Room has no tasks',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: OutlinedButton.icon(
@@ -99,14 +121,14 @@ class _RoomTasksListState extends State<RoomTasksList> {
 
   void getRoomTasks() {
     _tasks = context.watch<TasksProvider>().allTasks.where((element) => element.room.id == widget.room.id).toList();
-	sortRoomTasks(); // todo this will be called too often
+    sortRoomTasks(); // todo this will be called too often
   }
 
   String getTitle() {
-    return _tasks.isEmpty ? 'Room has no associated Tasks' : '${_tasks.length} Tasks';
+    return _tasks.isEmpty ? 'Room has no tasks' : '${_tasks.length} Tasks';
   }
 
-  Widget? getSubTitle() {
+  Widget getSubTitle() {
     var totalCost = 0.0;
     for (var e in _tasks) {
       if (e.estimatedCost != null) {
@@ -118,7 +140,7 @@ class _RoomTasksListState extends State<RoomTasksList> {
             '${NumberFormat.currency(symbol: '\$').format(totalCost)} Total Estimated Cost',
             style: const TextStyle(fontSize: 12),
           )
-        : null;
+        : const Text('');
   }
 
   void promptSortTasks() {
@@ -134,7 +156,7 @@ class _RoomTasksListState extends State<RoomTasksList> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, 'OK');
-				  sortRoomTasks();
+                  sortRoomTasks();
                   setState(() {});
                 },
                 child: const Text('APPLY'),
@@ -163,7 +185,6 @@ class _RoomTasksListState extends State<RoomTasksList> {
                                   onChanged: (SortOptions? value) {
                                     setState(() {
                                       _sortByValue = value!;
-                                      // todo launch popup to select date
                                     });
                                   },
                                   items: SortOptions.values.map<DropdownMenuItem<SortOptions>>((SortOptions value) {

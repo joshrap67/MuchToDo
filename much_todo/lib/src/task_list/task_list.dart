@@ -78,12 +78,19 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                           },
                           controller: _searchController,
                           trailing: <Widget>[
-                            IconButton(
-                              onPressed: () {
-                                filterTasks();
-                              },
-                              tooltip: 'Filter',
-                              icon: const Icon(Icons.filter_list_sharp),
+                            Badge(
+                              label: Text(context.watch<TasksProvider>().filters.getFilterCount().toString()),
+                              isLabelVisible: context.watch<TasksProvider>().filters.getFilterCount() > 0,
+                              alignment: Alignment.bottomLeft,
+                              backgroundColor: Theme.of(context).colorScheme.tertiary,
+                              textColor: Theme.of(context).colorScheme.onTertiary,
+                              child: IconButton(
+                                onPressed: () {
+                                  filterTasks();
+                                },
+                                tooltip: 'Filter',
+                                icon: const Icon(Icons.filter_list_sharp),
+                              ),
                             ),
                             Visibility(
                               visible: !_bounceDice,

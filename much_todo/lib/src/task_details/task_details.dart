@@ -3,9 +3,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/create_task/create_task.dart';
-import 'package:much_todo/src/domain/task.dart' as TaskDomain;
+import 'package:much_todo/src/domain/task.dart' as task_domain;
 import 'package:much_todo/src/edit_task/edit_task.dart';
-import 'package:much_todo/src/photos/set_task_photos_screen.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/task_details/links_card_read_only.dart';
 import 'package:much_todo/src/task_details/contacts_card_read_only.dart';
@@ -16,7 +15,7 @@ import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class TaskDetails extends StatefulWidget {
-  final TaskDomain.Task task;
+  final task_domain.Task task;
 
   const TaskDetails({super.key, required this.task});
 
@@ -38,7 +37,7 @@ enum StatusOptions {
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
-  late TaskDomain.Task _task;
+  late task_domain.Task _task;
   StatusOptions _status = StatusOptions.notStarted;
   late Future<List<String>> _photoUrls; // doing it like this to avoid hassle of having awaits everywhere to get url
 
@@ -47,17 +46,16 @@ class _TaskDetailsState extends State<TaskDetails> {
     super.initState();
     _task = widget.task;
     _photoUrls = loadPhotos();
+    if (_task.inProgress) {
+      _status = StatusOptions.started;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: AutoSizeText(
-          _task.name,
-          minFontSize: 10,
-          maxLines: 1,
-        ),
+        title: getAppBarTitle(),
         scrolledUnderElevation: 0,
         actions: [
           PopupMenuButton(
@@ -130,7 +128,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                           onChanged: (StatusOptions? value) {
                                             setState(() {
                                               _status = value!;
-                                              // todo launch popup to select date
+                                              setStatus(value);
                                             });
                                           },
                                           items: StatusOptions.values
@@ -154,7 +152,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                 child: ListTile(
                                   title: Align(
                                     alignment: Alignment.topLeft,
-                                    child: PriorityIndicator(task: widget.task),
+                                    child: PriorityIndicator(priority: _task.priority),
                                   ),
                                   contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
                                   subtitle: const Text(
@@ -178,7 +176,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                             )
                           ],
                         ),
-                        if (_task.note != null)
+                        if (_task.note != null && _task.note!.isNotEmpty)
                           Row(
                             children: [
                               Expanded(
@@ -187,22 +185,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     title: Text(_task.note!),
                                     subtitle: const Text(
                                       'Note',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        if (_task.completeBy != null)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(getDueByDate()),
-                                    subtitle: const Text(
-                                      'Due Date',
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ),
@@ -239,13 +221,13 @@ class _TaskDetailsState extends State<TaskDetails> {
                               if (photos.hasData && !photos.hasError) {
                                 return PhotosCardReadOnly(
                                   photos: photos.data!,
-                                  taskId: widget.task.id,
+                                  taskId: _task.id,
                                   onSetPhotos: (task) => onPhotosUpdated(task),
                                 );
                               } else if (photos.hasError) {
                                 return const Center(child: Icon(Icons.broken_image));
                               } else {
-                                return const CircularProgressIndicator();
+                                return const CircularProgressIndicator(); // todo skeleton?
                               }
                             }),
                       ],
@@ -260,7 +242,7 @@ class _TaskDetailsState extends State<TaskDetails> {
             child: ElevatedButton.icon(
               onPressed: promptCompleteTask,
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
+                foregroundColor: Colors.white,
                 backgroundColor: Colors.green,
               ),
               icon: const Icon(Icons.done),
@@ -272,18 +254,30 @@ class _TaskDetailsState extends State<TaskDetails> {
     );
   }
 
-  String getDueByDate() {
-    if (_task.completeBy == null) {
-      return '';
+  Widget getAppBarTitle() {
+    if (_task.completeBy != null) {
+      return ListTile(
+        title: AutoSizeText(
+          _task.name,
+          minFontSize: 10,
+          maxLines: 1,
+        ),
+        subtitle: Text('Due ${DateFormat.yMd().format(_task.completeBy!)}'),
+        contentPadding: EdgeInsets.zero,
+      );
     } else {
-      return DateFormat.yMd().format(_task.completeBy!);
+      return AutoSizeText(
+        _task.name,
+        minFontSize: 10,
+        maxLines: 1,
+      );
     }
   }
 
   String getEffortTitle() {
-    if (_task.effort == TaskDomain.Task.lowEffort) {
+    if (_task.effort == task_domain.Task.lowEffort) {
       return 'Low';
-    } else if (_task.effort == TaskDomain.Task.mediumEffort) {
+    } else if (_task.effort == task_domain.Task.mediumEffort) {
       return 'Medium';
     } else {
       return 'High';
@@ -299,14 +293,18 @@ class _TaskDetailsState extends State<TaskDetails> {
     return _task.effort / 3;
   }
 
+  void setStatus(StatusOptions status) {
+    TaskService.setTaskProgress(context, _task.id, status == StatusOptions.started);
+  }
+
   Future<List<String>> loadPhotos() async {
-    if (widget.task.photos.isEmpty) {
+    if (_task.photos.isEmpty) {
       return [];
     }
     final storageRef = FirebaseStorage.instance.ref();
     try {
       var urls = <String>[];
-      for (var photo in widget.task.photos) {
+      for (var photo in _task.photos) {
         var url = await storageRef.child(photo).getDownloadURL();
         urls.add(url);
       }
@@ -365,26 +363,28 @@ class _TaskDetailsState extends State<TaskDetails> {
     if (pickDate != null) {
       if (context.mounted) {
         showLoadingDialog(context, msg: 'Completing...');
-      }
-
-      // todo complete api call
-      await Future.delayed(const Duration(seconds: 2));
-      if (context.mounted) {
-        closePopup(context);
-        Navigator.of(context).pop;
+        await TaskService.completeTask(context, _task, pickDate);
+        if (context.mounted) {
+          closePopup(context);
+          Navigator.of(context).pop; // todo not popping for some reason...
+        }
       }
     }
   }
 
   Future<void> deleteTask() async {
-    var deleted = await TaskService.deleteTask(context, widget.task);
+    showLoadingDialog(context, msg: 'Deleting...');
+    var deleted = await TaskService.deleteTask(context, _task);
+    if (context.mounted) {
+      closePopup(context);
+    }
     if (context.mounted && deleted) {
       Navigator.of(context).pop();
     }
   }
 
   Future<void> editTask() async {
-    TaskDomain.Task? result = await Navigator.push(
+    task_domain.Task? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditTask(
@@ -400,17 +400,18 @@ class _TaskDetailsState extends State<TaskDetails> {
     }
   }
 
-  Future<void> onPhotosUpdated(TaskDomain.Task? task) async {
+  Future<void> onPhotosUpdated(task_domain.Task? task) async {
     if (task != null) {
       setState(() {
         _task = task;
-		_photoUrls = loadPhotos();
+        _photoUrls = loadPhotos();
       });
     }
   }
 
   Future<void> duplicateTask() async {
-    List<Task>? result = await Navigator.push(
+    // todo route to new task?
+    List<task_domain.Task>? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CreateTask(

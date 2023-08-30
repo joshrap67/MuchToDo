@@ -44,7 +44,7 @@ class _PhotosGalleryState extends State<PhotosGallery> {
                   initialScale: PhotoViewComputedScale.contained,
                   minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
                   maxScale: PhotoViewComputedScale.covered * 4.1,
-                  heroAttributes: PhotoViewHeroAttributes(tag: url.hashCode),
+                  heroAttributes: PhotoViewHeroAttributes(tag: url.hashCode), // todo remove since causes issues when you scroll on gallery
                 );
               },
               itemCount: widget.links.length,

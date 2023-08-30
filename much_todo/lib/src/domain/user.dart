@@ -33,6 +33,7 @@ class User {
     for (var task in json['tasks']) {
       tasks.add(task);
     }
+
     rooms = <String>[];
     for (var room in json['rooms']) {
       rooms.add(room);

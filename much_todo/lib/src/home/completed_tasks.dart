@@ -1,21 +1,18 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
-import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/services/completed_tasks_service.dart';
 import 'package:much_todo/src/skeletons/completed_tasks_skeleton.dart';
 import 'package:much_todo/src/widgets/completed_task_card.dart';
 
-class RoomCompletedTasks extends StatefulWidget {
-  final Room room;
-
-  const RoomCompletedTasks({super.key, required this.room});
+class CompletedTasks extends StatefulWidget {
+  const CompletedTasks({super.key});
 
   @override
-  State<RoomCompletedTasks> createState() => _RoomCompletedTasksState();
+  State<CompletedTasks> createState() => _CompletedTasksState();
 }
 
-class _RoomCompletedTasksState extends State<RoomCompletedTasks> {
+class _CompletedTasksState extends State<CompletedTasks> {
   late bool _loading = false;
   late List<CompletedTask> _completedTasks;
 
@@ -29,14 +26,14 @@ class _RoomCompletedTasksState extends State<RoomCompletedTasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: AutoSizeText(
-          '${widget.room.name} Completed Tasks',
+        title: const AutoSizeText(
+          'All Completed Tasks',
           minFontSize: 10,
           maxLines: 1,
         ),
         scrolledUnderElevation: 0,
       ),
-      body: !_loading // todo skeleton
+      body: !_loading
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -66,7 +63,7 @@ class _RoomCompletedTasksState extends State<RoomCompletedTasks> {
     setState(() {
       _loading = true;
     });
-    List<CompletedTask> tasks = await CompletedTaskService.getCompletedTasksByRoom(context, widget.room);
+    List<CompletedTask> tasks = await CompletedTaskService.getAllCompletedTasks(context);
     setState(() {
       _completedTasks = tasks;
       _loading = false;

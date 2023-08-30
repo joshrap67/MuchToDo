@@ -3,6 +3,8 @@ import * as taskService from '../services/taskService';
 import {ICreateTaskRequest} from "./requests/taskRequests/createTaskRequest";
 import {IUpdateTaskRequest} from "./requests/taskRequests/updateTaskRequest";
 import {ISetPhotosRequest} from "./requests/taskRequests/setPhotosRequest";
+import {ICompleteTaskRequest} from "./requests/taskRequests/completeTaskRequest";
+import {ISetTaskProgressRequest} from "./requests/taskRequests/setTaskProgressRequest";
 
 export const getAllTasksByUser = async (_req: express.Request, res: express.Response) => {
     try {
@@ -67,6 +69,30 @@ export const deleteTask = async (req: express.Request<{ id: string }, {}, {}>, r
     try {
         const userId = res.locals.firebaseId;
         await taskService.deleteTask(req.params.id, userId);
+
+        return res.status(204).send();
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(400);
+    }
+}
+
+export const completeTask = async (req: express.Request<{ id: string }, {}, ICompleteTaskRequest>, res: express.Response) => {
+    try {
+        const userId = res.locals.firebaseId;
+        const completedTask = await taskService.completeTask(req.params.id, req.body.completeDate, userId);
+
+        return res.status(201).json(completedTask);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(400);
+    }
+}
+
+export const setProgress = async (req: express.Request<{ id: string }, {}, ISetTaskProgressRequest>, res: express.Response) => {
+    try {
+        const userId = res.locals.firebaseId;
+        await taskService.setProgress(req.params.id, req.body.inProgress, userId);
 
         return res.status(204).send();
     } catch (error) {

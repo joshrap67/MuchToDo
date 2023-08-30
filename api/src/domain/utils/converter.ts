@@ -1,6 +1,7 @@
 import {IRoom, IRoomTask} from "domain/room"
 import {ITask, ITaskContact, ITaskRoom, ITaskTag} from "domain/task"
 import {IContact, ITag} from "../user";
+import {ICompletedTaskContact} from "../completedTask";
 
 export const convertTaskToRoomTask = (task: ITask): IRoomTask => {
     return {id: task._id, name: task.name, estimatedCost: task.estimatedCost};
@@ -16,4 +17,8 @@ export const convertTagToTaskTag = (tag: ITag): ITaskTag => {
 
 export const convertContactToTaskContact = (contact: IContact): ITaskContact => {
     return {id: contact.id, name: contact.name, email: contact.email, phoneNumber: contact.phoneNumber};
+}
+
+export const convertTaskContactToCompletedTaskContact = (contact: ITaskContact): ICompletedTaskContact => {
+    return {name: contact.name, email: contact.email, phoneNumber: contact.phoneNumber};
 }

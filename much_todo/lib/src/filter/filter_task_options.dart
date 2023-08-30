@@ -117,6 +117,40 @@ class FilterTaskOptions {
     this.creationDateEquality = DateEqualityComparisons.equalTo,
     this.creationDate,
     this.completionDateEquality = DateEqualityComparisons.equalTo,
-    this.completionDate,
+    this.completionDate, // todo delete
   });
+
+  int getFilterCount() {
+    int count = 0;
+    if (priorityFilter != null) {
+      count++;
+    }
+	if (effortFilter != null) {
+		count++;
+	}
+	if (roomIdFilter != null) {
+		count++;
+	}
+	if (estimatedCost != null) {
+		count++;
+	}
+	if (selectedTags.isNotEmpty) {
+		count++;
+	}
+	if (selectedContacts.isNotEmpty) {
+		count++;
+	}
+	if (showOnlyInProgress) {
+		count++;
+	}
+	if (completeBy != null) {
+		count++;
+	}
+	if (creationDate != null) {
+		count++;
+	}
+
+
+	return count;
+  }
 }

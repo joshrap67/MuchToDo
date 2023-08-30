@@ -36,7 +36,7 @@ void showLoadingDialog(BuildContext context, {String msg = 'Loading...', bool di
     builder: (context) {
       return WillPopScope(
         onWillPop: () async => dismissible,
-        child: AlertDialog(
+        child: AlertDialog.adaptive(
           title: Text(msg),
           content: const Column(
             mainAxisSize: MainAxisSize.min,

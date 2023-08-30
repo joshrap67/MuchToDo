@@ -57,7 +57,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                     style: const TextStyle(fontSize: 22),
                   ),
                   subtitle: Text(
-                    '${totalTasks()} Total Incomplete Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
+                    '${totalTasks()} Total Tasks | ${NumberFormat.currency(symbol: '\$').format(totalCost())}',
                     style: const TextStyle(fontSize: 12),
                   ),
                   trailing: sortDropdown(),

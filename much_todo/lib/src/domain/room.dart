@@ -1,7 +1,6 @@
 import 'package:much_todo/src/domain/task.dart';
 
 class Room {
-  // todo rename to something generic like "Space"? Just since if you had outside areas they really aren't rooms
   late String id;
   late String name;
   String? note;

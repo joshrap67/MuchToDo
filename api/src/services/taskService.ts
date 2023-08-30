@@ -5,7 +5,7 @@ import {IRoom, RoomModel} from "../domain/room";
 import {
     convertContactToTaskContact,
     convertRoomToTaskRoom,
-    convertTagToTaskTag,
+    convertTagToTaskTag, convertTaskContactToCompletedTaskContact,
     convertTaskToRoomTask
 } from "../domain/utils/converter";
 import {ICreateTaskRequest} from "../controllers/requests/taskRequests/createTaskRequest";
@@ -13,8 +13,11 @@ import {IUpdateTaskRequest} from "../controllers/requests/taskRequests/updateTas
 import {ITaskResponse} from "../controllers/responses/taskResponse";
 import {mapTaskToResponse} from "./mappers/taskMapper";
 import {ISetPhotosRequest} from "../controllers/requests/taskRequests/setPhotosRequest";
-import {uploadTaskPhoto} from "./photoService";
-
+import {deletePhotos, uploadTaskPhoto} from "./photoService";
+import {maxTaskPhotoCount} from "../utils/constants";
+import {CompletedTaskModel, ICompletedTask} from "../domain/completedTask";
+import {ICompletedTaskResponse} from "../controllers/responses/completedTaskResponse";
+import {mapCompletedTaskToResponse} from "./mappers/completedTaskMapper";
 
 export async function getTasksByUser(userId: string): Promise<ITaskResponse[]> {
     const tasks = await TaskModel.find({'createdBy': userId});
@@ -75,7 +78,7 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
                 estimatedCost: request.estimatedCost,
                 completeBy: request.completeBy,
                 inProgress: request.inProgress
-            });
+            } as ITask);
             await task.save({session});
             roomIdToTask[roomId] = task;
             createdTasks.push(task);
@@ -124,6 +127,9 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
             // room changed, so we need to update old room to delete this task
             oldRoom.tasks = oldRoom.tasks.filter(x => !x.id.equals(task.id));
             await oldRoom.save({session});
+            // update new room with denormalized task data
+            newRoom.tasks.push(convertTaskToRoomTask(task));
+            await newRoom.save({session});
         }
 
         const tagIdToTag: Record<string, ITag> = {};
@@ -177,9 +183,6 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         }
         await user.save({session});
 
-        // update room with denormalized task data
-        newRoom.tasks.push(convertTaskToRoomTask(task));
-        await newRoom.save({session});
         await session.commitTransaction();
 
         taskResponse = mapTaskToResponse(task);
@@ -194,16 +197,20 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
 }
 
 export async function setPhotos(taskId: string, request: ISetPhotosRequest, userId: string): Promise<ITaskResponse> {
+    const task = await TaskModel.findOne({'_id': taskId, 'createdBy': userId});
+    if (task.photos.length + request.photosToUpload.length - request.deletedPhotos.length > maxTaskPhotoCount) {
+        throw Error(`Cannot have more than ${maxTaskPhotoCount} photos on a task.`);
+    }
+
     const session = await mongoose.startSession();
     let response: ITaskResponse;
     try {
         session.startTransaction();
 
-        const task = await TaskModel.findOne({'_id': taskId, 'createdBy': userId}).session(session);
         if (request.deletedPhotos && request.deletedPhotos.length) {
             // remove photos that are to be deleted
             task.photos = task.photos.filter(x => request.deletedPhotos.some(d => d === x));
-            // todo api call to microservice to delete photos of tasks
+            await deletePhotos({taskIds: [taskId], firebaseId: userId});
         }
 
         // todo check if they have uploaded too many
@@ -228,28 +235,13 @@ export async function setPhotos(taskId: string, request: ISetPhotosRequest, user
     return response;
 }
 
-// todo delete photos when competing task
-
 export async function deleteTask(taskId: string, userId: string): Promise<void> {
     const session = await mongoose.startSession();
 
     try {
         session.startTransaction();
 
-        const user = await UserModel.findOne({'firebaseId': userId}).session(session);
-        const task = await TaskModel.findOneAndDelete({'_id': taskId, 'createdBy': userId}).session(session);
-        // remove task from its room
-        await RoomModel.updateOne({'_id': task.room.id}, {$pull: {'tasks': {'id': taskId}}}).session(session);
-        // todo api call to microservice to delete photos of tasks
-
-        for (const tag of user.tags) {
-            tag.tasks = tag.tasks.filter(x => !x.equals(task.id));
-        }
-        for (const contact of user.contacts) {
-            contact.tasks = contact.tasks.filter(x => !x.equals(task.id));
-        }
-        user.tasks = user.tasks.filter(x => !x.equals(task.id))
-        await user.save({session});
+        await deleteAndReturnTask(session, taskId, userId);
 
         await session.commitTransaction();
     } catch (e) {
@@ -258,4 +250,63 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
     } finally {
         await session.endSession();
     }
+}
+
+export async function setProgress(taskId: string, inProgress: boolean, userId: string): Promise<void> {
+    await TaskModel.updateOne({'_id': taskId, 'createdBy': userId}, {$set: {'inProgress': inProgress}});
+}
+
+export async function completeTask(taskId: string, completionDate: Date, userId: string): Promise<ICompletedTaskResponse> {
+    // completing a task is for all intents and purposes a soft delete, so perform much of the same delete steps
+    const session = await mongoose.startSession();
+    let completedTaskResponse;
+    try {
+        session.startTransaction();
+
+        const task = await deleteAndReturnTask(session, taskId, userId);
+
+        const completedTask = new CompletedTaskModel({
+            name: task.name,
+            priority: task.priority,
+            effort: task.effort,
+            roomId: task.room.id.toHexString(),
+            roomName: task.room.name,
+            createdBy: userId,
+            tags: task.tags.map(e => e.name),
+            contacts: task.contacts.map((e) => convertTaskContactToCompletedTaskContact(e)),
+            links: task.links,
+            note: task.note,
+            estimatedCost: task.estimatedCost,
+            completionDate: completionDate
+        } as ICompletedTask);
+        await completedTask.save({session});
+
+        await session.commitTransaction();
+        completedTaskResponse = mapCompletedTaskToResponse(completedTask);
+    } catch (e) {
+        await session.abortTransaction();
+        throw (e);
+    } finally {
+        await session.endSession();
+    }
+    return completedTaskResponse;
+}
+
+async function deleteAndReturnTask(session: mongoose.mongo.ClientSession, taskId: string, userId: string): Promise<ITask> {
+    const user = await UserModel.findOne({'firebaseId': userId}).session(session);
+    const task = await TaskModel.findOneAndDelete({'_id': taskId, 'createdBy': userId}).session(session);
+    // remove task from its room
+    await RoomModel.updateOne({'_id': task.room.id}, {$pull: {'tasks': {'id': taskId}}}).session(session);
+    await deletePhotos({taskIds: [taskId], firebaseId: userId});
+
+    for (const tag of user.tags) {
+        tag.tasks = tag.tasks.filter(x => !x.equals(task.id));
+    }
+    for (const contact of user.contacts) {
+        contact.tasks = contact.tasks.filter(x => !x.equals(task.id));
+    }
+    user.tasks = user.tasks.filter(x => !x.equals(task.id))
+    await user.save({session});
+
+    return task;
 }

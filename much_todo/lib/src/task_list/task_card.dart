@@ -25,7 +25,7 @@ class _TaskCardState extends State<TaskCard> {
             leading: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                PriorityIndicator(task: widget.task),
+                PriorityIndicator(priority: widget.task.priority),
                 const Text('Priority'),
               ],
             ),
@@ -78,7 +78,7 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   Future<void> openTask() async {
-    var result = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => TaskDetails(task: widget.task)),
     );

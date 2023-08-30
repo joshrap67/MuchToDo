@@ -5,6 +5,7 @@ import {TaskModel} from "../domain/task";
 import {maxRoomCount} from "../utils/constants";
 import {IRoomResponse} from "../controllers/responses/roomResponse";
 import {mapRoomToResponse} from "./mappers/roomMapper";
+import {deletePhotosBlindSend} from "./photoService";
 
 export async function getRoomsByUser(userId: string): Promise<IRoomResponse[]> {
     const rooms = await RoomModel.find({'createdBy': userId});
@@ -81,7 +82,7 @@ export async function deleteRoom(roomId: string, firebaseId: string): Promise<vo
         // task cannot have null room. delete all tasks that contained this room
         const taskIds = room.tasks.map(x => x.id);
         await TaskModel.deleteMany({'_id': {$in: taskIds}}).session(session);
-        // todo api call to microservice to delete photos of task
+        deletePhotosBlindSend({taskIds: taskIds.map(e => e.toHexString()), firebaseId: firebaseId});
         // todo delete completed tasks? if not i need to change ui so you can still see ones of deleted rooms
 
         await UserModel.updateOne(

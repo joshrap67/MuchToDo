@@ -1,10 +1,11 @@
 import express from 'express';
 import {
+    completeTask,
     createTasks,
     deleteTask,
     getAllTasksByUser,
     getTask,
-    setPhotos,
+    setPhotos, setProgress,
     updateTask
 } from "../controllers/taskController";
 
@@ -14,5 +15,7 @@ export default (router: express.Router) => {
     router.post('/tasks', (req, res) => createTasks(req, res));
     router.put('/tasks/:id', (req, res) => updateTask(req, res));
     router.delete('/tasks/:id', (req, res) => deleteTask(req, res));
+    router.post('/tasks/:id/complete', (req, res) => completeTask(req, res));
+    router.put('/tasks/:id/progress', (req, res) => setProgress(req, res));
     router.post('/tasks/:id/photos', (req, res) => setPhotos(req, res));
 };

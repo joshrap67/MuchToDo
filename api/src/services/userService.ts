@@ -9,6 +9,7 @@ import {mapContactToResponse, mapTagToResponse, mapUserToResponse} from "./mappe
 import {ISetContactRequest} from "../controllers/requests/userRequests/setContactRequest";
 import {ISetTagRequest} from "../controllers/requests/userRequests/setTagRequest";
 import * as crypto from "crypto";
+import {deletePhotosBlindSend} from "./photoService";
 
 export async function getUserByFirebaseId(id: string): Promise<IUserResponse> {
     const user = await UserModel.findOne({'firebaseId': id});
@@ -154,7 +155,13 @@ export async function updateContact(contactId: string, request: ISetContactReque
         // update all tasks that this contact belongs to with the new fields
         await TaskModel.updateMany(
             {'_id': {$in: contact.tasks}},
-            {$set: {'contacts.$[element].name': contact.name, 'contacts.$[element].email': contact.email, 'contacts.$[element].phoneNumber': contact.phoneNumber}},
+            {
+                $set: {
+                    'contacts.$[element].name': contact.name,
+                    'contacts.$[element].email': contact.email,
+                    'contacts.$[element].phoneNumber': contact.phoneNumber
+                }
+            },
             {arrayFilters: [{'element.id': {$eq: contactId}}]}
         ).session(session);
 
@@ -201,8 +208,7 @@ export async function deleteUser(firebaseId: string): Promise<void> {
         await TaskModel.deleteMany({'_id': {$in: user.tasks}}).session(session);
         await RoomModel.deleteMany({'_id': {$in: user.rooms}}).session(session);
         // todo delete completed tasks (denormalize on user? maybe just don't return it to frontend since its not needed. or just do a count)
-        // todo api call to microservice to delete photos of tasks
-        // todo api call to microservice to delete photos of completed tasks
+        deletePhotosBlindSend({taskIds: user.tasks.map(e => e.toHexString()), firebaseId: firebaseId});
 
         await session.commitTransaction();
     } catch (e) {

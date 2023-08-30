@@ -48,8 +48,8 @@ class ApiGateway {
     return handleResult(response);
   }
 
-  static Future<ApiResult> get(String route) async {
-    var url = Uri.http(baseUrl, route);
+  static Future<ApiResult> get(String route, {Map<String, String>? queryParams}) async {
+    var url = Uri.http(baseUrl, route, queryParams);
     var token = await getToken();
     http.Response response = await http.get(url, headers: {"Authorization": "Bearer $token"});
     return handleResult(response);

@@ -1,6 +1,5 @@
 import 'package:much_todo/src/domain/room.dart';
 
-// todo should i use the decimal package for this? idk i mean this are approximate anyway so im not too concerned with small floating point errors
 // todo list of steps?
 // todo date last updated?
 class Task {
@@ -24,8 +23,6 @@ class Task {
   bool inProgress = false;
   late DateTime? completeBy;
   late DateTime creationDate;
-
-  // todo completionDate? could just have that replace isCompleted and make isCompleted a function
 
   Task(
       this.id,

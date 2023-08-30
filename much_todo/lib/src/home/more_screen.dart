@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/home/completed_tasks.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/sign_in/sign_in_screen.dart';
@@ -79,6 +80,14 @@ class _MoreScreenState extends State<MoreScreen> {
               onTap: launchContacts,
               trailing: const Icon(Icons.arrow_forward),
               leading: const Icon(Icons.person),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Completed Tasks'),
+              onTap: launchCompletedTasks,
+              trailing: const Icon(Icons.arrow_forward),
+              leading: const Icon(Icons.check),
             ),
           ),
           Card(
@@ -191,6 +200,15 @@ class _MoreScreenState extends State<MoreScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => const UserContacts(),
+      ),
+    );
+  }
+
+  void launchCompletedTasks() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CompletedTasks(),
       ),
     );
   }

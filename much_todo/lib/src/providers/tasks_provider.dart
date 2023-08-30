@@ -9,8 +9,10 @@ class TasksProvider with ChangeNotifier {
   List<Task> _allTasks = [];
   List<Task> _filteredTasks = [];
   bool _isLoading = true;
-  FilterTaskOptions _filters =
-      FilterTaskOptions.named(sortByValue: SortOptions.creationDate, sortDirectionValue: SortDirection.descending);
+  FilterTaskOptions _filters = FilterTaskOptions.named(
+    sortByValue: SortOptions.creationDate, // todo shared prefs?
+    sortDirectionValue: SortDirection.descending,
+  );
 
   List<Task> get allTasks => [..._allTasks]; // spread since otherwise widgets could bypass mutation methods
   List<Task> get filteredTasks => [..._filteredTasks];
@@ -43,6 +45,14 @@ class TasksProvider with ChangeNotifier {
     var index = _allTasks.indexWhere((element) => element.id == task.id);
     if (index >= 0) {
       _allTasks[index] = task;
+    }
+    filterAndNotify();
+  }
+
+  void updateTaskProgress(String taskId, bool inProgress) {
+    var index = _allTasks.indexWhere((element) => element.id == taskId);
+    if (index >= 0) {
+      _allTasks[index].inProgress = inProgress;
     }
     filterAndNotify();
   }
@@ -175,16 +185,6 @@ class TasksProvider with ChangeNotifier {
         if (!match) {
           return false;
         }
-      }
-      if (_filters.completionDate != null) {
-        // todo i need to decide if this is going to be a date instead of a bool on the domain
-        // if (task.isCompleted) {
-        //   return false; // if specifying to filter by a date and a task has no complete by date, it shouldn't be shown in result
-        // }
-        // bool match = equalityCheckDate(options.creationDateEquality, options.creationDate!, task.creationDate!);
-        // if (!match) {
-        //   return false;
-        // }
       }
       return true;
     }).toList();

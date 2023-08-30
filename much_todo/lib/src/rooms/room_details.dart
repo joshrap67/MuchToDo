@@ -78,16 +78,16 @@ class _RoomDetailsState extends State<RoomDetails> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Visibility(
-            visible: _room.note.isNotNullOrEmpty(),
-            child: ListTile(
-              title: Text(_room.note ?? ''),
-              subtitle: const Text(
-                'Note',
-                style: TextStyle(fontSize: 11),
-              ),
-            ),
-          ),
+          // Visibility(
+          //   visible: _room.note.isNotNullOrEmpty(),
+          //   child: ListTile(
+          //     title: Text(_room.note ?? ''),
+          //     subtitle: const Text(
+          //       'Note',
+          //       style: TextStyle(fontSize: 11),
+          //     ),
+          //   ),
+          // ),
           Expanded(
             child: RoomTasksList(
               room: _room,
@@ -161,8 +161,10 @@ class _RoomDetailsState extends State<RoomDetails> {
   }
 
   Future<void> deleteRoom() async {
-    await RoomsService.deleteRoom(context, _room);
+    showLoadingDialog(context, msg: 'Deleting...');
+    await RoomsService.deleteRoom(context, _room); // todo in general need better error handling pattern from service
     if (context.mounted) {
+      closePopup(context);
       Navigator.of(context).pop();
     }
   }

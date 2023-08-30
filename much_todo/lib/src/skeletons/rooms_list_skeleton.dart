@@ -23,7 +23,7 @@ class _RoomsListSkeletonState extends State<RoomsListSkeleton> {
               style: TextStyle(fontSize: 22),
             ),
             subtitle: Text(
-              '10 Total Incomplete Tasks | \$1.00',
+              '10 Total Tasks | \$1.00',
               style: TextStyle(fontSize: 12),
             ),
             trailing: Icon(Icons.sort),

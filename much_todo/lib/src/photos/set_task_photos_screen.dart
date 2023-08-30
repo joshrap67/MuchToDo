@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/photos/task_photo_view.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class PhotoWrapper {
   String? networkUrl;
@@ -133,6 +134,8 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
 
   Future<void> addPhoto() async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+	// todo max file size?
+	// todo compression
     if (image != null) {
       setState(() {
         _photos.add(PhotoWrapper(localPhoto: image));
@@ -142,15 +145,24 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
 
   Future<void> save() async {
     var newPhotos = _photos.where((element) => element.isLocal()).map((e) => e.localPhoto);
+    if (newPhotos.isEmpty && _removedPhotos.isEmpty) {
+      return;
+    }
+
+    showLoadingDialog(context, msg: 'Saving...');
     List<String> uploadedPhotos = [];
     for (var photo in newPhotos) {
       var bytes = await photo?.readAsBytes();
       uploadedPhotos.add(base64Encode(bytes as List<int>));
     }
-    if (context.mounted && (newPhotos.isNotEmpty || _removedPhotos.isNotEmpty)) {
+    if (context.mounted) {
       Task? task = await TaskService.setTaskPhotos(context, widget.taskId, uploadedPhotos, _removedPhotos);
+
       if (task != null && context.mounted) {
+        closePopup(context); // todo ugh
         Navigator.pop(context, task);
+      } else if (context.mounted) {
+        closePopup(context);
       }
     }
   }

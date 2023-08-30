@@ -2,6 +2,9 @@ import {taskPhotoBucket} from "../utils/constants";
 import * as stream from "stream";
 import * as crypto from "crypto";
 import {getStorage} from "firebase-admin/storage";
+import axios from "axios";
+import * as process from "process";
+import {IDeletePhotosRequest} from "../controllers/requests/taskRequests/deletePhotosRequest";
 
 export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -23,5 +26,14 @@ export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: stri
             .on('error', () => {
                 reject('Error uploading photo');
             });
-    })
+    });
+}
+
+export const deletePhotos = async (deletePhotosRequest: IDeletePhotosRequest): Promise<void> => {
+    await axios.post(`${process.env.MuchToDo_Urls__DeletePhotos}photos`, deletePhotosRequest);
+}
+
+export const deletePhotosBlindSend = (deletePhotosRequest: IDeletePhotosRequest): void => {
+    // to be used for potentially long-running operations (like when deleting a user that could have hundreds of photos)
+    axios.post(`${process.env.MuchToDo_Urls__DeletePhotos}photos`, deletePhotosRequest);
 }

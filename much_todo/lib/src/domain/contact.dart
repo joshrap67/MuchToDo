@@ -10,14 +10,15 @@ class Contact {
   Contact(this.id, this.name, this.email, this.phoneNumber);
 
   Contact.fromJson(Map<String, dynamic> json) {
-	  id = json['id'];
-	  name = json['name'];
-	  email = json['email'];
-	  phoneNumber = json['phoneNumber'];
-	  tasks = <String>[];
-	  for (var task in json['tasks']) {
-		  tasks.add(task);
-	  }
+    id = json['id'];
+    name = json['name'];
+    email = json['email'];
+    phoneNumber = json['phoneNumber'];
+
+    tasks = <String>[];
+    for (var task in json['tasks']) {
+      tasks.add(task);
+    }
   }
 
   TaskContact convert() {

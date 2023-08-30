@@ -7,51 +7,41 @@ export interface ICompletedTask {
     createdBy: string;
     priority: number;
     effort: number;
-    roomId: Types.ObjectId;
+    roomId: string;
     roomName: string;
     estimatedCost: number;
     note: string;
-    tags: ICompletedTaskTag[];
+    tags: string[];
     contacts: ICompletedTaskContact[];
     links: string[];
-}
-
-export interface ICompletedTaskTag {
-    id: string;
-    name: string;
+    completionDate: Date;
 }
 
 export interface ICompletedTaskContact {
-    id: string;
     name: string;
     email: string;
     phoneNumber: string;
 }
 
-const TagSchema = new Schema<ICompletedTaskTag>({
-    id: {type: String, required: true},
-    name: {type: String, required: true},
-});
-
 const ContactSchema = new Schema<ICompletedTaskContact>({
-    id: {type: String, required: true},
     name: {type: String, required: true},
     email: {type: String},
     phoneNumber: {type: String},
-});
+}, {_id: false});
 
 const CompletedTaskSchema = new Schema<ICompletedTask>({
     name: {type: String, required: true},
     createdBy: {type: String, required: true},
     priority: {type: Number, required: true},
     effort: {type: Number, required: true},
-    roomId: {type: Schema.Types.ObjectId, required: true},
+    roomId: {type: String, required: true},
     roomName: {type: String, required: true},
     estimatedCost: {type: Number},
     note: {type: String},
-    tags: [TagSchema],
+    tags: [{type: String}],
     contacts: [ContactSchema],
-    links: [{type: String}]
+    links: [{type: String}],
+    completionDate: {type: Date}
 });
 
 export const CompletedTaskModel = model<ICompletedTask>(completedTasksCollection, CompletedTaskSchema);

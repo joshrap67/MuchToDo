@@ -8,7 +8,6 @@ export interface ICreateTaskRequest {
     tagIds: string[];
     contactIds: string[];
     links: string[];
-    photos: string[];
     inProgress: boolean;
     completeBy: Date;
 }

@@ -166,7 +166,7 @@ class _UserContactsState extends State<UserContacts> {
     showDialog<void>(
         context: context,
         builder: (ctx) {
-          return AlertDialog(
+          return AlertDialog.adaptive(
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),

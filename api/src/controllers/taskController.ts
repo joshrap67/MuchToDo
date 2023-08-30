@@ -2,6 +2,7 @@ import express from 'express';
 import * as taskService from '../services/taskService';
 import {ICreateTaskRequest} from "./requests/taskRequests/createTaskRequest";
 import {IUpdateTaskRequest} from "./requests/taskRequests/updateTaskRequest";
+import {ISetPhotosRequest} from "./requests/taskRequests/setPhotosRequest";
 
 export const getAllTasksByUser = async (_req: express.Request, res: express.Response) => {
     try {
@@ -44,6 +45,18 @@ export const updateTask = async (req: express.Request<{ id: string }, {}, IUpdat
         const task = await taskService.updateTask(req.params.id, req.body, userId);
 
         return res.status(201).json(task);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(400);
+    }
+}
+
+export const setPhotos = async (req: express.Request<{ id: string }, {}, ISetPhotosRequest>, res: express.Response) => {
+    try {
+        const userId = res.locals.firebaseId;
+        const task = await taskService.setPhotos(req.params.id, req.body, userId);
+
+        return res.status(200).json(task);
     } catch (error) {
         console.log(error);
         return res.sendStatus(400);

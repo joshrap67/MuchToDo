@@ -9,7 +9,6 @@ class UpdateTaskRequest implements ApiRequest {
   String? note;
   List<String> tagIds = [];
   List<String> links = [];
-  List<String> photos = [];
   List<String> contactIds = [];
   late DateTime? completeBy;
 
@@ -23,7 +22,6 @@ class UpdateTaskRequest implements ApiRequest {
     this.roomId,
     this.note,
     this.links,
-    this.photos,
     this.completeBy,
   );
 
@@ -36,7 +34,6 @@ class UpdateTaskRequest implements ApiRequest {
       'estimatedCost': estimatedCost,
       'note': note,
       'links': links,
-      'photos': photos,
       'tagIds': tagIds,
       'contactIds': contactIds,
       'roomId': roomId,
@@ -46,7 +43,7 @@ class UpdateTaskRequest implements ApiRequest {
 
   @override
   String toString() {
-    return 'CreateTasksRequest{name: $name, priority: $priority, effort: $effort, estimatedCost: $estimatedCost, note: $note, links: $links,'
-        'photos: $photos, tagIds: $tagIds, contactIds: $contactIds, roomId: $roomId, completeBy: $completeBy}';
+    return 'CreateTasksRequest{name: $name, priority: $priority, effort: $effort, estimatedCost: $estimatedCost, note: $note, links: $links, '
+        'tagIds: $tagIds, contactIds: $contactIds, roomId: $roomId, completeBy: $completeBy}';
   }
 }

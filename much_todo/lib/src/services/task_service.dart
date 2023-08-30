@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/repositories/tasks/requests/create_tasks_request.dart';
+import 'package:much_todo/src/repositories/tasks/requests/set_task_photos_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/update_task_request.dart';
 import 'package:much_todo/src/repositories/tasks/task_repository.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -39,13 +39,9 @@ class TaskService {
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
-      List<Contact> contacts = const [],
-      List<XFile> photos = const []}) async {
-    // todo pass in original
-
+      List<Contact> contacts = const []}) async {
     Task? updatedTask;
     try {
-      // todo upload photos to cloud
       updatedTask = await TaskRepository.updateTask(
           originalTask.id,
           UpdateTaskRequest(
@@ -58,7 +54,6 @@ class TaskService {
             room.id,
             note,
             links,
-            [],
             completeBy,
           ));
       if (context.mounted) {
@@ -67,8 +62,8 @@ class TaskService {
         context.read<UserProvider>().updateTask(updatedTask);
       }
     } catch (e, stack) {
-		print(e);
-		print(stack);
+      print(e);
+      print(stack);
       if (context.mounted) {
         showSnackbar('There was a problem updating the task', context);
       }
@@ -83,11 +78,9 @@ class TaskService {
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
-      List<Contact> contacts = const [],
-      List<XFile> photos = const []}) async {
+      List<Contact> contacts = const []}) async {
     List<Task>? createdTasks;
     try {
-      // todo upload photos to cloud
       createdTasks = await TaskRepository.createTasks(CreateTasksRequest(
         name,
         priority,
@@ -98,7 +91,6 @@ class TaskService {
         estimatedCost,
         note,
         links,
-        [],
         false,
         completeBy,
       ));
@@ -114,6 +106,25 @@ class TaskService {
     }
 
     return createdTasks;
+  }
+
+  static Future<Task?> setTaskPhotos(
+      BuildContext context, String taskId, List<String> photosToUpload, List<String> deletedPhotos) async {
+    Task? task;
+    try {
+      task = await TaskRepository.setTaskPhotos(
+        taskId,
+        SetTaskPhotosRequest(photosToUpload: photosToUpload, deletedPhotos: deletedPhotos),
+      );
+      if (context.mounted) {
+        context.read<TasksProvider>().updateTask(task);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showSnackbar('There was a problem creating tasks', context);
+      }
+    }
+    return task;
   }
 
   static Future<bool> deleteTask(BuildContext context, Task task) async {

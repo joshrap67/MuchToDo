@@ -1,13 +1,12 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
-import 'package:much_todo/src/create_task/contact_card.dart';
+import 'package:much_todo/src/widgets/contact_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
-import 'package:much_todo/src/create_task/tags_card.dart';
+import 'package:much_todo/src/widgets/tags_card.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/edit_task/room_card.dart';
@@ -17,7 +16,6 @@ import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/links_card.dart';
-import 'package:much_todo/src/widgets/photos_card.dart';
 import 'package:provider/provider.dart';
 
 import 'package:intl/intl.dart';
@@ -39,7 +37,6 @@ class _EditTaskState extends State<EditTask> {
   late int _effort;
 
   List<String> _links = [];
-  List<XFile> _photos = [];
   Room? _selectedRoom;
   DateTime? _completeBy;
   List<Contact> _contacts = [];
@@ -65,7 +62,6 @@ class _EditTaskState extends State<EditTask> {
         widget.task.estimatedCost != null ? formatter.format(widget.task.estimatedCost!.toStringAsFixed(2)) : '';
 
     _noteController.text = widget.task.note ?? '';
-    _photos = widget.task.photos.map((e) => XFile(e)).toList();
     _completeBy = widget.task.completeBy;
     if (_completeBy != null) {
       _completeByController.text = DateFormat('yyyy-MM-dd').format(_completeBy!);
@@ -176,12 +172,6 @@ class _EditTaskState extends State<EditTask> {
                           links: _links,
                           onChange: (links) {
                             _links = [...links];
-                          },
-                        ),
-                        PhotosCard(
-                          photos: _photos,
-                          onChange: (photos) {
-                            _photos = [...photos];
                           },
                         ),
                         const Divider(),
@@ -327,7 +317,7 @@ class _EditTaskState extends State<EditTask> {
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
+        return AlertDialog.adaptive(
           title: const Text('Unsaved Changes'),
           content: (const Text('You have changes that are not saved. Do you wish to discard these changes?')),
           actions: [
@@ -366,7 +356,6 @@ class _EditTaskState extends State<EditTask> {
     double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
     Task? task = await TaskService.editTask(
         context, widget.task, _nameController.text.toString().trim(), _priority, _effort, _selectedRoom!,
-        photos: _photos,
         contacts: _contacts,
         note: _noteController.text.toString().trim(),
         links: _links,

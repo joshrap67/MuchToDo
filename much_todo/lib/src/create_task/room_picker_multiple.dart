@@ -11,16 +11,16 @@ class RoomPickerPopData {
   RoomPickerPopData(this.selectedRooms);
 }
 
-class RoomPicker extends StatefulWidget {
+class RoomPickerMultiple extends StatefulWidget {
   final List<Room> selectedRooms;
 
-  const RoomPicker({super.key, this.selectedRooms = const []});
+  const RoomPickerMultiple({super.key, this.selectedRooms = const []});
 
   @override
-  State<RoomPicker> createState() => _RoomPickerState();
+  State<RoomPickerMultiple> createState() => _RoomPickerMultipleState();
 }
 
-class _RoomPickerState extends State<RoomPicker> {
+class _RoomPickerMultipleState extends State<RoomPickerMultiple> {
   final TextEditingController _searchController = TextEditingController();
 
   List<Room> _selectedRooms = [];

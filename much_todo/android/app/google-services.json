@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "895180784965-be01i6092tau233il28bkdj0qo68p4h4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joshrap.much_todo.much_todo",
+            "certificate_hash": "c51760393bfa10d153a24907166ba27640969d7b"
+          }
+        },
+        {
           "client_id": "895180784965-no3ri31smpvmojtkogvjqa7croml8kp7.apps.googleusercontent.com",
           "client_type": 3
         }

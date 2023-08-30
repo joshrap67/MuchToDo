@@ -8,6 +8,5 @@ export interface IUpdateTaskRequest {
     tagIds: string[];
     contactIds: string[];
     links: string[];
-    photos: string[];
     completeBy: Date;
 }

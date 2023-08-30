@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/create_task/room_picker.dart';
+import 'package:much_todo/src/create_task/room_picker_multiple.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
-class RoomCard extends StatefulWidget {
+class RoomCardMultiple extends StatefulWidget {
   final List<Room> selectedRooms;
   final ValueChanged<List<Room>> onRoomsChange;
   final bool showError;
 
-  const RoomCard({super.key, this.selectedRooms = const [], required this.onRoomsChange, this.showError = false});
+  const RoomCardMultiple({super.key, this.selectedRooms = const [], required this.onRoomsChange, this.showError = false});
 
   @override
-  State<RoomCard> createState() => _RoomCardState();
+  State<RoomCardMultiple> createState() => _RoomCardMultipleState();
 }
 
-class _RoomCardState extends State<RoomCard> {
+class _RoomCardMultipleState extends State<RoomCardMultiple> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -89,7 +89,7 @@ class _RoomCardState extends State<RoomCard> {
     RoomPickerPopData result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RoomPicker(
+        builder: (context) => RoomPickerMultiple(
           selectedRooms: widget.selectedRooms,
         ),
       ),

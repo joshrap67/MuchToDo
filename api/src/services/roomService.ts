@@ -81,8 +81,8 @@ export async function deleteRoom(roomId: string, firebaseId: string): Promise<vo
         // task cannot have null room. delete all tasks that contained this room
         const taskIds = room.tasks.map(x => x.id);
         await TaskModel.deleteMany({'_id': {$in: taskIds}}).session(session);
-
-        //TODO should completed tasks get removed too?
+        // todo api call to microservice to delete photos of task
+        // todo delete completed tasks? if not i need to change ui so you can still see ones of deleted rooms
 
         await UserModel.updateOne(
             {'firebaseId': firebaseId},

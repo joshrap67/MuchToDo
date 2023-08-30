@@ -102,7 +102,7 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
     showDialog<void>(
         context: context,
         builder: (ctx) {
-          return AlertDialog(
+          return AlertDialog.adaptive(
             actions: <Widget>[
               TextButton(
                 child: const Text('NO'),

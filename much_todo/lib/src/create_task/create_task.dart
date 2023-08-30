@@ -1,14 +1,13 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
-import 'package:much_todo/src/create_task/contact_card.dart';
+import 'package:much_todo/src/widgets/contact_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
-import 'package:much_todo/src/create_task/room_card.dart';
-import 'package:much_todo/src/create_task/tags_card.dart';
+import 'package:much_todo/src/create_task/room_card_multiple.dart';
+import 'package:much_todo/src/widgets/tags_card.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/services/task_service.dart';
@@ -16,7 +15,6 @@ import 'package:much_todo/src/utils/globals.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/links_card.dart';
-import 'package:much_todo/src/widgets/photos_card.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -41,7 +39,6 @@ class _CreateTaskState extends State<CreateTask> {
   int _priority = defaultPriority;
   int _effort = defaultEffort;
   List<String> _links = [];
-  List<XFile> _photos = [];
   List<Room> _selectedRooms = [];
   DateTime? _completeBy;
   List<Contact> _contacts = [];
@@ -70,7 +67,6 @@ class _CreateTaskState extends State<CreateTask> {
           widget.task!.estimatedCost != null ? formatter.format(widget.task!.estimatedCost!.toStringAsFixed(2)) : '';
 
       _noteController.text = widget.task!.note ?? '';
-      _photos = widget.task!.photos.map((e) => XFile(e)).toList();
       _completeBy = widget.task!.completeBy;
       if (_completeBy != null) {
         _completeByController.text = DateFormat('yyyy-MM-dd').format(_completeBy!);
@@ -131,7 +127,7 @@ class _CreateTaskState extends State<CreateTask> {
                             ),
                           ),
                         ),
-                        RoomCard(
+                        RoomCardMultiple(
                           selectedRooms: _selectedRooms,
                           showError: _roomError,
                           onRoomsChange: (room) {
@@ -184,12 +180,6 @@ class _CreateTaskState extends State<CreateTask> {
                           links: _links,
                           onChange: (links) {
                             _links = [...links];
-                          },
-                        ),
-                        PhotosCard(
-                          photos: _photos,
-                          onChange: (photos) {
-                            _photos = [...photos];
                           },
                         ),
                         Padding(
@@ -326,7 +316,6 @@ class _CreateTaskState extends State<CreateTask> {
         _tags.isNotEmpty ||
         _contacts.isNotEmpty ||
         _links.isNotEmpty ||
-        _photos.isNotEmpty ||
         _completeByController.text.isNotEmpty;
   }
 
@@ -350,7 +339,7 @@ class _CreateTaskState extends State<CreateTask> {
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
+        return AlertDialog.adaptive(
           title: const Text('Unsaved Changes'),
           content: (const Text('You have changes that are not saved. Do you wish to discard these changes?')),
           actions: [
@@ -389,7 +378,6 @@ class _CreateTaskState extends State<CreateTask> {
     double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
     var createdTasks = await TaskService.createTasks(
         context, _nameController.text.toString().trim(), _priority, _effort, _selectedRooms,
-        photos: _photos,
         contacts: _contacts,
         note: _noteController.text.toString().trim(),
         links: _links,

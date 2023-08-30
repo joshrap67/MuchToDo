@@ -12,6 +12,9 @@ import {ICreateTaskRequest} from "../controllers/requests/taskRequests/createTas
 import {IUpdateTaskRequest} from "../controllers/requests/taskRequests/updateTaskRequest";
 import {ITaskResponse} from "../controllers/responses/taskResponse";
 import {mapTaskToResponse} from "./mappers/taskMapper";
+import {ISetPhotosRequest} from "../controllers/requests/taskRequests/setPhotosRequest";
+import {uploadTaskPhoto} from "./photoService";
+
 
 export async function getTasksByUser(userId: string): Promise<ITaskResponse[]> {
     const tasks = await TaskModel.find({'createdBy': userId});
@@ -68,7 +71,6 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
                 tags: taskTags,
                 contacts: taskContacts,
                 links: request.links,
-                photos: request.photos,
                 note: request.note,
                 estimatedCost: request.estimatedCost,
                 completeBy: request.completeBy,
@@ -151,7 +153,6 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         task.tags = taskTags;
         task.contacts = taskContacts;
         task.links = request.links;
-        task.photos = request.photos;
         task.note = request.note;
         task.estimatedCost = request.estimatedCost;
         task.completeBy = request.completeBy;
@@ -192,6 +193,43 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
     return taskResponse;
 }
 
+export async function setPhotos(taskId: string, request: ISetPhotosRequest, userId: string): Promise<ITaskResponse> {
+    const session = await mongoose.startSession();
+    let response: ITaskResponse;
+    try {
+        session.startTransaction();
+
+        const task = await TaskModel.findOne({'_id': taskId, 'createdBy': userId}).session(session);
+        if (request.deletedPhotos && request.deletedPhotos.length) {
+            // remove photos that are to be deleted
+            task.photos = task.photos.filter(x => request.deletedPhotos.some(d => d === x));
+            // todo api call to microservice to delete photos of tasks
+        }
+
+        // todo check if they have uploaded too many
+        const uploadedPhotos: string[] = [];
+        for (const photo of request.photosToUpload) {
+            const fileName = await uploadTaskPhoto(photo, userId, taskId);
+            uploadedPhotos.push(fileName);
+        }
+        task.photos.push(...uploadedPhotos);
+        await task.save({session});
+
+        await session.commitTransaction();
+
+        response = mapTaskToResponse(task);
+    } catch (e) {
+        await session.abortTransaction();
+        throw (e);
+    } finally {
+        await session.endSession();
+    }
+
+    return response;
+}
+
+// todo delete photos when competing task
+
 export async function deleteTask(taskId: string, userId: string): Promise<void> {
     const session = await mongoose.startSession();
 
@@ -202,6 +240,7 @@ export async function deleteTask(taskId: string, userId: string): Promise<void> 
         const task = await TaskModel.findOneAndDelete({'_id': taskId, 'createdBy': userId}).session(session);
         // remove task from its room
         await RoomModel.updateOne({'_id': task.room.id}, {$pull: {'tasks': {'id': taskId}}}).session(session);
+        // todo api call to microservice to delete photos of tasks
 
         for (const tag of user.tags) {
             tag.tasks = tag.tasks.filter(x => !x.equals(task.id));

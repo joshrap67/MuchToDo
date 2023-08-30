@@ -1,19 +1,14 @@
 import {ISetRoomRequest} from "../controllers/requests/roomRequests/setRoomRequest";
 import {RoomModel} from "../domain/room";
-import {IContact, ITag, IUser, UserModel} from "../domain/user"
+import {IContact, ITag, UserModel} from "../domain/user"
 import mongoose, {Types} from "mongoose";
-import {ITaskContact, ITaskTag, TaskModel} from "../domain/task";
+import {TaskModel} from "../domain/task";
 import {defaultTags} from "../utils/defaults";
 import {IContactResponse, ITagResponse, IUserResponse} from "../controllers/responses/userResponse";
 import {mapContactToResponse, mapTagToResponse, mapUserToResponse} from "./mappers/userMapper";
 import {ISetContactRequest} from "../controllers/requests/userRequests/setContactRequest";
 import {ISetTagRequest} from "../controllers/requests/userRequests/setTagRequest";
 import * as crypto from "crypto";
-
-
-export async function getUserById(id: string): Promise<IUser> {
-    return UserModel.findOne({'_id': id});
-}
 
 export async function getUserByFirebaseId(id: string): Promise<IUserResponse> {
     const user = await UserModel.findOne({'firebaseId': id});
@@ -205,6 +200,9 @@ export async function deleteUser(firebaseId: string): Promise<void> {
         // delete all tasks and rooms from user
         await TaskModel.deleteMany({'_id': {$in: user.tasks}}).session(session);
         await RoomModel.deleteMany({'_id': {$in: user.rooms}}).session(session);
+        // todo delete completed tasks (denormalize on user? maybe just don't return it to frontend since its not needed. or just do a count)
+        // todo api call to microservice to delete photos of tasks
+        // todo api call to microservice to delete photos of completed tasks
 
         await session.commitTransaction();
     } catch (e) {

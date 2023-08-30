@@ -32,10 +32,7 @@ class _ContactCardReadOnlyState extends State<ContactCardReadOnly> {
                   backgroundColor: Theme.of(context).colorScheme.tertiary,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   onPressed: () {
-                    var contact = widget.contacts[i];
-                    if (contact.email != null || contact.phoneNumber != null) {
-                      showContactInfo(widget.contacts[i]);
-                    }
+                    showContactInfo(widget.contacts[i]);
                   },
                 ),
             ],

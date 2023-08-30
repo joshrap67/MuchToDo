@@ -218,7 +218,7 @@ class _MoreScreenState extends State<MoreScreen> {
     showDialog<void>(
         context: context,
         builder: (ctx) {
-          return AlertDialog(
+          return AlertDialog.adaptive(
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),

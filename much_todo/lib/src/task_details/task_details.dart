@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/create_task/create_task.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/edit_task/edit_task.dart';
+import 'package:much_todo/src/photos/set_task_photos_screen.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/task_details/links_card_read_only.dart';
 import 'package:much_todo/src/task_details/contacts_card_read_only.dart';
@@ -106,29 +107,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                   children: [
                     Column(
                       children: [
-                        // ListTile(
-                        //   title: AutoSizeText(_task.name),
-                        //   subtitle: _task.note != null ? Text(_task.note!) : null,
-                        // ),
-                        Visibility(
-                          visible: _task.completeBy != null,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  getDueByDate(),
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -213,6 +191,22 @@ class _TaskDetailsState extends State<TaskDetails> {
                               )
                             ],
                           ),
+                        if (_task.completeBy != null)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Card(
+                                  child: ListTile(
+                                    title: Text(getDueByDate()),
+                                    subtitle: const Text(
+                                      'Due Date',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         Row(
                           children: [
                             if (_task.estimatedCost != null)
@@ -227,13 +221,16 @@ class _TaskDetailsState extends State<TaskDetails> {
                                   ),
                                 ),
                               ),
-                            Flexible(child: RoomCardReadOnly(selectedRoom: _task.room)),
+                            Flexible(
+                              child: RoomCardReadOnly(selectedRoom: _task.room),
+                            ),
+                            // todo allow click to go to room?
                           ],
                         ),
                         if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
                         if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
                         if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
-                        if (_task.photos.isNotEmpty) PhotosCardReadOnly(photos: _task.photos),
+                        PhotosCardReadOnly(photos: _task.photos, setPhotos: setPhotos,),
                       ],
                     )
                   ],
@@ -245,8 +242,12 @@ class _TaskDetailsState extends State<TaskDetails> {
             padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
             child: ElevatedButton.icon(
               onPressed: promptCompleteTask,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.green,
+              ),
               icon: const Icon(Icons.done),
-              label: const Text('COMPLETE'),
+              label: const Text('COMPLETE TASK'),
             ),
           )
         ],
@@ -258,7 +259,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     if (_task.completeBy == null) {
       return '';
     } else {
-      return 'Due ${DateFormat.yMd().format(_task.completeBy!)}';
+      return DateFormat.yMd().format(_task.completeBy!);
     }
   }
 
@@ -299,7 +300,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     showDialog<void>(
         context: context,
         builder: (ctx) {
-          return AlertDialog(
+          return AlertDialog.adaptive(
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -320,38 +321,7 @@ class _TaskDetailsState extends State<TaskDetails> {
         });
   }
 
-  void promptCompleteTask() {
-    showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // Navigator.pop(context);
-                  completeTask();
-                },
-                child: const Text('COMPLETE'),
-              )
-            ],
-            title: const Text('Complete Task'),
-            content: const Text.rich(
-              TextSpan(children: <TextSpan>[
-                TextSpan(text: 'Congratulations on completing your task! Completing a task is '),
-                TextSpan(text: 'irreversible ', style: TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: 'and moves the completed task to the details page of its room.'
-					'\n\nDo you still wish to complete this task?'),
-              ]),
-            ),
-          );
-        });
-  }
-
-  Future<void> completeTask() async {
+  Future<void> promptCompleteTask() async {
     DateTime? pickDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -394,6 +364,23 @@ class _TaskDetailsState extends State<TaskDetails> {
         _task = result;
       });
     }
+  }
+
+  Future<void> setPhotos() async {
+    Task? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SetTaskPhotosScreen(
+          task: _task,
+        ),
+      ),
+    );
+
+    // if (result != null) {
+    //   setState(() {
+    //     _task = result;
+    //   });
+    // }
   }
 
   Future<void> duplicateTask() async {

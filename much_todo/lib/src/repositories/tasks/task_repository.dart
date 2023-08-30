@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/network/api_gateway.dart';
 import 'package:much_todo/src/repositories/tasks/requests/create_tasks_request.dart';
+import 'package:much_todo/src/repositories/tasks/requests/set_task_photos_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/update_task_request.dart';
 
 class TaskRepository {
@@ -50,6 +51,16 @@ class TaskRepository {
       return true;
     } else {
       throw Exception('There was a problem deleting the task.');
+    }
+  }
+
+  static Future<Task> setTaskPhotos(String taskId, SetTaskPhotosRequest request) async {
+    final apiResult = await ApiGateway.post('/tasks/$taskId/photos', request);
+    if (apiResult.success) {
+      var decodedJson = jsonDecode(apiResult.data);
+      return Task.fromJson(decodedJson);
+    } else {
+      throw Exception('There was a problem setting the photos.');
     }
   }
 }

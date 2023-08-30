@@ -14,7 +14,6 @@ export interface ICompletedTask {
     tags: ICompletedTaskTag[];
     contacts: ICompletedTaskContact[];
     links: string[];
-    photos: string[];
 }
 
 export interface ICompletedTaskTag {
@@ -52,8 +51,7 @@ const CompletedTaskSchema = new Schema<ICompletedTask>({
     note: {type: String},
     tags: [TagSchema],
     contacts: [ContactSchema],
-    links: [{type: String}],
-    photos: [{type: String}]
+    links: [{type: String}]
 });
 
 export const CompletedTaskModel = model<ICompletedTask>(completedTasksCollection, CompletedTaskSchema);

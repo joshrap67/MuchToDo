@@ -3,14 +3,16 @@ import 'package:much_todo/src/task_details/photos_gallery.dart';
 
 class PhotosCardReadOnly extends StatelessWidget {
   final List<String> _photos;
+  final VoidCallback setPhotos;
 
-  const PhotosCardReadOnly({super.key, List<String> photos = const []}) : _photos = photos;
+  const PhotosCardReadOnly({super.key, required this.setPhotos, List<String> photos = const []}) : _photos = photos;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Column(
         children: [
+          ElevatedButton(onPressed: setPhotos, child: const Text('Set Photos')),
           Theme(
             // removes weird borders that are enabled by default on expansion tile
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),

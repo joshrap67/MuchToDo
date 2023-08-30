@@ -1,8 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/create_task/create_task.dart';
-import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/domain/task.dart' as TaskDomain;
 import 'package:much_todo/src/edit_task/edit_task.dart';
 import 'package:much_todo/src/photos/set_task_photos_screen.dart';
 import 'package:much_todo/src/services/task_service.dart';
@@ -15,7 +16,7 @@ import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class TaskDetails extends StatefulWidget {
-  final Task task;
+  final TaskDomain.Task task;
 
   const TaskDetails({super.key, required this.task});
 
@@ -37,13 +38,15 @@ enum StatusOptions {
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
-  late Task _task;
+  late TaskDomain.Task _task;
   StatusOptions _status = StatusOptions.notStarted;
+  late Future<List<String>> _photoUrls; // doing it like this to avoid hassle of having awaits everywhere to get url
 
   @override
   void initState() {
     super.initState();
     _task = widget.task;
+    _photoUrls = loadPhotos();
   }
 
   @override
@@ -230,7 +233,21 @@ class _TaskDetailsState extends State<TaskDetails> {
                         if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
                         if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
                         if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
-                        PhotosCardReadOnly(photos: _task.photos, setPhotos: setPhotos,),
+                        FutureBuilder(
+                            future: _photoUrls,
+                            builder: (BuildContext context, AsyncSnapshot<List<String>> photos) {
+                              if (photos.hasData && !photos.hasError) {
+                                return PhotosCardReadOnly(
+                                  photos: photos.data!,
+                                  taskId: widget.task.id,
+                                  onSetPhotos: (task) => onPhotosUpdated(task),
+                                );
+                              } else if (photos.hasError) {
+                                return const Center(child: Icon(Icons.broken_image));
+                              } else {
+                                return const CircularProgressIndicator();
+                              }
+                            }),
                       ],
                     )
                   ],
@@ -264,9 +281,9 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   String getEffortTitle() {
-    if (_task.effort == Task.lowEffort) {
+    if (_task.effort == TaskDomain.Task.lowEffort) {
       return 'Low';
-    } else if (_task.effort == Task.mediumEffort) {
+    } else if (_task.effort == TaskDomain.Task.mediumEffort) {
       return 'Medium';
     } else {
       return 'High';
@@ -280,6 +297,23 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   double getEffortPercentage() {
     return _task.effort / 3;
+  }
+
+  Future<List<String>> loadPhotos() async {
+    if (widget.task.photos.isEmpty) {
+      return [];
+    }
+    final storageRef = FirebaseStorage.instance.ref();
+    try {
+      var urls = <String>[];
+      for (var photo in widget.task.photos) {
+        var url = await storageRef.child(photo).getDownloadURL();
+        urls.add(url);
+      }
+      return urls;
+    } catch (e) {
+      return Future.error('error');
+    }
   }
 
   onOptionSelected(TaskOptions result) {
@@ -350,7 +384,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> editTask() async {
-    Task? result = await Navigator.push(
+    TaskDomain.Task? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditTask(
@@ -366,21 +400,13 @@ class _TaskDetailsState extends State<TaskDetails> {
     }
   }
 
-  Future<void> setPhotos() async {
-    Task? result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SetTaskPhotosScreen(
-          task: _task,
-        ),
-      ),
-    );
-
-    // if (result != null) {
-    //   setState(() {
-    //     _task = result;
-    //   });
-    // }
+  Future<void> onPhotosUpdated(TaskDomain.Task? task) async {
+    if (task != null) {
+      setState(() {
+        _task = task;
+		_photoUrls = loadPhotos();
+      });
+    }
   }
 
   Future<void> duplicateTask() async {

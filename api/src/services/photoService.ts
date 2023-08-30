@@ -9,7 +9,7 @@ export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: stri
         const taskBucket = storage.bucket(taskPhotoBucket);
 
         // each task should have its own directory under the user with its photos
-        const fileName = `${userId}/${taskId}/${crypto.randomUUID()}`;
+        const fileName = `${userId}/${taskId}/${crypto.randomUUID()}.jpg`;
         const file = taskBucket.file(fileName);
         const fileStream = new stream.PassThrough();
         const bytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));

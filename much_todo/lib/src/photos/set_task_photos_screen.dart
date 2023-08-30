@@ -22,9 +22,10 @@ class PhotoWrapper {
 }
 
 class SetTaskPhotosScreen extends StatefulWidget {
-  final Task task;
+  final String taskId;
+  final List<String> firebaseUrls;
 
-  const SetTaskPhotosScreen({super.key, required this.task});
+  const SetTaskPhotosScreen({super.key, required this.taskId, required this.firebaseUrls});
 
   @override
   State<SetTaskPhotosScreen> createState() => _SetTaskPhotosScreenState();
@@ -37,6 +38,12 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
   final PageController _controller = PageController();
 
   @override
+  void initState() {
+    super.initState();
+    _photos.addAll(widget.firebaseUrls.map((e) => PhotoWrapper(networkUrl: e)).toList());
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -46,8 +53,8 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Set Task Photos'),
-        actions: [TextButton(onPressed: () {}, child: const Text('SAVE'))],
+        title: const Text('Task Photos'),
+        actions: [TextButton(onPressed: save, child: const Text('SAVE'))],
       ),
       body: Stack(
         alignment: Alignment.bottomRight,
@@ -140,8 +147,8 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
       var bytes = await photo?.readAsBytes();
       uploadedPhotos.add(base64Encode(bytes as List<int>));
     }
-    if (context.mounted) {
-      Task? task = await TaskService.setTaskPhotos(context, widget.task.id, uploadedPhotos, _removedPhotos);
+    if (context.mounted && (newPhotos.isNotEmpty || _removedPhotos.isNotEmpty)) {
+      Task? task = await TaskService.setTaskPhotos(context, widget.taskId, uploadedPhotos, _removedPhotos);
       if (task != null && context.mounted) {
         Navigator.pop(context, task);
       }

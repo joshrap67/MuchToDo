@@ -12,7 +12,8 @@ import admin, {credential} from "firebase-admin";
 const app = express();
 app.use(cors({credentials: true}));
 app.use(compression());
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
+
 app.use(authenticateJWT);
 app.use('/', router());
 

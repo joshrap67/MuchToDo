@@ -4,6 +4,7 @@ class Room {
   late String id;
   late String name;
   String? note;
+  late DateTime creationDate;
   List<RoomTask> tasks = [];
 
   Room(this.id, this.name, this.note, this.tasks);
@@ -12,20 +13,21 @@ class Room {
     id = json['id'];
     name = json['name'];
     note = json['note'];
+    creationDate = json['creationDate'] != null ? DateTime.parse(json['creationDate']) : DateTime.now();
     tasks = <RoomTask>[];
     for (var task in json['tasks']) {
       tasks.add(RoomTask.fromJson(task));
     }
   }
 
-  void update(String name, String? note) {
-    this.name = name;
-    this.note = note;
+  void update(String newName, String? newNote) {
+    name = newName;
+    note = newNote;
   }
 
   @override
   String toString() {
-    return 'Room{Id: $id, name: $name, note: $note, tasks: $tasks}';
+    return 'Room{Id: $id, name: $name, note: $note, creationDate: $creationDate, tasks: $tasks}';
   }
 
   TaskRoom convert() {
@@ -57,9 +59,9 @@ class RoomTask {
     estimatedCost = json['estimatedCost']?.toDouble();
   }
 
-  void update(String name, double? estimatedCost) {
-    this.name = name;
-    this.estimatedCost = estimatedCost;
+  void update(String newName, double? newEstimatedCost) {
+    name = newName;
+    estimatedCost = newEstimatedCost;
   }
 
   @override

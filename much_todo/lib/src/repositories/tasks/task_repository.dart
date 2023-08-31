@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:much_todo/src/domain/task.dart';
-import 'package:much_todo/src/network/api_gateway.dart';
+import 'package:much_todo/src/repositories/network/api_gateway.dart';
 import 'package:much_todo/src/repositories/tasks/requests/complete_task_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/create_tasks_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/set_task_photos_request.dart';

@@ -5,7 +5,7 @@ import '../services/settings_service.dart';
 class SettingsProvider with ChangeNotifier {
   SettingsProvider(this._settingsService);
 
-  final SettingsService _settingsService; // todo i don't think this needs to be here, it can be static
+  final SettingsService _settingsService;
 
   late ThemeMode _themeMode;
 

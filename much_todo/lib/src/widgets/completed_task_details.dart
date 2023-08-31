@@ -2,12 +2,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
+import 'package:much_todo/src/screens/task_details/links_card_read_only.dart';
 import 'package:much_todo/src/services/completed_tasks_service.dart';
-import 'package:much_todo/src/task_details/links_card_read_only.dart';
-import 'package:much_todo/src/widgets/contacts_card_completed_task.dart';
+import 'package:much_todo/src/screens/home/more_screen/completed_tasks/contacts_card_completed_task.dart';
 import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:much_todo/src/widgets/tags_card_completed_task.dart';
+import 'package:much_todo/src/screens/home/more_screen/completed_tasks/tags_card_completed_task.dart';
 
 class CompletedTaskDetails extends StatefulWidget {
   final CompletedTask task;
@@ -62,7 +62,7 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
                             Flexible(
                               child: Card(
                                 child: ListTile(
-                                  title: Text(getEffortTitle()),
+                                  title: Text(getEffortTitle(widget.task.effort)),
                                   contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
                                   subtitle: const Text(
                                     'Effort',
@@ -130,7 +130,6 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
                                 ),
                               ),
                             ),
-                            // todo allow click to go to room?
                           ],
                         ),
                         if (widget.task.tags.isNotEmpty) TagsCardCompletedTask(tags: widget.task.tags),
@@ -146,25 +145,6 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
         ],
       ),
     );
-  }
-
-  String getEffortTitle() {
-    if (widget.task.effort == CompletedTask.lowEffort) {
-      return 'Low';
-    } else if (widget.task.effort == CompletedTask.mediumEffort) {
-      return 'Medium';
-    } else {
-      return 'High';
-    }
-  }
-
-  double getPriorityPercentage() {
-    // lower priority is more important, so we want linear indicator to be reversed
-    return (6 - widget.task.priority) / 5;
-  }
-
-  double getEffortPercentage() {
-    return widget.task.effort / 3;
   }
 
   void promptDeleteTask() {

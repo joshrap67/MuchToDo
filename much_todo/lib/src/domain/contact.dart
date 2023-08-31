@@ -21,6 +21,12 @@ class Contact {
     }
   }
 
+  void update(String newName, String? newEmail, String? newPhoneNumber) {
+    name = newName;
+    email = newEmail;
+    phoneNumber = newPhoneNumber;
+  }
+
   TaskContact convert() {
     return TaskContact(id, name, email, phoneNumber);
   }

@@ -1,23 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
-import 'package:much_todo/src/filter/filter_task_options.dart';
-import 'package:much_todo/src/utils/globals.dart';
+import 'package:much_todo/src/utils/enums.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void hideKeyboard() {
   FocusManager.instance.primaryFocus?.unfocus();
-}
-
-extension StringExtensions on String? {
-  bool isNullOrEmpty() {
-    // todo makes no sense as extension since null would throw exception trying to invoke this method
-    return this == null || this!.isEmpty;
-  }
-
-  bool isNotNullOrEmpty() {
-    return this != null && this!.isNotEmpty;
-  }
 }
 
 void showSnackbar(String message, BuildContext context, {int milliseconds = 3000}) {
@@ -54,49 +41,26 @@ void showLoadingDialog(BuildContext context, {String msg = 'Loading...', bool di
 }
 
 void closePopup(BuildContext context) {
-	Navigator.of(context, rootNavigator: true).pop('dialog');
+  Navigator.of(context, rootNavigator: true).pop('dialog');
 }
 
-String? validNewTag(String? tagName, List<Tag> tags) {
-  if (tagName == null || tagName.isEmpty) {
-    return 'Name is required.';
-  } else if (tags.any((x) => x.name == tagName)) {
-    return 'Tag already exists';
+String getEffortTitle(int effort) {
+  if (effort == Task.lowEffort) {
+    return 'Low';
+  } else if (effort == Task.mediumEffort) {
+    return 'Medium';
   } else {
-    return null;
+    return 'High';
   }
 }
 
-String? validRoomName(String? name, List<Room> rooms) {
-  if (name == null || name.isEmpty) {
-    return 'Required';
-  }
-  if (rooms.any((r) => r.name == name)) {
-    // todo don't do this?
-    return 'Room name already exists';
-  }
-  return null;
+double getPriorityPercentage(int priority) {
+  // lower priority is more important, so we want display indicator to be reversed
+  return (6 - priority) / 5;
 }
 
-String? validRoomEditName(String? name, String originalName, List<Room> rooms) {
-  if (name != null && name == originalName) {
-    return null;
-  }
-
-  if (name == null || name.isEmpty) {
-    return 'Required';
-  }
-  if (rooms.any((r) => r.name == name)) {
-    return 'Room name already exists';
-  }
-  return null;
-}
-
-String? validRoomNote(String? note) {
-  if (note != null && note.length > Constants.maxRoomNoteLength) {
-    return 'Note too large';
-  }
-  return null;
+double getEffortPercentage(int effort) {
+  return effort / 3;
 }
 
 bool equalityCheckInt(EqualityComparisons equalityType, int filterValue, int taskValue) {
@@ -192,43 +156,34 @@ bool equalityCheckDate(DateEqualityComparisons equalityType, DateTime filterValu
   }
 }
 
-void sortTasks(List<Task> tasks, SortOptions sortBy, SortDirection sortDirection) {
+void sortTasks(List<Task> tasks, TaskSortOptions sortBy, SortDirection sortDirection) {
   // initially ascending
   switch (sortBy) {
-    case SortOptions.name:
+    case TaskSortOptions.name:
       tasks.sort((a, b) => a.name.compareTo(b.name));
       break;
-    case SortOptions.priority:
+    case TaskSortOptions.priority:
       tasks.sort((a, b) => a.priority.compareTo(b.priority));
       break;
-    case SortOptions.effort:
+    case TaskSortOptions.effort:
       tasks.sort((a, b) => a.effort.compareTo(b.effort));
       break;
-    case SortOptions.room:
+    case TaskSortOptions.room:
       tasks.sort((a, b) => a.room.name.compareTo(b.room.name));
       break;
-    case SortOptions.cost:
-      tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1); // todo ugh
+    case TaskSortOptions.cost:
+      tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1);
       break;
-    case SortOptions.creationDate:
+    case TaskSortOptions.creationDate:
       tasks.sort((a, b) => a.creationDate.compareTo(b.creationDate));
       break;
-    case SortOptions.dueBy:
-      tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1); // todo ugh
+    case TaskSortOptions.dueBy:
+      tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1);
       break;
-    case SortOptions.inProgress:
+    case TaskSortOptions.inProgress:
       tasks.sort((a, b) {
         if (b.inProgress) {
           // ones that are in progress are on top in ascending
-          return 1;
-        }
-        return -1;
-      });
-      break;
-    case SortOptions.completed:
-      tasks.sort((a, b) {
-        if (b.isCompleted) {
-          // ones that are completed are on top in ascending
           return 1;
         }
         return -1;
@@ -242,4 +197,36 @@ void sortTasks(List<Task> tasks, SortOptions sortBy, SortDirection sortDirection
       tasks[tasks.length - 1 - i] = temp;
     }
   }
+}
+
+Future<void> launchEmail(BuildContext context, String? email) async {
+	if (email == null) {
+		showSnackbar('Email is empty.', context);
+		return;
+	}
+
+	final Uri uri = Uri(scheme: 'mailto', path: email);
+	if (await canLaunchUrl(uri)) {
+		await launchUrl(uri);
+	} else {
+		if (context.mounted) {
+			showSnackbar('Could not launch email.', context);
+		}
+	}
+}
+
+Future<void> launchPhone(BuildContext context, String? phoneNumber) async {
+	if (phoneNumber == null) {
+		showSnackbar('Phone number is empty.', context);
+		return;
+	}
+
+	final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+	if (await canLaunchUrl(uri)) {
+		await launchUrl(uri);
+	} else {
+		if (context.mounted) {
+			showSnackbar('Could not launch number.', context);
+		}
+	}
 }

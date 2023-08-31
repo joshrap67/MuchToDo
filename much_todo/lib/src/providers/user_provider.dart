@@ -72,7 +72,7 @@ class UserProvider with ChangeNotifier {
   void updateTag(Tag tag) {
     var index = _user?.tags.indexWhere((t) => t.id == tag.id) ?? -1;
     if (index >= 0) {
-      _user?.tags[index] = tag;
+      _user?.tags[index].update(tag.name);
     }
     notifyListeners();
   }
@@ -80,7 +80,7 @@ class UserProvider with ChangeNotifier {
   void updateContact(Contact contact) {
     var index = _user?.contacts.indexWhere((p) => p.id == contact.id) ?? -1;
     if (index >= 0) {
-      _user?.contacts[index] = contact; // todo update method instead
+      _user?.contacts[index].update(contact.name, contact.email, contact.phoneNumber);
     }
     notifyListeners();
   }

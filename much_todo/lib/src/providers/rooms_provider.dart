@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/task.dart';
-import 'package:much_todo/src/utils/globals.dart';
+import 'package:much_todo/src/utils/enums.dart';
 
 class RoomsProvider with ChangeNotifier {
   List<Room> _rooms = [];
   bool _isLoading = true;
+  RoomSortOptions _sort = RoomSortOptions.name;
+  SortDirection _sortDirection = SortDirection.ascending;
 
   List<Room> get rooms => [..._rooms]; // spread since otherwise widgets could bypass mutation methods
   bool get isLoading => _isLoading;
+  RoomSortOptions get sort => _sort;
+  SortDirection get sortDirection => _sortDirection;
 
   void setRooms(List<Room> rooms) {
     _rooms = rooms;
-    notifyListeners(); // todo sort too?
+    sortRooms();
   }
 
   void setLoading(bool loading) {
@@ -41,37 +45,36 @@ class RoomsProvider with ChangeNotifier {
     return room;
   }
 
-  void sortRooms(RoomSortingValues sort) {
-    switch (sort) {
-      case RoomSortingValues.alphaAscending:
-        _rooms.sort((a, b) => a.name.compareTo(b.name));
-        break;
-      case RoomSortingValues.alphaDescending:
-        _rooms.sort((a, b) => b.name.compareTo(a.name));
-        break;
-      case RoomSortingValues.taskCountAscending:
-        _rooms.sort((a, b) => a.tasks.length.compareTo(b.tasks.length));
-        break;
-      case RoomSortingValues.taskCountDescending:
-        _rooms.sort((a, b) => b.tasks.length.compareTo(a.tasks.length));
-        break;
-      case RoomSortingValues.estimateCostAscending:
-        _rooms.sort((a, b) => a.totalCost().compareTo(b.totalCost()));
-        break;
-      case RoomSortingValues.estimatedCostDescending:
-        _rooms.sort((a, b) => b.totalCost().compareTo(a.totalCost()));
-        break;
-    }
-    notifyListeners();
+  void setSort(RoomSortOptions sort, SortDirection sortDirection) {
+    _sort = sort;
+    _sortDirection = sortDirection;
+    sortRooms();
   }
 
-  void updateTask(Task updatedTask, String oldRoomId) {
-    // task changed room, need to remove this task from the old room
-    var oldRoom = _rooms.firstWhere((r) => r.id == oldRoomId);
-    oldRoom.tasks.removeWhere((t) => t.id == updatedTask.id);
+  void sortRooms() {
+    // initially ascending
+    switch (_sort) {
+      case RoomSortOptions.name:
+        _rooms.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case RoomSortOptions.taskCount:
+        _rooms.sort((a, b) => a.tasks.length.compareTo(b.tasks.length));
+        break;
 
-    var newRoom = _rooms.firstWhere((r) => r.id == updatedTask.room.id);
-    newRoom.tasks.add(updatedTask.convert());
+      case RoomSortOptions.creationDate:
+        _rooms.sort((a, b) => a.creationDate.compareTo(b.creationDate));
+        break;
+      case RoomSortOptions.totalCost:
+        _rooms.sort((a, b) => a.totalCost().compareTo(b.totalCost()));
+        break;
+    }
+    if (_sortDirection == SortDirection.descending) {
+      for (var i = 0; i < _rooms.length / 2; i++) {
+        var temp = _rooms[i];
+        _rooms[i] = _rooms[_rooms.length - 1 - i];
+        _rooms[_rooms.length - 1 - i] = temp;
+      }
+    }
     notifyListeners();
   }
 
@@ -85,6 +88,16 @@ class RoomsProvider with ChangeNotifier {
         room.tasks.add(roomIdToTask[room.id]!.convert());
       }
     }
+    notifyListeners();
+  }
+
+  void updateTask(Task updatedTask, String oldRoomId) {
+    // task changed room, need to remove this task from the old room
+    var oldRoom = _rooms.firstWhere((r) => r.id == oldRoomId);
+    oldRoom.tasks.removeWhere((t) => t.id == updatedTask.id);
+
+    var newRoom = _rooms.firstWhere((r) => r.id == updatedTask.room.id);
+    newRoom.tasks.add(updatedTask.convert());
     notifyListeners();
   }
 

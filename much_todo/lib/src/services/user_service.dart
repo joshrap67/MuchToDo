@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/home/home.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
@@ -12,7 +11,8 @@ import 'package:much_todo/src/repositories/user/requests/create_user_request.dar
 import 'package:much_todo/src/repositories/user/requests/set_contact_request.dart';
 import 'package:much_todo/src/repositories/user/requests/set_tag_request.dart';
 import 'package:much_todo/src/repositories/user/user_repository.dart';
-import 'package:much_todo/src/sign_in/create_account.dart';
+import 'package:much_todo/src/screens/home/home.dart';
+import 'package:much_todo/src/screens/sign_in/create_account.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/domain/contact.dart';

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/network/api_gateway.dart';
+import 'package:much_todo/src/repositories/network/api_gateway.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 

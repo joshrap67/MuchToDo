@@ -20,6 +20,10 @@ class Tag {
     return TaskTag(id, name);
   }
 
+  void update(String newName) {
+    name = newName;
+  }
+
   @override
   String toString() {
     return 'Tag{id: $id, name: $name, tasks: $tasks}';

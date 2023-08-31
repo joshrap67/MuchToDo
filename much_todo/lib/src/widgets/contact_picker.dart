@@ -65,7 +65,6 @@ class _ContactPickerState extends State<ContactPicker> {
                   leading: const Icon(Icons.search),
                   controller: _searchController,
                   hintText: 'Search Contacts',
-                  // todo bug with flutter... if you close keyboard while focus is on this you can't open keyboard again
                   onChanged: (_) {
                     setState(() {});
                   },

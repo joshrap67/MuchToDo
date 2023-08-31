@@ -38,7 +38,7 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
                 child: Text(
-                  'Completed: ${DateFormat.yMd().format(widget.task.completionDate!)}',
+                  'Completed: ${DateFormat.yMd().format(widget.task.completionDate)}',
                   style: const TextStyle(fontSize: 11),
                 ),
               ),

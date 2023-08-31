@@ -3,6 +3,7 @@ import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/utils/validation.dart';
 import 'package:provider/provider.dart';
 
 class TagCreated {
@@ -85,7 +86,6 @@ class _TagPickerState extends State<TagPicker> {
               Expanded(
                 child: ListView.builder(
                   itemCount: tags.length + 1,
-                  // todo key?
                   itemBuilder: (BuildContext ctx, int index) {
                     if (index < tags.length) {
                       var tag = tags[index];

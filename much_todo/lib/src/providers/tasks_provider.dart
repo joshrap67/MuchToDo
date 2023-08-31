@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/filter/filter_task_options.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/screens/filter_tasks/filter_task_options.dart';
+import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class TasksProvider with ChangeNotifier {
@@ -10,11 +11,11 @@ class TasksProvider with ChangeNotifier {
   List<Task> _filteredTasks = [];
   bool _isLoading = true;
   FilterTaskOptions _filters = FilterTaskOptions.named(
-    sortByValue: SortOptions.creationDate, // todo shared prefs?
+    sortByValue: TaskSortOptions.creationDate, // todo shared prefs?
     sortDirectionValue: SortDirection.descending,
   );
 
-  List<Task> get allTasks => [..._allTasks]; // spread since otherwise widgets could bypass mutation methods
+  List<Task> get allTasks => [..._allTasks];
   List<Task> get filteredTasks => [..._filteredTasks];
 
   bool get isLoading => _isLoading;

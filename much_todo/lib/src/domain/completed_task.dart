@@ -1,9 +1,6 @@
 import 'package:much_todo/src/domain/room.dart';
 
 class CompletedTask {
-  static const lowEffort = 1;
-  static const mediumEffort = 2;
-  static const highEffort = 3;
 
   late String id;
   late String createdBy;
@@ -57,7 +54,7 @@ class CompletedTask {
     var rawContacts = json['contacts'] as List<dynamic>;
     var contacts = <CompletedTaskContact>[];
     for (var rawContact in rawContacts) {
-      contacts.add(CompletedTaskContact(rawContact['name'], rawContact['email'], rawContact['phoneNumber']));
+      contacts.add(CompletedTaskContact.fromJson(rawContact));
     }
     this.contacts = contacts;
 
@@ -73,7 +70,7 @@ class CompletedTask {
 
   @override
   String toString() {
-    return 'Task{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
+    return 'CompletedTaskContact{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
         'roomId: $roomId, roomName: $roomName, estimatedCost: $estimatedCost, note: $note, links: $links, '
         'contacts: $contacts, completionDate: $completionDate}';
   }
@@ -83,24 +80,18 @@ class CompletedTask {
   }
 }
 
-class TaskRoom {
-  String id;
-  String name;
-
-  TaskRoom(this.id, this.name);
-
-  @override
-  String toString() {
-    return 'TaskRoom{id: $id, name: $name}';
-  }
-}
-
 class CompletedTaskContact {
-  String name;
+  late String name;
   String? email;
   String? phoneNumber;
 
   CompletedTaskContact(this.name, this.email, this.phoneNumber);
+
+  CompletedTaskContact.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    email = json['email'];
+    phoneNumber = json['phoneNumber'];
+  }
 
   @override
   String toString() {

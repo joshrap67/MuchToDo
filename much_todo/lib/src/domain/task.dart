@@ -1,6 +1,5 @@
 import 'package:much_todo/src/domain/room.dart';
 
-// todo list of steps?
 // todo date last updated?
 class Task {
   static const lowEffort = 1;
@@ -19,28 +18,12 @@ class Task {
   List<String> links = [];
   List<String> photos = [];
   List<TaskContact> contacts = [];
-  bool isCompleted = false;
   bool inProgress = false;
   late DateTime? completeBy;
   late DateTime creationDate;
 
-  Task(
-      this.id,
-      this.createdBy,
-      this.name,
-      this.tags,
-      this.priority,
-      this.effort,
-      this.room,
-      this.estimatedCost,
-      this.note,
-      this.links,
-      this.photos,
-      this.contacts,
-      this.isCompleted,
-      this.inProgress,
-      this.completeBy,
-      this.creationDate);
+  Task(this.id, this.createdBy, this.name, this.tags, this.priority, this.effort, this.room, this.estimatedCost,
+      this.note, this.links, this.photos, this.contacts, this.inProgress, this.completeBy, this.creationDate);
 
   Task.named({
     required this.id,
@@ -56,7 +39,6 @@ class Task {
     this.links = const [],
     this.photos = const [],
     this.contacts = const [],
-    this.isCompleted = false,
     this.inProgress = false,
     this.completeBy,
   });
@@ -67,23 +49,20 @@ class Task {
     priority = json['priority'];
     effort = json['effort'];
     createdBy = json['createdBy'];
-
-    var rawRoom = json['room'];
-    room = TaskRoom(rawRoom['id'], rawRoom['name']);
-
     creationDate = DateTime.parse(json['creationDate']);
+    room = TaskRoom.fromJson(json['room']);
 
     var rawTags = json['tags'] as List<dynamic>;
     var tags = <TaskTag>[];
     for (var rawTag in rawTags) {
-      tags.add(TaskTag(rawTag['id'], rawTag['name']));
+      tags.add(TaskTag.fromJson(rawTag));
     }
     this.tags = tags;
 
     var rawContacts = json['contacts'] as List<dynamic>;
     var contacts = <TaskContact>[];
     for (var rawContact in rawContacts) {
-      contacts.add(TaskContact(rawContact['id'], rawContact['name'], rawContact['email'], rawContact['phoneNumber']));
+      contacts.add(TaskContact.fromJson(rawContact));
     }
     this.contacts = contacts;
 
@@ -110,7 +89,7 @@ class Task {
   String toString() {
     return 'Task{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
         'room: $room, estimatedCost: $estimatedCost, note: $note, links: $links, photos: $photos, '
-        'contacts: $contacts, isCompleted: $isCompleted, inProgress: $inProgress, completeBy: $completeBy}';
+        'contacts: $contacts, inProgress: $inProgress, completeBy: $completeBy}';
   }
 
   RoomTask convert() {
@@ -119,10 +98,15 @@ class Task {
 }
 
 class TaskRoom {
-  String id;
-  String name;
+  late String id;
+  late String name;
 
   TaskRoom(this.id, this.name);
+
+  TaskRoom.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
 
   @override
   String toString() {
@@ -131,12 +115,19 @@ class TaskRoom {
 }
 
 class TaskContact {
-  String id;
-  String name;
+  late String id;
+  late String name;
   String? email;
   String? phoneNumber;
 
   TaskContact(this.id, this.name, this.email, this.phoneNumber);
+
+  TaskContact.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    email = json['email'];
+    phoneNumber = json['phoneNumber'];
+  }
 
   @override
   String toString() {
@@ -145,10 +136,15 @@ class TaskContact {
 }
 
 class TaskTag {
-  String id;
-  String name;
+  late String id;
+  late String name;
 
   TaskTag(this.id, this.name);
+
+  TaskTag.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
 
   @override
   String toString() {

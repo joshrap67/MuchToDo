@@ -4,5 +4,3 @@ class Constants {
   static const int minimumPasswordLength = 8;
 }
 
-enum RoomSortingValues { alphaDescending, alphaAscending, taskCountDescending, taskCountAscending, estimatedCostDescending, estimateCostAscending }
-

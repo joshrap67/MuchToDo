@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/user.dart';
-import 'package:much_todo/src/network/api_gateway.dart';
+import 'package:much_todo/src/repositories/network/api_gateway.dart';
 import 'package:much_todo/src/repositories/exceptions/user_not_found_exception.dart';
 import 'package:much_todo/src/repositories/user/requests/set_contact_request.dart';
 import 'package:much_todo/src/repositories/user/requests/set_tag_request.dart';

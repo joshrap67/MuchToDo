@@ -10,7 +10,7 @@ import 'package:much_todo/src/repositories/user/requests/set_tag_request.dart';
 import 'package:much_todo/src/repositories/user/requests/create_user_request.dart';
 
 class UserRepository {
-  static const basePath = '/users';
+  static const basePath = 'users';
 
   static Future<User> getUser() async {
     final apiResult = await ApiGateway.get(basePath);

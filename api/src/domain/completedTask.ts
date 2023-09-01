@@ -1,5 +1,5 @@
 import {Schema, Types, model} from 'mongoose';
-import {completedTasksCollection, roomsCollection} from "./utils/collections";
+import {completedTasksCollection} from "./utils/collections";
 
 export interface ICompletedTask {
     _id: Types.ObjectId;

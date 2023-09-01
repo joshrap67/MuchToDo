@@ -178,6 +178,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
   }
 
   Future<void> addContact() async {
+    // todo use popup
     hideKeyboard();
     Contact? createdContact = await Navigator.push(
       context,

@@ -6,7 +6,8 @@ import 'package:much_todo/src/repositories/api_request.dart';
 import 'package:much_todo/src/repositories/network/api_result.dart';
 
 class ApiGateway {
-  static const String baseUrl = '10.0.2.2:8080';
+  static const String baseUrl = 'us-central1-muchtodo-42777.cloudfunctions.net';
+  static const String functionName = '/expressApi';
 
   static Future<String> getToken() async {
     var token = await FirebaseAuth.instance.currentUser?.getIdToken();
@@ -14,7 +15,7 @@ class ApiGateway {
   }
 
   static Future<ApiResult> post(String route, ApiRequest body) async {
-    var url = Uri.http(baseUrl, route);
+    var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
     http.Response response = await http.post(
       url,
@@ -28,7 +29,7 @@ class ApiGateway {
   }
 
   static Future<ApiResult> put(String route, ApiRequest body) async {
-    var url = Uri.http(baseUrl, route);
+    var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
     http.Response response = await http.put(
       url,
@@ -42,14 +43,14 @@ class ApiGateway {
   }
 
   static Future<ApiResult> delete(String route) async {
-    var url = Uri.http(baseUrl, route);
+    var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
     http.Response response = await http.delete(url, headers: {"Authorization": "Bearer $token"});
     return handleResult(response);
   }
 
   static Future<ApiResult> get(String route, {Map<String, String>? queryParams}) async {
-    var url = Uri.http(baseUrl, route, queryParams);
+    var url = Uri.https(baseUrl, '$functionName/$route', queryParams);
     var token = await getToken();
     http.Response response = await http.get(url, headers: {"Authorization": "Bearer $token"});
     return handleResult(response);

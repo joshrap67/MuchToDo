@@ -2,16 +2,16 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
-import router from './router';
 import admin, {credential} from "firebase-admin";
 import http from "http";
+import {deletePhotos} from "./photoController";
 
 
 const app = express();
 app.use(cors({credentials: true}));
 app.use(compression());
 app.use(bodyParser.json());
-app.use('/', router());
+app.post('/photos', (req, res) => deletePhotos(req, res));
 
 admin.initializeApp({
     projectId: process.env.MuchToDo_Firebase__ProjectId,

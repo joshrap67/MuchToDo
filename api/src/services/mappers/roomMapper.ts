@@ -1,4 +1,4 @@
-import {IRoom, IRoomTask} from "../../domain/room";
+import {IRoom} from "../../domain/room";
 import {IRoomResponse, IRoomTaskResponse} from "../../controllers/responses/roomResponse";
 
 export const mapRoomToResponse = (room: IRoom): IRoomResponse => {

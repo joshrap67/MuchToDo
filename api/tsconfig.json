@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
     "moduleResolution": "node",
     "baseUrl": "src",
-    "outDir": "dist",
+    "outDir": "lib",
     "sourceMap": true,
     "noImplicitAny": true,
+    "module": "NodeNext",
+    "noUnusedLocals": true,
+    "allowSyntheticDefaultImports": true
   },
+  "compileOnSave": true,
   "include": ["src/**/*"],
 }

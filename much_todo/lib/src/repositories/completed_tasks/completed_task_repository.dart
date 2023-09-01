@@ -4,7 +4,7 @@ import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/repositories/network/api_gateway.dart';
 
 class CompletedTaskRepository {
-  static const baseUrl = '/completed-tasks';
+  static const baseUrl = 'completed-tasks';
 
   static Future<List<CompletedTask>> getAllCompletedTasksByUser() async {
     final apiResult = await ApiGateway.get(baseUrl);

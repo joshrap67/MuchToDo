@@ -1,8 +1,6 @@
 import {ITask} from "../../domain/task";
 import {
-    ITaskContactResponse,
     ITaskResponse, ITaskRoomResponse,
-    ITaskTagResponse
 } from "../../controllers/responses/taskResponse";
 
 export const mapTaskToResponse = (task: ITask): ITaskResponse => {

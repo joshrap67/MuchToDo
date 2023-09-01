@@ -14,12 +14,11 @@ Google cloud CLI is needed to run the API and microservices locally.
 
 Below environment variables must be set
 
-- MuchToDo_Mongo__ConnectionString
-- MuchToDo_Firebase__ProjectId
-- MuchToDo_Firebase__TaskPhotoBucket
-- MuchToDo_Api__Port
-- MuchToDo_Microservice__DeletePhotosPort
-- MuchToDo_Urls__DeletePhotos
+- MUCHTODO_MONGO__CONNECTIONSTRING
+- MUCHTODO_FIREBASE__PROJECTID
+- MUCHTODO_FIREBASE__TASKPHOTOBUCKET
+- MUCHTODO_MICROSERVICE__DELETEPHOTOSPORT
+- MUCHTODO_URLS__DELETEPHOTOS
 - GOOGLE_APPLICATION_CREDENTIALS
 
 Ensure environment variable GOOGLE_APPLICATION_CREDENTIALS is pointed to `%APPDATA%\gcloud\application_default_credentials.json`

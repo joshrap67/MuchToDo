@@ -9,7 +9,7 @@ import 'package:much_todo/src/repositories/tasks/requests/set_task_progress_requ
 import 'package:much_todo/src/repositories/tasks/requests/update_task_request.dart';
 
 class TaskRepository {
-  static const baseUrl = '/tasks';
+  static const baseUrl = 'tasks';
 
   static Future<List<Task>> getAllTasksByUser() async {
     final apiResult = await ApiGateway.get(baseUrl);

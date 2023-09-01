@@ -6,7 +6,7 @@ import 'package:much_todo/src/repositories/rooms/requests/create_room_request.da
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 
 class RoomRepository {
-  static const basePath = '/rooms';
+  static const basePath = 'rooms';
 
   static Future<List<Room>> getAllRoomsByUser() async {
     final apiResult = await ApiGateway.get(basePath);

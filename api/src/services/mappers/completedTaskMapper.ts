@@ -1,9 +1,3 @@
-import {ITask} from "../../domain/task";
-import {
-    ITaskContactResponse,
-    ITaskResponse, ITaskRoomResponse,
-    ITaskTagResponse
-} from "../../controllers/responses/taskResponse";
 import {ICompletedTaskResponse} from "../../controllers/responses/completedTaskResponse";
 import {ICompletedTask} from "../../domain/completedTask";
 

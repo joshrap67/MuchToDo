@@ -1,4 +1,4 @@
-import mongoose, {Schema, Types, model} from 'mongoose';
+import {Schema, Types, model} from 'mongoose';
 import {roomsCollection, tasksCollection} from "./utils/collections";
 
 export interface ITask {

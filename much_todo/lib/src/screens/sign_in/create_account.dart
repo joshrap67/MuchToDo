@@ -216,6 +216,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: validRoomName,
+                      keyboardType: TextInputType.name,
                       controller: nameController,
                     ),
                     const Padding(padding: EdgeInsets.all(8)),

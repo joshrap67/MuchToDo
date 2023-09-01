@@ -46,7 +46,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(8,8,8,2),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
           child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
             return RawAutocomplete<TagOption>(
               optionsBuilder: (TextEditingValue textEditingValue) {
@@ -92,6 +92,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                 return Align(
                   alignment: Alignment.topLeft,
                   child: Material(
+                    elevation: 10,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: constraints.maxWidth,

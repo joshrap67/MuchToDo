@@ -139,14 +139,14 @@ class UserService {
     }
   }
 
-  static Future<void> updateContact(BuildContext context, Contact contact) async {
+  static Future<void> updateContact(
+      BuildContext context, String id, String name, String email, String phoneNumber) async {
     try {
-      await UserRepository.updateContact(
-          contact.id, SetContactRequest(contact.name, contact.email, contact.phoneNumber));
+      await UserRepository.updateContact(id, SetContactRequest(name, email, phoneNumber));
       if (context.mounted) {
-        context.read<UserProvider>().updateContact(contact);
-        context.read<TasksProvider>().updateContactForTasks(contact);
-		showSnackbar('Contact updated.', context);
+        context.read<UserProvider>().updateContact(id, name, email, phoneNumber);
+        context.read<TasksProvider>().updateContactForTasks(id, name, email, phoneNumber);
+        showSnackbar('Contact updated.', context);
       }
     } catch (e) {
       if (context.mounted) {

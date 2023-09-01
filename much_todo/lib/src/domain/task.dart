@@ -122,6 +122,12 @@ class TaskContact {
 
   TaskContact(this.id, this.name, this.email, this.phoneNumber);
 
+  void update(String newName, String? newEmail, String? newPhoneNumber) {
+    name = newName;
+    email = newEmail;
+    phoneNumber = newPhoneNumber;
+  }
+
   TaskContact.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];

@@ -140,7 +140,7 @@ class _UserTagsState extends State<UserTags> {
               leading: const Icon(Icons.drive_file_rename_outline),
               onTap: () {
                 Navigator.pop(context);
-                renameTagPopup(tag);
+                promptRenameTag(tag);
               },
             ),
             ListTile(
@@ -156,48 +156,6 @@ class _UserTagsState extends State<UserTags> {
         );
       },
     );
-  }
-
-  void renameTagPopup(Tag tag) {
-    final formKey = GlobalKey<FormState>();
-    _renameTagController.text = tag.name;
-    showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    renameTag(tag, _renameTagController.text);
-                    Navigator.pop(context, 'OK');
-                  }
-                },
-                child: const Text('RENAME'),
-              )
-            ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Rename Tag'),
-            content: Form(
-              key: formKey,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    label: Text('Tag name'),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (val) => validNewTag(val, context.read<UserProvider>().tags),
-                  controller: _renameTagController,
-                ),
-              ),
-            ),
-          );
-        }).then((value) => _renameTagController.clear());
   }
 
   void promptDeleteTag(Tag tag) {
@@ -239,25 +197,6 @@ class _UserTagsState extends State<UserTags> {
     }
   }
 
-  Future<void> renameTag(Tag tag, String tagName) async {
-    if (tagName.isEmpty || tag.name == tagName) {
-      return;
-    }
-    tag.name = tagName.trim();
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    await UserService.updateTag(context, tag);
-
-    setState(() {
-      _isLoading = false;
-      hideKeyboard();
-      _searchController.clear();
-    });
-  }
-
   Future<void> addTag() async {
     hideKeyboard();
     await Dialogs.promptAddTag(context, _searchController.text);
@@ -265,5 +204,67 @@ class _UserTagsState extends State<UserTags> {
     setState(() {
       _searchController.clear();
     });
+  }
+
+  Future<void> promptRenameTag(Tag tag) async {
+    hideKeyboard();
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+    final nameController = TextEditingController(text: tag.name);
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: !isLoading,
+      builder: (ctx) {
+        return StatefulBuilder(builder: (dialogContext, setState) {
+          return AlertDialog.adaptive(
+            actions: <Widget>[
+              if (!isLoading)
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, null),
+                  child: const Text('CANCEL'),
+                ),
+              TextButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await renameTag(dialogContext, tag, nameController.text);
+                    setState(() {
+                      isLoading = false;
+                    });
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext);
+                    }
+                  }
+                },
+                child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
+              )
+            ],
+            insetPadding: const EdgeInsets.all(8.0),
+            title: const Text('Rename Tag'),
+            content: Form(
+              key: formKey,
+              child: SizedBox(
+                width: MediaQuery.of(dialogContext).size.width,
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    label: Text('Tag name'),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) => validNewTag(val, dialogContext.read<UserProvider>().tags),
+                  controller: nameController,
+                ),
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  Future<void> renameTag(BuildContext context, Tag tag, String tagName) async {
+    hideKeyboard();
+    await UserService.updateTag(context, tag);
   }
 }

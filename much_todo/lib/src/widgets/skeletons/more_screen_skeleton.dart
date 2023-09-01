@@ -55,21 +55,26 @@ class MoreScreenSkeleton extends StatelessWidget {
             child: ListTile(
               title: const Text('Theme'),
               leading: const Icon(Icons.brush),
+              contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
               trailing: DropdownButtonHideUnderline(
-                child: DropdownButton<ThemeMode>( // todo migrate to https://api.flutter.dev/flutter/material/DropdownMenu-class.html
-                  onChanged: (_) {}, // rebuilds MaterialApp
-                  items: const [
-                    DropdownMenuItem(
+                child: DropdownMenu<ThemeMode>(
+                  onSelected: (_) {},
+                  inputDecorationTheme: const InputDecorationTheme(
+                    filled: true,
+                    fillColor: Colors.transparent,
+                  ),
+                  dropdownMenuEntries: const [
+                    DropdownMenuEntry(
                       value: ThemeMode.system,
-                      child: Text('System Theme'),
+                      label: 'System Theme',
                     ),
-                    DropdownMenuItem(
+                    DropdownMenuEntry(
                       value: ThemeMode.light,
-                      child: Text('Light Theme'),
+                      label: 'Light Theme',
                     ),
-                    DropdownMenuItem(
+                    DropdownMenuEntry(
                       value: ThemeMode.dark,
-                      child: Text('Dark Theme'),
+                      label: 'Dark Theme',
                     )
                   ],
                 ),

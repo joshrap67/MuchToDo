@@ -94,25 +94,28 @@ class _MoreScreenState extends State<MoreScreen> {
             child: ListTile(
               title: const Text('Theme'),
               leading: const Icon(Icons.brush),
-              trailing: DropdownButtonHideUnderline(
-                child: DropdownButton<ThemeMode>(
-                  value: widget.controller.themeMode,
-                  onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
-                  items: const [
-                    DropdownMenuItem(
-                      value: ThemeMode.system,
-                      child: Text('System Theme'),
-                    ),
-                    DropdownMenuItem(
-                      value: ThemeMode.light,
-                      child: Text('Light Theme'),
-                    ),
-                    DropdownMenuItem(
-                      value: ThemeMode.dark,
-                      child: Text('Dark Theme'),
-                    )
-                  ],
+              contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+              trailing: DropdownMenu<ThemeMode>(
+                initialSelection: widget.controller.themeMode,
+                onSelected: widget.controller.updateThemeMode, // rebuilds MaterialApp
+                inputDecorationTheme: const InputDecorationTheme(
+                  filled: true,
+                  fillColor: Colors.transparent,
                 ),
+                dropdownMenuEntries: const [
+                  DropdownMenuEntry(
+                    value: ThemeMode.system,
+                    label: 'System Theme',
+                  ),
+                  DropdownMenuEntry(
+                    value: ThemeMode.light,
+                    label: 'Light Theme',
+                  ),
+                  DropdownMenuEntry(
+                    value: ThemeMode.dark,
+                    label: 'Dark Theme',
+                  )
+                ],
               ),
             ),
           ),

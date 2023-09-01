@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
-import 'package:much_todo/src/screens/home/room_list/create_room.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -117,6 +117,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                 return Align(
                   alignment: Alignment.topLeft,
                   child: Material(
+                    elevation: 10,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: constraints.maxWidth,
@@ -177,14 +178,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
   Future<void> addRoom() async {
     var name = _autoCompleteController.text; // since onFocus lost input is cleared, grab before hiding keyboard
     hideKeyboard();
-    Room? createdRoom = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreateRoom(
-          name: name,
-        ),
-      ),
-    );
+    Room? createdRoom = await Dialogs.promptAddRoom(context, initialName: name);
     if (createdRoom != null) {
       selectRoom(RoomOption(room: createdRoom));
     }

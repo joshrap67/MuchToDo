@@ -1,11 +1,19 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/screens/room_details/edit_room.dart';
+import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
+import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
+import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/screens/room_details/room_completed_tasks.dart';
-import 'package:much_todo/src/screens/room_details/room_tasks_list.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
+import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/utils/validation.dart';
+import 'package:much_todo/src/widgets/sort_direction_button.dart';
+import 'package:much_todo/src/widgets/task_card.dart';
+import 'package:provider/provider.dart';
 
 class RoomDetails extends StatefulWidget {
   final Room room;
@@ -20,15 +28,27 @@ enum TaskOptions { edit, delete, showCompletedTasks }
 
 class _RoomDetailsState extends State<RoomDetails> {
   late Room _room;
+  late List<Task> _tasks;
+
+  TaskSortOptions _sortByValue = TaskSortOptions.creationDate;
+  SortDirection _sortDirectionValue = SortDirection.descending;
+  final List<DropdownMenuItem<TaskSortOptions>> _sortEntries = <DropdownMenuItem<TaskSortOptions>>[];
 
   @override
   void initState() {
     super.initState();
+    for (var value in TaskSortOptions.values) {
+      _sortEntries.add(DropdownMenuItem<TaskSortOptions>(
+        value: value,
+        child: Text(value.label),
+      ));
+    }
     _room = widget.room;
   }
 
   @override
   Widget build(BuildContext context) {
+    getRoomTasks();
     return Scaffold(
       appBar: AppBar(
         title: AutoSizeText(_room.name),
@@ -78,22 +98,63 @@ class _RoomDetailsState extends State<RoomDetails> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Visibility(
-          //   visible: _room.note.isNotNullOrEmpty(),
-          //   child: ListTile(
-          //     title: Text(_room.note ?? ''),
-          //     subtitle: const Text(
-          //       'Note',
-          //       style: TextStyle(fontSize: 11),
-          //     ),
-          //   ),
-          // ),
           Expanded(
-            child: RoomTasksList(
-              room: _room,
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    getTitle(),
+                    style: const TextStyle(fontSize: 22),
+                  ),
+                  subtitle: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      getSubTitle(),
+                      if (_room.note != null && _room.note!.isNotEmpty)
+                        Text(
+                          _room.note!,
+                          style: const TextStyle(fontSize: 12),
+                        )
+                    ],
+                  ),
+                  trailing: IconButton(
+                    onPressed: promptSortTasks,
+                    icon: const Icon(Icons.sort),
+                  ),
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 1, 8),
+                ),
+                if (_tasks.isNotEmpty)
+                  Expanded(
+                    child: Scrollbar(
+                      child: ListView.builder(
+                        itemCount: _tasks.length,
+                        padding: const EdgeInsets.only(bottom: 75),
+                        itemBuilder: (ctx, index) {
+                          var task = _tasks[index];
+                          return TaskCard(task: task, showRoom: false);
+                        },
+                      ),
+                    ),
+                  ),
+                if (_tasks.isEmpty)
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        'Room has no tasks',
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: launchAddTask,
+        label: const Text('CREATE NEW TASK'),
+        icon: const Icon(Icons.add),
       ),
     );
   }
@@ -101,7 +162,7 @@ class _RoomDetailsState extends State<RoomDetails> {
   onOptionSelected(TaskOptions result) {
     switch (result) {
       case TaskOptions.edit:
-        editRoom();
+        promptEditRoom();
         break;
       case TaskOptions.delete:
         promptDeleteRoom();
@@ -112,14 +173,202 @@ class _RoomDetailsState extends State<RoomDetails> {
     }
   }
 
-  Future<void> editRoom() async {
-    Room? room = await Navigator.push(
+  Future<void> promptEditRoom() async {
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+    final nameController = TextEditingController(text: _room.name);
+    final noteController = TextEditingController(text: _room.note);
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: !isLoading,
+      builder: (ctx) {
+        return StatefulBuilder(builder: (dialogContext, setState) {
+          return AlertDialog.adaptive(
+            actions: <Widget>[
+              if (!isLoading)
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('CANCEL'),
+                ),
+              TextButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await editRoom(dialogContext, nameController.text, noteController.text);
+                    setState(() {
+                      isLoading = false;
+                    });
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext);
+                    }
+                  }
+                },
+                child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
+              )
+            ],
+            insetPadding: const EdgeInsets.all(8.0),
+            title: const Text('Edit Room'),
+            content: Form(
+              key: formKey,
+              child: SizedBox(
+                width: MediaQuery.of(dialogContext).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        label: Text('Room name *'),
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.name,
+                      controller: nameController,
+                      validator: validRoomName,
+                    ),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        label: Text('Note'),
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: noteController,
+                      validator: validRoomNote,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  void getRoomTasks() {
+    _tasks = context.watch<TasksProvider>().allTasks.where((element) => element.room.id == _room.id).toList();
+    sortRoomTasks();
+  }
+
+  String getTitle() {
+    return _tasks.isEmpty ? 'Room has no tasks' : '${_tasks.length} Tasks';
+  }
+
+  Widget getSubTitle() {
+    var totalCost = 0.0;
+    for (var e in _tasks) {
+      if (e.estimatedCost != null) {
+        totalCost += e.estimatedCost!;
+      }
+    }
+    return Text(
+      '${NumberFormat.currency(symbol: '\$').format(totalCost)} Total Estimated Cost',
+      style: const TextStyle(fontSize: 12),
+    );
+  }
+
+  void promptSortTasks() {
+    showDialog<void>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog.adaptive(
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, 'OK');
+                  sortRoomTasks();
+                  setState(() {});
+                },
+                child: const Text('APPLY'),
+              )
+            ],
+            title: const Text('Sort Tasks'),
+            content: StatefulBuilder(
+              builder: (statefulContext, setState) {
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                                labelText: 'Sort By',
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<TaskSortOptions>(
+                                  value: _sortByValue,
+                                  onChanged: (TaskSortOptions? value) {
+                                    setState(() {
+                                      _sortByValue = value!;
+                                    });
+                                  },
+                                  items: TaskSortOptions.values
+                                      .map<DropdownMenuItem<TaskSortOptions>>((TaskSortOptions value) {
+                                    return DropdownMenuItem<TaskSortOptions>(value: value, child: Text(value.label));
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SortDirectionButton(
+                              sortDirection: _sortDirectionValue,
+                              onChange: (sort) {
+                                setState(() {
+                                  _sortDirectionValue = sort;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        });
+  }
+
+  void sortRoomTasks() {
+    var tasks = _tasks;
+    sortTasks(tasks, _sortByValue, _sortDirectionValue);
+
+    _tasks = tasks;
+  }
+
+  Future<void> launchAddTask() async {
+    Task? result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditRoom(room: _room),
+        builder: (context) => CreateTask(
+          room: _room,
+        ),
       ),
     );
-    if (room != null && context.mounted) {
+    if (result != null) {
+      setState(() {
+        showSnackbar('Task created', context);
+      });
+    }
+  }
+
+  Future<void> editRoom(BuildContext context, String name, String? note) async {
+    hideKeyboard();
+    var room = await RoomsService.editRoom(context, _room.id, name, note);
+    if (room != null) {
       setState(() {
         _room = room;
       });
@@ -155,7 +404,7 @@ class _RoomDetailsState extends State<RoomDetails> {
             ],
             title: const Text('Delete Room'),
             content: const Text(
-                'Are you sure you wish to delete this room? ALL tasks associated with this room will be deleted!'),
+                'Are you sure you wish to delete this room?\n\n\ALL tasks associated with this room will be deleted!'),
           );
         });
   }

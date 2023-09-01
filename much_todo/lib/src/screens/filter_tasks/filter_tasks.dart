@@ -215,9 +215,11 @@ class _FilterTasksState extends State<FilterTasks> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: DropdownButtonFormField(
+                              // todo these widgets are really annoying and might just need to use 3rd party lib. focus won't go away, and menu opens with offset relative to initial value
                               items: _priorityEntries,
                               isExpanded: true,
                               value: _priorityFilter,
+
                               decoration: InputDecoration(
                                 suffixIcon: _priorityFilter == null
                                     ? null

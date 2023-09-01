@@ -232,9 +232,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               ),
             ),
           );
-        }).then((value) {
-      nameController.clear();
-      noteController.clear();
-    });
+        }).then(
+      (value) {
+        nameController.clear();
+        noteController.clear();
+      },
+    );
   }
 }

@@ -92,6 +92,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                 return Align(
                   alignment: Alignment.topLeft,
                   child: Material(
+                    elevation: 10,
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: constraints.maxWidth,

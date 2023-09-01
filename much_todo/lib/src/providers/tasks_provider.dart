@@ -16,6 +16,7 @@ class TasksProvider with ChangeNotifier {
   );
 
   List<Task> get allTasks => [..._allTasks];
+
   List<Task> get filteredTasks => [..._filteredTasks];
 
   bool get isLoading => _isLoading;
@@ -75,11 +76,11 @@ class TasksProvider with ChangeNotifier {
     filterAndNotify();
   }
 
-  void updateContactForTasks(Contact contact) {
+  void updateContactForTasks(String id, String name, String email, String phoneNumber) {
     for (var task in _allTasks) {
-      var index = task.contacts.indexWhere((p) => p.id == contact.id);
+      var index = task.contacts.indexWhere((p) => p.id == id);
       if (index >= 0) {
-        task.contacts[index] = contact.convert();
+        task.contacts[index].update(name, email, phoneNumber);
       }
     }
     filterAndNotify();

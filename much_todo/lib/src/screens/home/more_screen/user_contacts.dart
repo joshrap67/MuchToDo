@@ -4,8 +4,7 @@ import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:much_todo/src/widgets/create_contact.dart';
-import 'package:much_todo/src/screens/home/more_screen/edit_contact.dart';
+import 'package:much_todo/src/utils/validation.dart';
 import 'package:provider/provider.dart';
 
 class UserContacts extends StatefulWidget {
@@ -111,15 +110,7 @@ class _UserContactsState extends State<UserContacts> {
 
   Future<void> addContact() async {
     hideKeyboard();
-	await Dialogs.promptAddContact(context, _searchController.text);
-    // await Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => CreateContact(
-    //       name: _searchController.text,
-    //     ),
-    //   ),
-    // );
+    await Dialogs.promptAddContact(context, _searchController.text);
   }
 
   void showContactInfo(Contact contact) {
@@ -134,7 +125,8 @@ class _UserContactsState extends State<UserContacts> {
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               child: ListTile(
                 title: Text(contact.name),
-                subtitle: Text('Associated with ${contact.tasks.length} ${contact.tasks.length == 1 ? 'Task' : 'Tasks'}'),
+                subtitle:
+                    Text('Associated with ${contact.tasks.length} ${contact.tasks.length == 1 ? 'Task' : 'Tasks'}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
@@ -146,7 +138,7 @@ class _UserContactsState extends State<UserContacts> {
               leading: const Icon(Icons.edit),
               onTap: () {
                 Navigator.pop(context);
-                editContact(contact);
+                promptEditContact(contact);
               },
             ),
             ListTile(
@@ -184,19 +176,107 @@ class _UserContactsState extends State<UserContacts> {
             ],
             title: const Text('Delete Contact'),
             content: const Text(
-                'Are you sure you wish to delete this contact? This contact will be removed from ALL tasks that have them!'),
+                'Are you sure you wish to delete this contact?\n\nThis contact will be removed from ALL tasks that have them!'),
           );
         });
   }
 
-  Future<void> editContact(Contact contact) async {
+  Future<void> promptEditContact(Contact contact) async {
     hideKeyboard();
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditContact(contact: contact),
-      ),
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+    final nameController = TextEditingController(text: contact.name);
+    final emailController = TextEditingController(text: contact.email);
+    final phoneNumberController = TextEditingController(text: contact.phoneNumber);
+    await showDialog<Contact?>(
+      context: context,
+      barrierDismissible: !isLoading,
+      builder: (ctx) {
+        return StatefulBuilder(builder: (dialogContext, setState) {
+          return AlertDialog.adaptive(
+            actions: <Widget>[
+              if (!isLoading)
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('CANCEL'),
+                ),
+              TextButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await editContact(
+                        contact.id, nameController.text, emailController.text, phoneNumberController.text);
+                    setState(() {
+                      isLoading = false;
+                    });
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext);
+                    }
+                  }
+                },
+                child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
+              )
+            ],
+            insetPadding: const EdgeInsets.all(8.0),
+            title: const Text('Edit Contact'),
+            content: Form(
+              key: formKey,
+              child: SizedBox(
+                width: MediaQuery.of(dialogContext).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Name'),
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.name,
+                        controller: nameController,
+                        validator: validContactName,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Email'),
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: validContactEmail,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Phone Number'),
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: phoneNumberController,
+                        keyboardType: TextInputType.phone,
+                        validator: validContactPhoneNumber,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+      },
     );
+  }
+
+  Future<void> editContact(String id, String name, String email, String phoneNumber) async {
+    hideKeyboard();
+    await UserService.updateContact(context, id, name, email, phoneNumber);
   }
 
   Future<void> deleteContact(Contact contact) async {

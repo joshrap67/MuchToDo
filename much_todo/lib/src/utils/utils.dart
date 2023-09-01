@@ -200,33 +200,33 @@ void sortTasks(List<Task> tasks, TaskSortOptions sortBy, SortDirection sortDirec
 }
 
 Future<void> launchEmail(BuildContext context, String? email) async {
-	if (email == null) {
-		showSnackbar('Email is empty.', context);
-		return;
-	}
+  if (email == null) {
+    showSnackbar('Email is empty.', context);
+    return;
+  }
 
-	final Uri uri = Uri(scheme: 'mailto', path: email);
-	if (await canLaunchUrl(uri)) {
-		await launchUrl(uri);
-	} else {
-		if (context.mounted) {
-			showSnackbar('Could not launch email.', context);
-		}
-	}
+  final Uri uri = Uri(scheme: 'mailto', path: email);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    if (context.mounted) {
+      showSnackbar('Could not launch email.', context);
+    }
+  }
 }
 
 Future<void> launchPhone(BuildContext context, String? phoneNumber) async {
-	if (phoneNumber == null) {
-		showSnackbar('Phone number is empty.', context);
-		return;
-	}
+  if (phoneNumber == null) {
+    showSnackbar('Phone number is empty.', context);
+    return;
+  }
 
-	final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
-	if (await canLaunchUrl(uri)) {
-		await launchUrl(uri);
-	} else {
-		if (context.mounted) {
-			showSnackbar('Could not launch number.', context);
-		}
-	}
+  final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    if (context.mounted) {
+      showSnackbar('Could not launch number.', context);
+    }
+  }
 }

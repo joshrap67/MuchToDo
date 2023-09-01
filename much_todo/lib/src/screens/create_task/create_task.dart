@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
-import 'package:much_todo/src/screens/create_task/room_card_multiple.dart';
+import 'package:much_todo/src/screens/create_task/pending_rooms_card.dart';
+import 'package:much_todo/src/utils/validation.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
 import 'package:much_todo/src/widgets/pending_contacts_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
@@ -34,7 +35,6 @@ class _CreateTaskState extends State<CreateTask> {
   static const int defaultEffort = 2;
 
   bool _shouldPop = false;
-  bool _roomError = false;
 
   int _priority = defaultPriority;
   int _effort = defaultEffort;
@@ -110,6 +110,16 @@ class _CreateTaskState extends State<CreateTask> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                          child: Text(
+                            'REQUIRED',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -123,16 +133,15 @@ class _CreateTaskState extends State<CreateTask> {
                               controller: _nameController,
                               keyboardType: TextInputType.name,
                               maxLength: Constants.maxNameLength,
-                              validator: validName,
+                              validator: validTaskName,
                             ),
                           ),
                         ),
-                        RoomCardMultiple(
+                        PendingRoomsCard(
                           selectedRooms: _selectedRooms,
-                          showError: _roomError,
-                          onRoomsChange: (room) {
+						  key: ValueKey(_selectedRooms),
+                          onChange: (room) {
                             setState(() {
-                              _roomError = false;
                               _selectedRooms = room;
                             });
                           },
@@ -159,8 +168,11 @@ class _CreateTaskState extends State<CreateTask> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
                           child: Text(
-                            'Optional Fields',
-                            style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 20),
+                            'OPTIONAL',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
                           ),
                         ),
                         PendingTagsCard(
@@ -176,12 +188,6 @@ class _CreateTaskState extends State<CreateTask> {
                             onChange: (contacts) {
                               _contacts = [...contacts];
                             }),
-                        PendingLinksCard(
-                          links: _links,
-                          onChange: (links) {
-                            _links = [...links];
-                          },
-                        ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
                           child: Row(
@@ -232,7 +238,7 @@ class _CreateTaskState extends State<CreateTask> {
                                           context: context,
                                           initialDate: DateTime.now(),
                                           firstDate: DateTime.now(),
-                                          lastDate: DateTime(2100));
+                                          lastDate: DateTime(9999));
                                       if (pickDate != null) {
                                         setState(() {
                                           _completeBy = pickDate;
@@ -277,7 +283,13 @@ class _CreateTaskState extends State<CreateTask> {
                               ),
                             ),
                           ),
-                        )
+                        ),
+                        PendingLinksCard(
+                          links: _links,
+                          onChange: (links) {
+                            _links = [...links];
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -312,7 +324,7 @@ class _CreateTaskState extends State<CreateTask> {
         _effort != defaultEffort ||
         _estimatedCostController.text.isNotEmpty ||
         _noteController.text.isNotEmpty ||
-        roomChanged() ||
+		_selectedRooms.isNotEmpty ||
         _tags.isNotEmpty ||
         _contacts.isNotEmpty ||
         _links.isNotEmpty ||
@@ -325,13 +337,6 @@ class _CreateTaskState extends State<CreateTask> {
     } else {
       return _selectedRooms.isNotEmpty;
     }
-  }
-
-  String? validName(String? name) {
-    if (name == null || name.isEmpty) {
-      return 'Required';
-    }
-    return null;
   }
 
   void promptUnsavedChanges() {
@@ -364,12 +369,7 @@ class _CreateTaskState extends State<CreateTask> {
   }
 
   Future<void> onSubmit() async {
-    if (!_formKey.currentState!.validate() || _selectedRooms.isEmpty) {
-      if (_selectedRooms.isEmpty) {
-        setState(() {
-          _roomError = true;
-        });
-      }
+    if (!_formKey.currentState!.validate()) {
       showSnackbar('Invalid input.', context);
       return;
     }

@@ -12,6 +12,13 @@ String? validNewTag(String? tagName, List<Tag> tags) {
   }
 }
 
+String? validTaskName(String? name) {
+  if (name == null || name.isEmpty) {
+    return 'Required';
+  }
+  return null;
+}
+
 String? validRoomName(String? name) {
   if (name == null || name.isEmpty) {
     return 'Required';
@@ -36,6 +43,27 @@ String? validRoomEditName(String? name, String originalName, List<Room> rooms) {
 String? validRoomNote(String? note) {
   if (note != null && note.length > Constants.maxRoomNoteLength) {
     return 'Note too large';
+  }
+  return null;
+}
+
+String? validContactName(String? name) {
+  if (name == null || name.isEmpty) {
+    return 'Required';
+  }
+  return null;
+}
+
+String? validContactEmail(String? email) {
+  if (email == null || email.isEmpty) {
+    return null;
+  }
+  return null;
+}
+
+String? validContactPhoneNumber(String? phoneNumber) {
+  if (phoneNumber == null || phoneNumber.isEmpty) {
+    return null;
   }
   return null;
 }

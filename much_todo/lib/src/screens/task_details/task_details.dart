@@ -341,7 +341,7 @@ class _TaskDetailsState extends State<TaskDetails> {
         initialDate: DateTime.now(),
         firstDate: DateTime(1800),
         helpText: 'Select Completion Date',
-        lastDate: DateTime(2100));
+        lastDate: DateTime(9999));
     if (pickDate != null) {
       if (context.mounted) {
         showLoadingDialog(context, msg: 'Completing...');

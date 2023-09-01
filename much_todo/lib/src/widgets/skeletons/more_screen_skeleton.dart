@@ -56,7 +56,7 @@ class MoreScreenSkeleton extends StatelessWidget {
               title: const Text('Theme'),
               leading: const Icon(Icons.brush),
               trailing: DropdownButtonHideUnderline(
-                child: DropdownButton<ThemeMode>(
+                child: DropdownButton<ThemeMode>( // todo migrate to https://api.flutter.dev/flutter/material/DropdownMenu-class.html
                   onChanged: (_) {}, // rebuilds MaterialApp
                   items: const [
                     DropdownMenuItem(

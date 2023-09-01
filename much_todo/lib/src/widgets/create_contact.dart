@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/utils/validation.dart';
 import 'loading_button.dart';
 
 class CreateContact extends StatefulWidget {
@@ -55,7 +56,7 @@ class _CreateContactState extends State<CreateContact> {
                               ),
                               keyboardType: TextInputType.name,
                               controller: _nameController,
-                              validator: validName,
+                              validator: validContactName,
                             ),
                           ),
                           Padding(
@@ -67,7 +68,7 @@ class _CreateContactState extends State<CreateContact> {
                               ),
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              validator: validEmail,
+                              validator: validContactEmail,
                             ),
                           ),
                           Padding(
@@ -79,7 +80,7 @@ class _CreateContactState extends State<CreateContact> {
                               ),
                               controller: _numberController,
                               keyboardType: TextInputType.phone,
-                              validator: validPhoneNumber,
+                              validator: validContactPhoneNumber,
                             ),
                           )
                         ],
@@ -101,27 +102,6 @@ class _CreateContactState extends State<CreateContact> {
         ],
       ),
     );
-  }
-
-  String? validName(String? name) {
-    if (name == null || name.isEmpty) {
-      return 'Required';
-    }
-    return null;
-  }
-
-  String? validEmail(String? email) {
-    if (email == null || email.isEmpty) {
-      return null;
-    }
-    return null;
-  }
-
-  String? validPhoneNumber(String? phoneNumber) {
-    if (phoneNumber == null || phoneNumber.isEmpty) {
-      return null;
-    }
-    return null;
   }
 
   Future<void> onSubmit() async {

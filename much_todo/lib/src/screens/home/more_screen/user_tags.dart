@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
 import 'package:provider/provider.dart';
@@ -15,10 +16,16 @@ class UserTags extends StatefulWidget {
 
 class _UserTagsState extends State<UserTags> {
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _newTagController = TextEditingController();
   final TextEditingController _renameTagController = TextEditingController();
 
   bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _renameTagController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +95,7 @@ class _UserTagsState extends State<UserTags> {
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: promptAddTag,
+          onPressed: addTag,
           label: const Text('ADD TAG'),
           icon: const Icon(Icons.add),
         ),
@@ -107,49 +114,6 @@ class _UserTagsState extends State<UserTags> {
     } else {
       return context.watch<UserProvider>().tags;
     }
-  }
-
-  void promptAddTag() {
-    // todo max amount check
-    final formKey = GlobalKey<FormState>();
-    _newTagController.text = _searchController.text; // shortcut for user if they were searching for one not found
-    showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    addTag(_newTagController.text);
-                    Navigator.pop(context, 'OK');
-                  }
-                },
-                child: const Text('CREATE'),
-              )
-            ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Create Tag'),
-            content: Form(
-              key: formKey,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    label: Text('Tag name'),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (val) => validNewTag(val, context.read<UserProvider>().tags),
-                  controller: _newTagController,
-                ),
-              ),
-            ),
-          );
-        }).then((value) => _newTagController.clear());
   }
 
   void showTagInfo(Tag tag) {
@@ -256,7 +220,7 @@ class _UserTagsState extends State<UserTags> {
             ],
             title: const Text('Delete Tag'),
             content: const Text(
-                'Are you sure you wish to delete this tag? This tag will be removed from ALL tasks that have it!'),
+                'Are you sure you wish to delete this tag?\n\nThis tag will be removed from ALL tasks that have it!'),
           );
         });
   }
@@ -294,20 +258,11 @@ class _UserTagsState extends State<UserTags> {
     });
   }
 
-  Future<void> addTag(String tagName) async {
-    if (tagName.isEmpty) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> addTag() async {
     hideKeyboard();
-
-    await UserService.createTag(context, tagName.trim());
+    await Dialogs.promptAddTag(context, _searchController.text);
 
     setState(() {
-      _isLoading = false;
       _searchController.clear();
     });
   }

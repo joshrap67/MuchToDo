@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/create_contact.dart';
 import 'package:much_todo/src/screens/home/more_screen/edit_contact.dart';
@@ -110,14 +111,15 @@ class _UserContactsState extends State<UserContacts> {
 
   Future<void> addContact() async {
     hideKeyboard();
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreateContact(
-          name: _searchController.text,
-        ),
-      ),
-    );
+	await Dialogs.promptAddContact(context, _searchController.text);
+    // await Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => CreateContact(
+    //       name: _searchController.text,
+    //     ),
+    //   ),
+    // );
   }
 
   void showContactInfo(Contact contact) {

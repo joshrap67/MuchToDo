@@ -2,8 +2,9 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/screens/edit_task/room_card.dart';
+import 'package:much_todo/src/screens/edit_task/pending_singular_room.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/validation.dart';
 import 'package:much_todo/src/widgets/effort_picker.dart';
 import 'package:much_todo/src/widgets/pending_contacts_card.dart';
 import 'package:much_todo/src/widgets/priority_picker.dart';
@@ -31,7 +32,6 @@ class EditTask extends StatefulWidget {
 
 class _EditTaskState extends State<EditTask> {
   bool _shouldPop = false;
-  bool _roomError = false;
 
   late int _priority;
   late int _effort;
@@ -107,7 +107,18 @@ class _EditTaskState extends State<EditTask> {
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                          child: Text(
+                            'REQUIRED',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -121,16 +132,15 @@ class _EditTaskState extends State<EditTask> {
                               controller: _nameController,
                               keyboardType: TextInputType.name,
                               maxLength: Constants.maxNameLength,
-                              validator: validName,
+                              validator: validTaskName,
                             ),
                           ),
                         ),
-                        RoomCard(
+                        PendingSingularRoom(
                           selectedRoom: _selectedRoom,
-                          showError: _roomError,
+                          key: ValueKey(_selectedRoom),
                           onRoomChange: (room) {
                             setState(() {
-                              _roomError = false;
                               _selectedRoom = room;
                             });
                           },
@@ -154,6 +164,16 @@ class _EditTaskState extends State<EditTask> {
                           },
                         ),
                         const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                          child: Text(
+                            'OPTIONAL',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
                         PendingTagsCard(
                           tags: _tags,
                           key: ValueKey(_tags),
@@ -168,13 +188,6 @@ class _EditTaskState extends State<EditTask> {
                             _contacts = [...contacts];
                           },
                         ),
-                        PendingLinksCard(
-                          links: _links,
-                          onChange: (links) {
-                            _links = [...links];
-                          },
-                        ),
-                        const Divider(),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
                           child: Row(
@@ -225,7 +238,7 @@ class _EditTaskState extends State<EditTask> {
                                           context: context,
                                           initialDate: DateTime.now(),
                                           firstDate: DateTime.now(),
-                                          lastDate: DateTime(2100));
+                                          lastDate: DateTime(9999));
                                       if (pickDate != null) {
                                         setState(() {
                                           _completeBy = pickDate;
@@ -270,7 +283,13 @@ class _EditTaskState extends State<EditTask> {
                               ),
                             ),
                           ),
-                        )
+                        ),
+                        PendingLinksCard(
+                          links: _links,
+                          onChange: (links) {
+                            _links = [...links];
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -292,24 +311,27 @@ class _EditTaskState extends State<EditTask> {
   }
 
   bool isModified() {
+    final currentTagsSet = Set.from(widget.task.tags.map((e) => e.id));
+    final selectedTagsSet = Set.from(_tags.map((e) => e.id));
+
+    final currentContactsSet = Set.from(widget.task.contacts.map((e) => e.id));
+    final selectedContactsSet = Set.from(_contacts.map((e) => e.id));
+
+    final currentLinksSet = Set.from(widget.task.links);
+    final selectedLinksSet = Set.from(_links);
+
+    final estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
+
     return _nameController.text != widget.task.name ||
         _priority != widget.task.priority ||
         _effort != widget.task.effort ||
-        // _approximateCostController.text.isNotEmpty ||
+        estimatedCost != widget.task.estimatedCost ||
         _noteController.text != widget.task.note ||
+        selectedTagsSet.difference(currentTagsSet).isNotEmpty ||
+        selectedContactsSet.difference(currentContactsSet).isNotEmpty ||
+        selectedLinksSet.difference(currentLinksSet).isNotEmpty ||
+        _completeBy != widget.task.completeBy ||
         _selectedRoom?.id != widget.task.room.id;
-    // _tags.isNotEmpty ||
-    // _contacts.isNotEmpty ||
-    // _links.isNotEmpty ||
-    // _photos.isNotEmpty ||
-    // _completeByController.text.isNotEmpty;
-  }
-
-  String? validName(String? name) {
-    if (name == null || name.isEmpty) {
-      return 'Required';
-    }
-    return null;
   }
 
   void promptUnsavedChanges() {
@@ -342,13 +364,8 @@ class _EditTaskState extends State<EditTask> {
   }
 
   Future<void> onSubmit() async {
-    if (!_formKey.currentState!.validate() || _selectedRoom == null) {
-      if (_selectedRoom == null) {
-        setState(() {
-          _roomError = true;
-        });
-      }
-      showSnackbar('Invalid input.', context);
+    if (!_formKey.currentState!.validate()) {
+      showSnackbar('Invalid input', context);
       return;
     }
 

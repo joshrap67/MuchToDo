@@ -6,12 +6,12 @@ import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
-import 'package:much_todo/src/screens/filter_tasks/contact_card_filter.dart';
 import 'package:much_todo/src/screens/filter_tasks/filter_task_options.dart';
-import 'package:much_todo/src/screens/filter_tasks/tags_card_filter.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
+import 'package:much_todo/src/widgets/pending_contacts_card.dart';
+import 'package:much_todo/src/widgets/pending_tags_card.dart';
 import 'package:provider/provider.dart';
 
 class FilterTasks extends StatefulWidget {
@@ -404,22 +404,22 @@ class _FilterTasksState extends State<FilterTasks> {
                         ],
                       ),
                     ),
-                    TagsCardFilter(
-                        tags: _selectedTags,
-                        key: ValueKey(_selectedTags),
-                        onChange: (tags) {
-                          setState(() {
-                            _selectedTags = tags;
-                          });
-                        }),
-                    ContactCardFilter(
-                        contacts: _selectedContacts,
-                        key: ValueKey(_selectedContacts),
-                        onChange: (contacts) {
-                          setState(() {
-                            _selectedContacts = contacts;
-                          });
-                        }),
+                    PendingTagsCard(
+                      tags: _selectedTags,
+                      key: ValueKey(_selectedTags),
+                      showAdd: false,
+                      onChange: (tags) {
+                        _selectedTags = [...tags];
+                      },
+                    ),
+                    PendingContactsCard(
+                      contacts: _selectedContacts,
+                      key: ValueKey(_selectedContacts),
+                      showAdd: false,
+                      onChange: (contacts) {
+                        _selectedContacts = [...contacts];
+                      },
+                    ),
                     CheckboxListTile(
                       value: _showOnlyInProgress,
                       onChanged: (bool? value) {
@@ -486,7 +486,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                       context: context,
                                       initialDate: DateTime.now(),
                                       firstDate: DateTime(2010),
-                                      lastDate: DateTime(2100));
+                                      lastDate: DateTime(9999));
                                   if (pickDate != null) {
                                     setState(() {
                                       _completeByFilter = pickDate;
@@ -558,7 +558,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                       context: context,
                                       initialDate: DateTime.now(),
                                       firstDate: DateTime(2010),
-                                      lastDate: DateTime(2100));
+                                      lastDate: DateTime(9999));
                                   if (pickDate != null) {
                                     setState(() {
                                       _creationDateFilter = pickDate;

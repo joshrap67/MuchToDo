@@ -4,8 +4,6 @@ import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
-import 'package:provider/provider.dart';
-import 'package:much_todo/src/providers/rooms_provider.dart';
 
 class CreateRoom extends StatefulWidget {
   final String? name;
@@ -49,7 +47,7 @@ class _CreateRoomState extends State<CreateRoom> {
                     children: [
                       TextFormField(
                         decoration: const InputDecoration(
-                          label: Text('Room name'),
+                          label: Text('Room name *'),
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.name,

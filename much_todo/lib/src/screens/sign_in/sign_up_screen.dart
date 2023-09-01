@@ -4,7 +4,7 @@ import 'package:much_todo/src/screens/home/home.dart';
 import 'package:much_todo/src/screens/sign_in/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/unverified_screen.dart';
-import 'package:much_todo/src/utils/globals.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class SignupScreen extends StatefulWidget {

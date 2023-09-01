@@ -29,12 +29,12 @@ export const getTask = async (req: express.Request<{ id: string }, {}, {}>, res:
     }
 }
 
-export const createTasks = async (req: express.Request<{}, {}, ICreateTaskRequest>, res: express.Response) => {
+export const createTask = async (req: express.Request<{}, {}, ICreateTaskRequest>, res: express.Response) => {
     try {
         const userId = res.locals.firebaseId;
-        const tasks = await taskService.createTasks(userId, req.body);
+        const task = await taskService.createTask(userId, req.body);
 
-        return res.status(201).json(tasks);
+        return res.status(201).json(task);
     } catch (error) {
         console.log(error);
         return res.sendStatus(400); // todo better responses

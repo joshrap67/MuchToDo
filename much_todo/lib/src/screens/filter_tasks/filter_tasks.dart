@@ -1,6 +1,4 @@
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
@@ -8,10 +6,12 @@ import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/screens/filter_tasks/filter_task_options.dart';
 import 'package:much_todo/src/utils/enums.dart';
-import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
-import 'package:much_todo/src/widgets/pending_contacts_card.dart';
-import 'package:much_todo/src/widgets/pending_tags_card.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_contacts_selector.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_tags_selector.dart';
+import 'package:much_todo/src/widgets/sort_direction_button.dart';
 import 'package:provider/provider.dart';
 
 class FilterTasks extends StatefulWidget {
@@ -29,6 +29,8 @@ class _FilterTasksState extends State<FilterTasks> {
   PriorityFilter? _priorityFilter;
 
   EffortFilter? _effortFilter;
+
+  double? _costFilter;
   EqualityComparisons _costEquality = EqualityComparisons.equalTo;
 
   DateTime? _completeByFilter;
@@ -49,9 +51,6 @@ class _FilterTasksState extends State<FilterTasks> {
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
   final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
   final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
-  final TextEditingController _costFilterController = TextEditingController();
-  final TextEditingController _completeByFilterController = TextEditingController();
-  final TextEditingController _creationDateFilterController = TextEditingController();
 
   @override
   void initState() {
@@ -94,24 +93,19 @@ class _FilterTasksState extends State<FilterTasks> {
         _priorityEquality = filters.priorityEquality;
         _effortFilter = filters.effortFilter;
         _roomIdFilter = filters.roomIdFilter;
-        _costFilterController.text = filters.estimatedCost?.toString() ?? '';
         _costEquality = filters.costEquality;
         _selectedContacts =
             context.read<UserProvider>().contacts.where((x) => filters.selectedContacts.any((y) => y == x.id)).toList();
         _selectedTags =
             context.read<UserProvider>().tags.where((x) => filters.selectedTags.any((y) => y == x.id)).toList();
         _showOnlyInProgress = filters.showOnlyInProgress;
+        _costFilter = filters.estimatedCost;
+
         _completeByFilter = filters.completeBy;
         _completeByEquality = filters.completeByEquality;
-        if (_completeByFilter != null) {
-          _completeByFilterController.text = DateFormat('yyyy-MM-dd').format(_completeByFilter!);
-        }
 
         _creationDateFilter = filters.creationDate;
         _creationDateEquality = filters.creationDateEquality;
-        if (_creationDateFilter != null) {
-          _creationDateFilterController.text = DateFormat('yyyy-MM-dd').format(_creationDateFilter!);
-        }
 
         setState(() {});
       });
@@ -143,268 +137,238 @@ class _FilterTasksState extends State<FilterTasks> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Sort By',
-                              textAlign: TextAlign.center,
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Sort By',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Flexible(
+                          flex: 3,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _sortEntries,
+                              isExpanded: true,
+                              value: _sortByValue,
+                              onChanged: (value) {
+                                setState(() {
+                                  _sortByValue = value!;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 3,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _sortEntries,
-                                isExpanded: true,
-                                value: _sortByValue,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _sortByValue = value!;
-                                  });
-                                },
-                              ),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SortDirectionButton(
+                              sortDirection: _sortDirectionValue,
+                              onChange: (sort) {
+                                setState(() {
+                                  _sortDirectionValue = sort;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: IconButton(
-                                icon: _sortDirectionValue == SortDirection.descending
-                                    ? const Icon(Icons.arrow_downward_sharp)
-                                    : const Icon(Icons.arrow_upward_sharp),
-                                tooltip: _sortDirectionValue == SortDirection.descending ? 'Descending' : 'Ascending',
-                                onPressed: () {
-                                  if (_sortDirectionValue == SortDirection.descending) {
-                                    _sortDirectionValue = SortDirection.ascending;
-                                  } else {
-                                    _sortDirectionValue = SortDirection.descending;
-                                  }
-                                  setState(() {});
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const Divider(),
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Priority',
-                              textAlign: TextAlign.center,
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Priority',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _equalityEntries,
+                              isExpanded: true,
+                              value: _priorityEquality,
+                              onChanged: (value) {
+                                setState(() {
+                                  _priorityEquality = value!;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _equalityEntries,
-                                isExpanded: true,
-                                value: _priorityEquality,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _priorityEquality = value!;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 4,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _priorityEntries,
-                                isExpanded: true,
-                                value: _priorityFilter,
-                                decoration: InputDecoration(
-                                  suffixIcon: _priorityFilter == null
-                                      ? null
-                                      : IconButton(
-                                          icon: const Icon(Icons.clear),
-                                          onPressed: () => setState(
-                                            () {
-                                              _priorityFilter = null;
-                                            },
-                                          ),
+                        ),
+                        Flexible(
+                          flex: 4,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _priorityEntries,
+                              isExpanded: true,
+                              value: _priorityFilter,
+                              decoration: InputDecoration(
+                                suffixIcon: _priorityFilter == null
+                                    ? null
+                                    : IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () => setState(
+                                          () {
+                                            _priorityFilter = null;
+                                          },
                                         ),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _priorityFilter = value!;
-                                  });
-                                },
+                                      ),
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _priorityFilter = value!;
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Effort',
-                              textAlign: TextAlign.center,
-                            ),
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Effort',
+                            textAlign: TextAlign.center,
                           ),
-                          Flexible(
-                            flex: 5,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _effortEntries,
-                                isExpanded: true,
-                                value: _effortFilter,
-                                decoration: InputDecoration(
-                                  suffixIcon: _effortFilter == null
-                                      ? null
-                                      : IconButton(
-                                          icon: const Icon(Icons.clear),
-                                          onPressed: () => setState(
-                                            () {
-                                              _effortFilter = null;
-                                            },
-                                          ),
+                        ),
+                        Flexible(
+                          flex: 5,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _effortEntries,
+                              isExpanded: true,
+                              value: _effortFilter,
+                              decoration: InputDecoration(
+                                suffixIcon: _effortFilter == null
+                                    ? null
+                                    : IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () => setState(
+                                          () {
+                                            _effortFilter = null;
+                                          },
                                         ),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _effortFilter = value!;
-                                  });
-                                },
+                                      ),
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _effortFilter = value!;
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Room',
-                              textAlign: TextAlign.center,
-                            ),
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Room',
+                            textAlign: TextAlign.center,
                           ),
-                          Flexible(
-                            flex: 5,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _roomEntries,
-                                isExpanded: true,
-                                value: _roomIdFilter,
-                                decoration: InputDecoration(
-                                  suffixIcon: _roomIdFilter == null
-                                      ? null
-                                      : IconButton(
-                                          icon: const Icon(Icons.clear),
-                                          onPressed: () => setState(
-                                            () {
-                                              _roomIdFilter = null;
-                                            },
-                                          ),
+                        ),
+                        Flexible(
+                          flex: 5,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _roomEntries,
+                              isExpanded: true,
+                              value: _roomIdFilter,
+                              decoration: InputDecoration(
+                                suffixIcon: _roomIdFilter == null
+                                    ? null
+                                    : IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () => setState(
+                                          () {
+                                            _roomIdFilter = null;
+                                          },
                                         ),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _roomIdFilter = value;
-                                  });
-                                },
+                                      ),
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _roomIdFilter = value;
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Cost',
-                              textAlign: TextAlign.center,
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Cost',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _equalityEntries,
+                              isExpanded: true,
+                              value: _costEquality,
+                              onChanged: (value) {
+                                setState(() {
+                                  _costEquality = value!;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _equalityEntries,
-                                isExpanded: true,
-                                value: _costEquality,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _costEquality = value!;
-                                  });
-                                },
-                              ),
+                        ),
+                        Flexible(
+                          flex: 4,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: MoneyInput(
+                              hintText: '\$',
+                              amount: _costFilter,
+                              showClear: true,
+                              onChange: (amount) {
+                                setState(() {
+                                  _costFilter = amount;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 4,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _costFilterController,
-                                onChanged: (_) {
-                                  setState(() {});
-                                },
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
-                                ],
-                                decoration: InputDecoration(
-                                  border: const OutlineInputBorder(),
-                                  label: const Text('\$'),
-                                  suffixIcon: _costFilterController.text.isEmpty
-                                      ? null
-                                      : IconButton(
-                                          icon: const Icon(Icons.clear),
-                                          onPressed: () => setState(
-                                            () {
-                                              _costFilterController.clear();
-                                            },
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    PendingTagsCard(
+                    PendingTagsSelector(
                       tags: _selectedTags,
                       key: ValueKey(_selectedTags),
                       showAdd: false,
@@ -412,7 +376,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         _selectedTags = [...tags];
                       },
                     ),
-                    PendingContactsCard(
+                    PendingContactsSelector(
                       contacts: _selectedContacts,
                       key: ValueKey(_selectedContacts),
                       showAdd: false,
@@ -429,149 +393,95 @@ class _FilterTasksState extends State<FilterTasks> {
                       },
                       title: const Text('Only Include In Progress Tasks'),
                     ),
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 2,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Complete By',
-                              textAlign: TextAlign.center,
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 2,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Complete By',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _dateEqualityEntries,
+                              isExpanded: true,
+                              value: _completeByEquality,
+                              onChanged: (value) {
+                                setState(() {
+                                  _completeByEquality = value!;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _dateEqualityEntries,
-                                isExpanded: true,
-                                value: _completeByEquality,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _completeByEquality = value!;
-                                  });
-                                },
-                              ),
+                        ),
+                        Flexible(
+                          flex: 3,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DatePicker(
+                              key: ValueKey(_completeByFilter),
+                              selectedDate: _completeByFilter,
+                              onChange: (date) {
+                                setState(() {
+                                  _completeByFilter = date;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 3,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _completeByFilterController,
-                                readOnly: true,
-                                decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.date_range),
-                                  border: const OutlineInputBorder(),
-                                  suffixIcon: _completeByFilterController.text.isNotEmpty
-                                      ? IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _completeByFilter = null;
-                                              _completeByFilterController.clear();
-                                            });
-                                          },
-                                          icon: const Icon(Icons.clear),
-                                        )
-                                      : null,
-                                ),
-                                onTap: () async {
-                                  hideKeyboard();
-                                  DateTime? pickDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2010),
-                                      lastDate: DateTime(9999));
-                                  if (pickDate != null) {
-                                    setState(() {
-                                      _completeByFilter = pickDate;
-                                      _completeByFilterController.text = DateFormat('yyyy-MM-dd').format(pickDate);
-                                    });
-                                  }
-                                  hideKeyboard();
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Card(
-                      child: Row(
-                        children: [
-                          const Flexible(
-                            flex: 2,
-                            fit: FlexFit.tight,
-                            child: Text(
-                              'Creation Date',
-                              textAlign: TextAlign.center,
+                    Row(
+                      children: [
+                        const Flexible(
+                          flex: 2,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            'Creation Date',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField(
+                              items: _dateEqualityEntries,
+                              isExpanded: true,
+                              value: _creationDateEquality,
+                              onChanged: (value) {
+                                setState(() {
+                                  _creationDateEquality = value!;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 1,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: DropdownButtonFormField(
-                                items: _dateEqualityEntries,
-                                isExpanded: true,
-                                value: _creationDateEquality,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _creationDateEquality = value!;
-                                  });
-                                },
-                              ),
+                        ),
+                        Flexible(
+                          flex: 3,
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DatePicker(
+                              key: ValueKey(_creationDateFilter),
+                              selectedDate: _creationDateFilter,
+                              onChange: (date) {
+                                setState(() {
+                                  _creationDateFilter = date;
+                                });
+                              },
                             ),
                           ),
-                          Flexible(
-                            flex: 3,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _creationDateFilterController,
-                                readOnly: true,
-                                decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.date_range),
-                                  border: const OutlineInputBorder(),
-                                  suffixIcon: _creationDateFilterController.text.isNotEmpty
-                                      ? IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _creationDateFilter = null;
-                                              _creationDateFilterController.clear();
-                                            });
-                                          },
-                                          icon: const Icon(Icons.clear),
-                                        )
-                                      : null,
-                                ),
-                                onTap: () async {
-                                  hideKeyboard();
-                                  DateTime? pickDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2010),
-                                      lastDate: DateTime(9999));
-                                  if (pickDate != null) {
-                                    setState(() {
-                                      _creationDateFilter = pickDate;
-                                      _creationDateFilterController.text = DateFormat('yyyy-MM-dd').format(pickDate);
-                                    });
-                                  }
-                                  hideKeyboard();
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -600,7 +510,7 @@ class _FilterTasksState extends State<FilterTasks> {
       effortFilter: _effortFilter,
       roomIdFilter: _roomIdFilter,
       costEquality: _costEquality,
-      estimatedCost: _costFilterController.text.isNotEmpty ? double.parse(_costFilterController.text) : null,
+      estimatedCost: _costFilter,
       selectedTags: _selectedTags.map((t) => t.id).toList(),
       selectedContacts: _selectedContacts.map((c) => c.id).toList(),
       showOnlyInProgress: _showOnlyInProgress,

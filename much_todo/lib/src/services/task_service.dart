@@ -72,22 +72,22 @@ class TaskService {
     return updatedTask;
   }
 
-  static Future<List<Task>?> createTasks(BuildContext context, String name, int priority, int effort, List<Room> rooms,
+  static Future<Task?> createTask(BuildContext context, String name, int priority, int effort, Room room,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
       List<Contact> contacts = const []}) async {
-    List<Task>? createdTasks;
+    Task? createdTask;
     try {
-      createdTasks = await TaskRepository.createTasks(CreateTasksRequest(
+      createdTask = await TaskRepository.createTask(CreateTasksRequest(
         name,
         priority,
         effort,
         tags.map((e) => e.id).toList(),
         contacts.map((e) => e.id).toList(),
-        rooms.map((e) => e.id).toList(),
+        room.id,
         estimatedCost,
         note,
         links,
@@ -95,17 +95,17 @@ class TaskService {
         completeBy,
       ));
       if (context.mounted) {
-        context.read<TasksProvider>().addTasks(createdTasks);
-        context.read<RoomsProvider>().addTasks(createdTasks);
-        context.read<UserProvider>().addTasks(createdTasks);
+        context.read<TasksProvider>().addTask(createdTask);
+        context.read<RoomsProvider>().addTask(createdTask);
+        context.read<UserProvider>().addTask(createdTask);
       }
     } catch (e) {
       if (context.mounted) {
-        showSnackbar('There was a problem creating tasks', context);
+        showSnackbar('There was a problem creating the task', context);
       }
     }
 
-    return createdTasks;
+    return createdTask;
   }
 
   static Future<Task?> setTaskPhotos(

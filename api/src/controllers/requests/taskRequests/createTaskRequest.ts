@@ -2,7 +2,7 @@ export interface ICreateTaskRequest {
     name: string;
     priority: number;
     effort: number;
-    roomIds: string[];
+    roomId: string;
     estimatedCost: number;
     note: string;
     tagIds: string[];

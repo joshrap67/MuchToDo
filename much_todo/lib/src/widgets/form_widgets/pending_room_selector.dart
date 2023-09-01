@@ -5,14 +5,14 @@ import 'package:much_todo/src/screens/home/room_list/create_room.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 
-class PendingRoomsCard extends StatefulWidget {
-  final List<Room> selectedRooms;
-  final ValueChanged<List<Room>> onChange;
+class PendingRoomSelector extends StatefulWidget {
+  final Room? selectedRoom;
+  final ValueChanged<Room?> onRoomChange;
 
-  const PendingRoomsCard({super.key, required this.selectedRooms, required this.onChange});
+  const PendingRoomSelector({super.key, this.selectedRoom, required this.onRoomChange});
 
   @override
-  State<PendingRoomsCard> createState() => _PendingRoomsCardState();
+  State<PendingRoomSelector> createState() => _PendingRoomSelectorState();
 }
 
 class RoomOption {
@@ -22,8 +22,8 @@ class RoomOption {
   RoomOption({this.room, this.hasResults = true});
 }
 
-class _PendingRoomsCardState extends State<PendingRoomsCard> {
-  List<Room> _selectedRooms = [];
+class _PendingRoomSelectorState extends State<PendingRoomSelector> {
+  Room? _selectedRoom;
   final _autoCompleteController = TextEditingController();
   final _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
@@ -31,7 +31,14 @@ class _PendingRoomsCardState extends State<PendingRoomsCard> {
   @override
   void initState() {
     super.initState();
-    _selectedRooms = [...widget.selectedRooms];
+    _selectedRoom = widget.selectedRoom;
+    _autoCompleteController.text = _selectedRoom?.name ?? '';
+  }
+
+  @override
+  void dispose() {
+    _autoCompleteController.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,14 +58,11 @@ class _PendingRoomsCardState extends State<PendingRoomsCard> {
 
                 // don't show options that are already selected
                 if (textEditingValue.text == '') {
-                  return rooms
-                      .where((element) => !_selectedRooms.any((t) => t.id == element.id))
-                      .map((e) => RoomOption(room: e));
+                  return rooms.map((e) => RoomOption(room: e));
                 }
 
-                var filteredRooms = rooms
-                    .where((element) => element.name.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                    .where((element) => !_selectedRooms.any((t) => t.id == element.id));
+                var filteredRooms =
+                    rooms.where((element) => element.name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                 if (filteredRooms.isNotEmpty) {
                   return filteredRooms.map((e) => RoomOption(room: e));
                 } else {
@@ -70,24 +74,43 @@ class _PendingRoomsCardState extends State<PendingRoomsCard> {
               focusNode: _focusNode,
               displayStringForOption: (roomOption) => roomOption.room!.name,
               fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                return TextFormField(
-                  key: _textFieldKey,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.house),
-                    labelText: _selectedRooms.isEmpty
-                        ? 'Room *'
-                        : '${_selectedRooms.length} Task${_selectedRooms.length > 1 ? 's' : ''} will be made',
-                  ),
-                  controller: fieldTextEditingController,
-                  focusNode: fieldFocusNode,
-                  validator: (_) {
-                    if (_selectedRooms.isEmpty) {
-                      return 'Required';
-                    } else {
-                      return null;
+                return Focus(
+                  onFocusChange: (hasFocus) {
+                    if (!hasFocus) {
+                      if (_selectedRoom == null) {
+                        _autoCompleteController.clear();
+                      } else {
+                        _autoCompleteController.text = _selectedRoom!.name;
+                      }
                     }
                   },
+                  child: TextFormField(
+                    key: _textFieldKey,
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.house),
+                        labelText: "Room *",
+                        suffixIcon: _autoCompleteController.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedRoom = null;
+                                    widget.onRoomChange(_selectedRoom);
+                                    _autoCompleteController.clear();
+                                  });
+                                },
+                                icon: const Icon(Icons.clear))
+                            : null),
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                    validator: (_) {
+                      if (_selectedRoom == null) {
+                        return 'Required';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
                 );
               },
               optionsViewBuilder: (context, onSelected, options) {
@@ -133,29 +156,6 @@ class _PendingRoomsCardState extends State<PendingRoomsCard> {
             );
           }),
         ),
-        if (_selectedRooms.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-            child: Wrap(
-              spacing: 8.0, // gap between adjacent chips
-              runSpacing: 4.0, // gap between lines
-              children: [
-                for (var i = 0; i < _selectedRooms.length; i++)
-                  Chip(
-                    label: Text(
-                      _selectedRooms[i].name,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    onDeleted: () {
-                      onDeleteRoom(_selectedRooms[i]);
-                    },
-                  ),
-              ],
-            ),
-          )
       ],
     );
   }
@@ -166,37 +166,27 @@ class _PendingRoomsCardState extends State<PendingRoomsCard> {
     }
 
     var room = roomOption.room!;
+    _selectedRoom = room;
+    widget.onRoomChange(_selectedRoom);
+
     _autoCompleteController.clear();
-    if (!_selectedRooms.any((element) => element.id == room.id)) {
-      _selectedRooms.add(room);
-    } else {
-      _selectedRooms.removeWhere((t) => t.id == room.id);
-    }
-    widget.onChange(_selectedRooms);
     hideKeyboard();
     setState(() {});
   }
 
   Future<void> addRoom() async {
+    var name = _autoCompleteController.text; // since onFocus lost input is cleared, grab before hiding keyboard
     hideKeyboard();
     Room? createdRoom = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CreateRoom(
-          name: _autoCompleteController.text,
+          name: name,
         ),
       ),
     );
     if (createdRoom != null) {
       selectRoom(RoomOption(room: createdRoom));
     }
-  }
-
-  void onDeleteRoom(Room room) {
-    hideKeyboard();
-    setState(() {
-      _selectedRooms.removeWhere((element) => element.id == room.id);
-      widget.onChange(_selectedRooms);
-    });
   }
 }

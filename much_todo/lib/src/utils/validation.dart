@@ -1,6 +1,6 @@
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/utils/globals.dart';
+import 'package:much_todo/src/utils/constants.dart';
 
 String? validNewTag(String? tagName, List<Tag> tags) {
   if (tagName == null || tagName.isEmpty) {
@@ -17,6 +17,13 @@ String? validTaskName(String? name) {
     return 'Required';
   }
   return null;
+}
+
+String? validTaskNote(String? note) {
+	if (note == null && note!.length>Constants.maxTaskNoteLength) {
+		return 'Required';
+	}
+	return null;
 }
 
 String? validRoomName(String? name) {

@@ -11,7 +11,9 @@ class RoomsProvider with ChangeNotifier {
 
   List<Room> get rooms => [..._rooms]; // spread since otherwise widgets could bypass mutation methods
   bool get isLoading => _isLoading;
+
   RoomSortOptions get sort => _sort;
+
   SortDirection get sortDirection => _sortDirection;
 
   void setRooms(List<Room> rooms) {
@@ -78,16 +80,12 @@ class RoomsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addTasks(List<Task> createdTasks) {
-    Map<String, Task> roomIdToTask = {};
-    for (var task in createdTasks) {
-      roomIdToTask[task.room.id] = task;
+  void addTask(Task createdTask) {
+    var index = _rooms.indexWhere((element) => element.id == createdTask.room.id);
+    if (index >= 0) {
+      _rooms[index].tasks.add(createdTask.convert());
     }
-    for (var room in _rooms) {
-      if (roomIdToTask.containsKey(room.id)) {
-        room.tasks.add(roomIdToTask[room.id]!.convert());
-      }
-    }
+
     notifyListeners();
   }
 

@@ -1,25 +1,25 @@
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/screens/edit_task/pending_singular_room.dart';
+import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_room_selector.dart';
 import 'package:much_todo/src/services/task_service.dart';
-import 'package:much_todo/src/utils/validation.dart';
-import 'package:much_todo/src/widgets/effort_picker.dart';
-import 'package:much_todo/src/widgets/pending_contacts_card.dart';
-import 'package:much_todo/src/widgets/priority_picker.dart';
-import 'package:much_todo/src/widgets/pending_tags_card.dart';
+import 'package:much_todo/src/widgets/form_widgets/effort_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_contacts_selector.dart';
+import 'package:much_todo/src/widgets/form_widgets/priority_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_tags_selector.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
-import 'package:much_todo/src/utils/globals.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/form_widgets/task_name_input.dart';
+import 'package:much_todo/src/widgets/form_widgets/task_note_input.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
-import 'package:much_todo/src/widgets/pending_links_card.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_links_picker.dart';
 import 'package:provider/provider.dart';
-
-import 'package:intl/intl.dart';
 
 class EditTask extends StatefulWidget {
   final Task task;
@@ -33,39 +33,30 @@ class EditTask extends StatefulWidget {
 class _EditTaskState extends State<EditTask> {
   bool _shouldPop = false;
 
-  late int _priority;
-  late int _effort;
-
-  List<String> _links = [];
+  String? _name;
   Room? _selectedRoom;
-  DateTime? _completeBy;
+  int _priority = Constants.defaultPriority;
+  int _effort = Constants.defaultEffort;
   List<Contact> _contacts = [];
+  List<String> _links = [];
+  DateTime? _completeBy;
+  double? _estimatedCost;
+  String? _note;
   List<Tag> _tags = [];
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _completeByController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _estimatedCostController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    _nameController.text = widget.task.name;
+    _name = widget.task.name;
     _priority = widget.task.priority;
     _effort = widget.task.effort;
     _links = [...widget.task.links];
-
-    CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(symbol: '');
-    _estimatedCostController.text =
-        widget.task.estimatedCost != null ? formatter.format(widget.task.estimatedCost!.toStringAsFixed(2)) : '';
-
-    _noteController.text = widget.task.note ?? '';
+    _estimatedCost = widget.task.estimatedCost;
+    _note = widget.task.note;
     _completeBy = widget.task.completeBy;
-    if (_completeBy != null) {
-      _completeByController.text = DateFormat('yyyy-MM-dd').format(_completeBy!);
-    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _selectedRoom = context
@@ -122,21 +113,19 @@ class _EditTaskState extends State<EditTask> {
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.sticky_note_2),
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Name of Task',
-                                  labelText: 'Name *',
-                                  counterText: ''),
-                              controller: _nameController,
-                              keyboardType: TextInputType.name,
-                              maxLength: Constants.maxNameLength,
-                              validator: validTaskName,
+                            child: TaskNameInput(
+                              hint: 'Name of Task',
+                              label: 'Name *',
+                              name: _name,
+                              onChange: (name) {
+                                setState(() {
+                                  _name = name;
+                                });
+                              },
                             ),
                           ),
                         ),
-                        PendingSingularRoom(
+                        PendingRoomSelector(
                           selectedRoom: _selectedRoom,
                           key: ValueKey(_selectedRoom),
                           onRoomChange: (room) {
@@ -174,14 +163,14 @@ class _EditTaskState extends State<EditTask> {
                                 fontWeight: FontWeight.w400),
                           ),
                         ),
-                        PendingTagsCard(
+                        PendingTagsSelector(
                           tags: _tags,
                           key: ValueKey(_tags),
                           onChange: (tags) {
                             _tags = [...tags];
                           },
                         ),
-                        PendingContactsCard(
+                        PendingContactsSelector(
                           contacts: _contacts,
                           key: ValueKey(_contacts),
                           onChange: (contacts) {
@@ -195,57 +184,31 @@ class _EditTaskState extends State<EditTask> {
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                                  child: TextFormField(
-                                    inputFormatters: [
-                                      CurrencyTextInputFormatter(locale: 'en', symbol: '', enableNegative: false)
-                                    ],
-                                    keyboardType: TextInputType.number,
-                                    controller: _estimatedCostController,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      prefixIcon: Icon(Icons.attach_money),
-                                      hintText: 'Estimated cost',
-                                      labelText: 'Cost',
-                                    ),
+                                  child: MoneyInput(
+                                    hintText: 'Estimated cost',
+                                    labelText: 'Cost',
+                                    prefixIcon: const Icon(Icons.attach_money),
+                                    amount: _estimatedCost,
+                                    onChange: (amount) {
+                                      setState(() {
+                                        _estimatedCost = amount;
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                                  child: TextFormField(
-                                    controller: _completeByController,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      prefixIcon: const Icon(Icons.date_range),
-                                      border: const OutlineInputBorder(),
-                                      hintText: 'Complete By',
-                                      labelText: 'Complete By',
-                                      suffixIcon: _completeByController.text.isNotEmpty
-                                          ? IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  _completeByController.clear();
-                                                });
-                                              },
-                                              icon: const Icon(Icons.clear),
-                                            )
-                                          : null,
-                                    ),
-                                    onTap: () async {
-                                      hideKeyboard();
-                                      DateTime? pickDate = await showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.now(),
-                                          firstDate: DateTime.now(),
-                                          lastDate: DateTime(9999));
-                                      if (pickDate != null) {
-                                        setState(() {
-                                          _completeBy = pickDate;
-                                          _completeByController.text = DateFormat('yyyy-MM-dd').format(pickDate);
-                                        });
-                                      }
-                                      hideKeyboard();
+                                  child: DatePicker(
+                                    label: 'Complete By',
+                                    hint: 'Complete By',
+                                    key: ValueKey(_completeBy),
+                                    selectedDate: _completeBy,
+                                    onChange: (date) {
+                                      setState(() {
+                                        _completeBy = date;
+                                      });
                                     },
                                   ),
                                 ),
@@ -256,35 +219,19 @@ class _EditTaskState extends State<EditTask> {
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: TextFormField(
-                              controller: _noteController,
-                              maxLines: null,
-                              keyboardType: TextInputType.multiline,
-                              onChanged: (v) {
+                            child: TaskNoteInput(
+                              hint: 'Note',
+                              label: 'Note',
+                              note: _note,
+                              onChange: (note) {
                                 setState(() {
-                                  // to get the clear button to show. gotta be a better way...
+                                  _note = note;
                                 });
                               },
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.note_alt),
-                                border: const OutlineInputBorder(),
-                                hintText: 'Note',
-                                labelText: 'Note',
-                                suffixIcon: _noteController.text.isNotEmpty
-                                    ? IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _noteController.clear();
-                                          });
-                                        },
-                                        icon: const Icon(Icons.clear),
-                                      )
-                                    : null,
-                              ),
                             ),
                           ),
                         ),
-                        PendingLinksCard(
+                        PendingLinksPicker(
                           links: _links,
                           onChange: (links) {
                             _links = [...links];
@@ -320,13 +267,11 @@ class _EditTaskState extends State<EditTask> {
     final currentLinksSet = Set.from(widget.task.links);
     final selectedLinksSet = Set.from(_links);
 
-    final estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-
-    return _nameController.text != widget.task.name ||
+    return _name != widget.task.name ||
         _priority != widget.task.priority ||
         _effort != widget.task.effort ||
-        estimatedCost != widget.task.estimatedCost ||
-        _noteController.text != widget.task.note ||
+        _estimatedCost != widget.task.estimatedCost ||
+        _note != widget.task.note ||
         selectedTagsSet.difference(currentTagsSet).isNotEmpty ||
         selectedContactsSet.difference(currentContactsSet).isNotEmpty ||
         selectedLinksSet.difference(currentLinksSet).isNotEmpty ||
@@ -370,14 +315,12 @@ class _EditTaskState extends State<EditTask> {
     }
 
     hideKeyboard();
-    double? estimatedCost = double.tryParse(_estimatedCostController.text.toString().replaceAll(',', ''));
-    Task? task = await TaskService.editTask(
-        context, widget.task, _nameController.text.toString().trim(), _priority, _effort, _selectedRoom!,
+    Task? task = await TaskService.editTask(context, widget.task, _name!, _priority, _effort, _selectedRoom!,
         contacts: _contacts,
-        note: _noteController.text.toString().trim(),
+        note: _note,
         links: _links,
         completeBy: _completeBy,
-        estimatedCost: estimatedCost,
+        estimatedCost: _estimatedCost,
         tags: _tags);
     if (context.mounted && task != null) {
       Navigator.of(context).pop(task);

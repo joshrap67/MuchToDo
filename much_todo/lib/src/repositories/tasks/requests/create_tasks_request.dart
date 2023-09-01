@@ -4,7 +4,7 @@ class CreateTasksRequest implements ApiRequest {
   late String name;
   late int priority;
   late int effort;
-  late List<String> roomIds;
+  late String roomId;
   double? estimatedCost;
   String? note;
   List<String> tagIds = [];
@@ -19,7 +19,7 @@ class CreateTasksRequest implements ApiRequest {
     this.effort,
     this.tagIds,
     this.contactIds,
-    this.roomIds,
+    this.roomId,
     this.estimatedCost,
     this.note,
     this.links,
@@ -38,7 +38,7 @@ class CreateTasksRequest implements ApiRequest {
       'links': links,
       'tagIds': tagIds,
       'contactIds': contactIds,
-      'roomIds': roomIds,
+      'roomId': roomId,
       'inProgress': inProgress,
       'completeBy': completeBy?.toIso8601String(),
     };
@@ -47,6 +47,6 @@ class CreateTasksRequest implements ApiRequest {
   @override
   String toString() {
     return 'CreateTasksRequest{name: $name, priority: $priority, effort: $effort, estimatedCost: $estimatedCost, note: $note, links: $links, '
-        'tagIds: $tagIds, contactIds: $contactIds, roomIds: $roomIds, inProgress: $inProgress, completeBy: $completeBy}';
+        'tagIds: $tagIds, contactIds: $contactIds, roomId: $roomId, inProgress: $inProgress, completeBy: $completeBy}';
   }
 }

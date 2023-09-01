@@ -1,7 +1,7 @@
 import {ITask, ITaskContact, ITaskTag, TaskModel} from "../domain/task"
 import {IContact, ITag, UserModel} from "../domain/user"
 import mongoose from "mongoose";
-import {IRoom, RoomModel} from "../domain/room";
+import {RoomModel} from "../domain/room";
 import {
     convertContactToTaskContact,
     convertRoomToTaskRoom,
@@ -29,24 +29,19 @@ export async function getTaskById(id: string, userId: string): Promise<ITaskResp
     return mapTaskToResponse(task);
 }
 
-export async function createTasks(userId: string, request: ICreateTaskRequest): Promise<ITaskResponse[]> {
-    const createdTasks: ITask[] = [];
+export async function createTask(userId: string, request: ICreateTaskRequest): Promise<ITaskResponse> {
+    let createdTask: ITask;
     const session = await mongoose.startSession();
 
     try {
         session.startTransaction();
 
         const user = await UserModel.findOne({'firebaseId': userId}).session(session);
-        const rooms = await RoomModel.find({'_id': {$in: request.roomIds}}).session(session);
+        const room = await RoomModel.findOne({'_id': request.roomId}).session(session);
 
-        const tagIdToTag: Record<string, ITag> = {};
         const contactIdToContact: Record<string, IContact> = {};
-        const roomIdToRoom: Record<string, IRoom> = {};
-        const roomIdToTask: Record<string, ITask> = {};
+        const tagIdToTag: Record<string, ITag> = {};
 
-        for (const room of rooms) {
-            roomIdToRoom[room.id] = room;
-        }
         for (const tag of user.tags) {
             tagIdToTag[tag.id] = tag;
         }
@@ -63,45 +58,40 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
             taskContacts.push(convertContactToTaskContact(contactIdToContact[contactId]));
         }
 
-        // create the tasks
-        for (const roomId of request.roomIds) {
-            const task = new TaskModel({
-                name: request.name,
-                priority: request.priority,
-                effort: request.effort,
-                room: convertRoomToTaskRoom(roomIdToRoom[roomId]),
-                createdBy: userId,
-                tags: taskTags,
-                contacts: taskContacts,
-                links: request.links,
-                note: request.note,
-                estimatedCost: request.estimatedCost,
-                completeBy: request.completeBy,
-                inProgress: request.inProgress
-            } as ITask);
-            await task.save({session});
-            roomIdToTask[roomId] = task;
-            createdTasks.push(task);
+        // create the task
+        const task = new TaskModel({
+            name: request.name,
+            priority: request.priority,
+            effort: request.effort,
+            room: convertRoomToTaskRoom(room),
+            createdBy: userId,
+            tags: taskTags,
+            contacts: taskContacts,
+            links: request.links,
+            note: request.note,
+            estimatedCost: request.estimatedCost,
+            completeBy: request.completeBy,
+            inProgress: request.inProgress
+        } as ITask);
+        await task.save({session});
+        createdTask = task;
 
-            // update tags/contacts of user now that we have an id
-            for (const tag of task.tags) {
-                const userTag = tagIdToTag[tag.id];
-                userTag.tasks.push(task._id);
-            }
-            for (const contact of task.contacts) {
-                const userContact = contactIdToContact[contact.id];
-                userContact.tasks.push(task._id);
-            }
-            user.tasks.push(task._id);
-            await user.save({session});
+        // update tags/contacts of user now that we have an id
+        for (const tag of task.tags) {
+            const userTag = tagIdToTag[tag.id];
+            userTag.tasks.push(task._id);
         }
+        for (const contact of task.contacts) {
+            const userContact = contactIdToContact[contact.id];
+            userContact.tasks.push(task._id);
+        }
+        user.tasks.push(task._id);
+        await user.save({session});
 
-        // update rooms with denormalized task data
-        for (const room of rooms) {
-            const task = roomIdToTask[room.id];
-            room.tasks.push(convertTaskToRoomTask(task));
-            await room.save({session});
-        }
+        // update room with denormalized task data
+        room.tasks.push(convertTaskToRoomTask(task));
+        await room.save({session});
+
         await session.commitTransaction();
     } catch (e) {
         await session.abortTransaction();
@@ -110,7 +100,7 @@ export async function createTasks(userId: string, request: ICreateTaskRequest): 
         await session.endSession();
     }
 
-    return createdTasks.map(x => mapTaskToResponse(x));
+    return mapTaskToResponse(createdTask);
 }
 
 export async function updateTask(taskId: string, request: IUpdateTaskRequest, userId: string): Promise<ITaskResponse> {

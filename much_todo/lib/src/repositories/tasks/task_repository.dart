@@ -25,17 +25,13 @@ class TaskRepository {
     }
   }
 
-  static Future<List<Task>> createTasks(CreateTasksRequest request) async {
+  static Future<Task> createTask(CreateTasksRequest request) async {
     final apiResult = await ApiGateway.post(baseUrl, request);
     if (apiResult.success) {
-      var tasks = <Task>[];
-      Iterable decodedJsonList = jsonDecode(apiResult.data);
-      for (var jsonTask in decodedJsonList) {
-        tasks.add(Task.fromJson(jsonTask));
-      }
-      return tasks;
+      Map<String, dynamic> decodedJson = jsonDecode(apiResult.data);
+      return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem creating tasks.');
+      throw Exception('There was a problem creating the task.');
     }
   }
 

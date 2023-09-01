@@ -4,6 +4,7 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/utils/enums.dart';
+import 'package:much_todo/src/widgets/sort_direction_button.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/widgets/task_card.dart';
@@ -188,7 +189,8 @@ class _RoomTasksListState extends State<RoomTasksList> {
                                       _sortByValue = value!;
                                     });
                                   },
-                                  items: TaskSortOptions.values.map<DropdownMenuItem<TaskSortOptions>>((TaskSortOptions value) {
+                                  items: TaskSortOptions.values
+                                      .map<DropdownMenuItem<TaskSortOptions>>((TaskSortOptions value) {
                                     return DropdownMenuItem<TaskSortOptions>(value: value, child: Text(value.label));
                                   }).toList(),
                                 ),
@@ -197,18 +199,12 @@ class _RoomTasksListState extends State<RoomTasksList> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: IconButton(
-                              icon: _sortDirectionValue == SortDirection.descending
-                                  ? const Icon(Icons.arrow_downward_sharp)
-                                  : const Icon(Icons.arrow_upward_sharp),
-                              tooltip: _sortDirectionValue == SortDirection.descending ? 'Descending' : 'Ascending',
-                              onPressed: () {
-                                if (_sortDirectionValue == SortDirection.descending) {
-                                  _sortDirectionValue = SortDirection.ascending;
-                                } else {
-                                  _sortDirectionValue = SortDirection.descending;
-                                }
-                                setState(() {});
+                            child: SortDirectionButton(
+                              sortDirection: _sortDirectionValue,
+                              onChange: (sort) {
+                                setState(() {
+                                  _sortDirectionValue = sort;
+                                });
                               },
                             ),
                           ),

@@ -196,14 +196,13 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<void> launchAddTask() async {
-    List<Task>? result = await Navigator.push(
+    Task? result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateTask()),
     );
     hideKeyboard();
-    if (result != null && result.isNotEmpty && context.mounted) {
-      var msg = result.length == 1 ? 'Task created' : '${result.length} Tasks created';
-      showSnackbar(msg, context);
+    if (result != null && context.mounted) {
+      showSnackbar('Task created', context);
     }
   }
 

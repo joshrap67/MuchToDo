@@ -37,11 +37,6 @@ class TasksProvider with ChangeNotifier {
     filterAndNotify();
   }
 
-  void addTasks(List<Task> tasks) {
-    _allTasks.addAll(tasks);
-    filterAndNotify();
-  }
-
   void updateTask(Task task) {
     var index = _allTasks.indexWhere((element) => element.id == task.id);
     if (index >= 0) {
@@ -130,13 +125,13 @@ class TasksProvider with ChangeNotifier {
   void filterTasks() {
     var filtered = _allTasks.where((task) {
       if (_filters.priorityFilter != null) {
-        bool match = equalityCheckInt(_filters.priorityEquality, _filters.priorityFilter!.value, task.priority);
+        bool match = equalityCheckNumber(_filters.priorityEquality, _filters.priorityFilter!.value, task.priority);
         if (!match) {
           return false;
         }
       }
       if (_filters.effortFilter != null) {
-        bool match = equalityCheckInt(EqualityComparisons.equalTo, _filters.effortFilter!.value, task.effort);
+        bool match = equalityCheckNumber(EqualityComparisons.equalTo, _filters.effortFilter!.value, task.effort);
         if (!match) {
           return false;
         }
@@ -150,7 +145,7 @@ class TasksProvider with ChangeNotifier {
         if (task.estimatedCost == null) {
           return false; // if specifying to filter by a cost and a task has no cost, it shouldn't be shown in result
         }
-        bool match = equalityCheckDouble(_filters.costEquality, _filters.estimatedCost!, task.estimatedCost!);
+        bool match = equalityCheckNumber(_filters.costEquality, _filters.estimatedCost!, task.estimatedCost!);
         if (!match) {
           return false;
         }

@@ -4,30 +4,8 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/domain/user.dart';
-import 'package:uuid/uuid.dart';
 
 class UserProvider with ChangeNotifier {
-  static User initialData = User(
-      const Uuid().v4(),
-      const Uuid().v4(),
-      [
-        Tag(const Uuid().v4(), 'Decoration'),
-        Tag(const Uuid().v4(), 'Electrical'),
-        Tag(const Uuid().v4(), 'Maintenance'),
-        Tag(const Uuid().v4(), 'Outside'),
-        Tag(const Uuid().v4(), 'Plumbing'),
-        Tag(const Uuid().v4(), 'Structural')
-      ],
-      'binary0010productions@gmail.com',
-      [],
-      [],
-      [
-        Contact(const Uuid().v4(), 'Dennis Reynolds', 'example@gmail.com', '+18038675309'),
-        Contact(const Uuid().v4(), 'Charlie Kelly', 'example@gmail.com', '+18038675309'),
-        Contact(const Uuid().v4(), 'Frank Reynolds', 'example@gmail.com', '+18038675309'),
-        Contact(const Uuid().v4(), 'Deandra Reynolds', 'example@gmail.com', '+18038675309'),
-        Contact(const Uuid().v4(), 'Ronald MacDonald', 'example@gmail.com', '+18038675309'),
-      ]);
   User? _user;
   bool _isLoading = true;
 
@@ -38,16 +16,6 @@ class UserProvider with ChangeNotifier {
   List<Contact> get contacts => [..._user?.contacts ?? []];
 
   List<Tag> get tags => [..._user?.tags ?? []];
-
-  Future<void> loadUser(String id) async {
-    _isLoading = true;
-    notifyListeners();
-    await Future.delayed(const Duration(seconds: 4), () {
-      _user = initialData;
-    });
-    _isLoading = false;
-    notifyListeners();
-  }
 
   void setLoading(bool loading) {
     _isLoading = loading;
@@ -95,11 +63,11 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addTasks(List<Task> createdTasks) {
+  void addTask(Task createdTask) {
     if (_user == null) {
       return;
     }
-    _user!.tasks.addAll(createdTasks.map((e) => e.id));
+    _user!.tasks.add(createdTask.id);
     Map<String, Tag> tagIdToTag = {};
     Map<String, Contact> contactIdToContact = {};
     // for quicker lookup
@@ -110,15 +78,13 @@ class UserProvider with ChangeNotifier {
       contactIdToContact[contact.id] = contact;
     }
 
-    for (var task in createdTasks) {
-      for (TaskTag taskTag in task.tags) {
-        Tag? tag = tagIdToTag[taskTag.id];
-        tag?.tasks.add(task.id);
-      }
-      for (TaskContact taskContact in task.contacts) {
-        Contact? contact = contactIdToContact[taskContact.id];
-        contact?.tasks.add(task.id);
-      }
+    for (TaskTag taskTag in createdTask.tags) {
+      Tag? tag = tagIdToTag[taskTag.id];
+      tag?.tasks.add(createdTask.id);
+    }
+    for (TaskContact taskContact in createdTask.contacts) {
+      Contact? contact = contactIdToContact[taskContact.id];
+      contact?.tasks.add(createdTask.id);
     }
 
     notifyListeners();
@@ -135,7 +101,7 @@ class UserProvider with ChangeNotifier {
       tag.tasks.removeWhere((t) => t == task.id);
     }
     // honestly easier to just assume the tag or contact was removed from the task, then add it back instead of keeping track of old task
-    addTasks([task]);
+    addTask(task);
   }
 
   void removeTask(Task task) {

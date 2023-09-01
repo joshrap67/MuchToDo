@@ -22,35 +22,33 @@ class _PriorityPickerState extends State<PriorityPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
-            child: Text(
-              'Priority',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+          child: Text(
+            'Priority',
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
-            child: SfSlider(
-              value: _selectedPriority,
-              min: 1.0,
-              interval: 1,
-              max: 5.0,
-              showTicks: true,
-              showLabels: true,
-              activeColor: const Color(0xFFf51818),
-              inactiveColor: const Color(0xffd3b9b9),
-              onChanged: onChange,
-              labelFormatterCallback: (dynamic actualValue, String formattedText) {
-                return '${(6 - actualValue).toInt()}';
-              },
-            ),
-          )
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+          child: SfSlider(
+            value: _selectedPriority,
+            min: 1.0,
+            interval: 1,
+            max: 5.0,
+            showTicks: true,
+            showLabels: true,
+            activeColor: const Color(0xFFf51818),
+            inactiveColor: const Color(0xffd3b9b9),
+            onChanged: onChange,
+            labelFormatterCallback: (dynamic actualValue, String formattedText) {
+              return '${(6 - actualValue).toInt()}';
+            },
+          ),
+        )
+      ],
     );
   }
 

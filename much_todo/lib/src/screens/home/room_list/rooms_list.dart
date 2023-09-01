@@ -6,6 +6,7 @@ import 'package:much_todo/src/screens/home/room_list/create_room.dart';
 import 'package:much_todo/src/screens/home/room_list/room_info_card.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/widgets/skeletons/rooms_list_skeleton.dart';
+import 'package:much_todo/src/widgets/sort_direction_button.dart';
 import 'package:provider/provider.dart';
 
 class RoomList extends StatefulWidget {
@@ -201,18 +202,12 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: IconButton(
-                              icon: _sortDirectionValue == SortDirection.descending
-                                  ? const Icon(Icons.arrow_downward_sharp)
-                                  : const Icon(Icons.arrow_upward_sharp),
-                              tooltip: _sortDirectionValue == SortDirection.descending ? 'Descending' : 'Ascending',
-                              onPressed: () {
-                                if (_sortDirectionValue == SortDirection.descending) {
-                                  _sortDirectionValue = SortDirection.ascending;
-                                } else {
-                                  _sortDirectionValue = SortDirection.descending;
-                                }
-                                setState(() {});
+                            child: SortDirectionButton(
+                              sortDirection: _sortDirectionValue,
+                              onChange: (sort) {
+                                setState(() {
+                                  _sortDirectionValue = sort;
+                                });
                               },
                             ),
                           ),

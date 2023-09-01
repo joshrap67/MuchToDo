@@ -7,7 +7,7 @@ void hideKeyboard() {
   FocusManager.instance.primaryFocus?.unfocus();
 }
 
-void showSnackbar(String message, BuildContext context, {int milliseconds = 3000}) {
+void showSnackbar(String message, BuildContext context, {int milliseconds = 1500}) {
   ScaffoldMessenger.of(context).removeCurrentSnackBar();
   final snackBar = SnackBar(
     content: Text(message),
@@ -63,42 +63,7 @@ double getEffortPercentage(int effort) {
   return effort / 3;
 }
 
-bool equalityCheckInt(EqualityComparisons equalityType, int filterValue, int taskValue) {
-  switch (equalityType) {
-    case EqualityComparisons.equalTo:
-      if (taskValue != filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparisons.greaterThan:
-      if (taskValue <= filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparisons.greaterThanOrEqualTo:
-      if (taskValue < filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparisons.lessThan:
-      if (taskValue >= filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparisons.lessThanOrEqualTo:
-      if (taskValue > filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-  }
-}
-
-bool equalityCheckDouble(EqualityComparisons equalityType, double filterValue, double taskValue) {
+bool equalityCheckNumber(EqualityComparisons equalityType, num filterValue, num taskValue) {
   switch (equalityType) {
     case EqualityComparisons.equalTo:
       if (taskValue != filterValue) {

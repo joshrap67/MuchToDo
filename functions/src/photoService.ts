@@ -1,6 +1,6 @@
 import {getStorage} from "firebase-admin/storage";
 
-const taskPhotoBucket = process.env.MuchToDo_Firebase__TaskPhotoBucket;
+const taskPhotoBucket = process.env.MUCHTODO_FIREBASE__TASKPHOTOBUCKET;
 
 export const deletePhotos = async (userId: string, taskIds: string[]): Promise<void> => {
     for (const taskId of taskIds) {

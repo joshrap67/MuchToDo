@@ -30,10 +30,10 @@ export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: stri
 }
 
 export const deletePhotos = async (deletePhotosRequest: IDeletePhotosRequest): Promise<void> => {
-    await axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}photos`, deletePhotosRequest);
+    await axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
 }
 
 export const deletePhotosBlindSend = (deletePhotosRequest: IDeletePhotosRequest): void => {
     // to be used for potentially long-running operations (like when deleting a user that could have hundreds of photos)
-    axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}photos`, deletePhotosRequest);
+    axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
 }

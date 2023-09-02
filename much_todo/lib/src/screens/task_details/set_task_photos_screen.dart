@@ -77,13 +77,13 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
                       child: photo.isNetwork()
                           ? Image.network(
                               photo.networkUrl!,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                               errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                                 return const Center(child: Icon(Icons.broken_image));
                               },
                             )
                           : Image.file(
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                               File(
                                 photo.localPhoto!.path,
                               ),

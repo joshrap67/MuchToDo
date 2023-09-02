@@ -17,15 +17,17 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(authenticateJWT);
 app.use('/', router());
 
-setGlobalOptions({ maxInstances: 1 }); // todo
+setGlobalOptions({maxInstances: 1}); // todo
 const MONGO_URL = process.env.MUCHTODO_MONGO__CONNECTIONSTRING; // DB URI
 mongoose
     .connect(MONGO_URL)
     .then(() => {
+        /*
+            To run locally, uncomment this block
+         */
         // const server = http.createServer(app);
-        // const port = process.env.MuchToDo_Api__Port || 8080
-        // server.listen(port, () => {
-        //     console.log(`Server running on http://localhost:${port}/`);
+        // server.listen(8080, () => {
+        //     console.log(`Server running on http://localhost:8080/`);
         // });
     });
 

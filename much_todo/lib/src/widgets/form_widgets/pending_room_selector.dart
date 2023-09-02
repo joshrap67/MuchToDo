@@ -8,8 +8,9 @@ import 'package:provider/provider.dart';
 class PendingRoomSelector extends StatefulWidget {
   final Room? selectedRoom;
   final ValueChanged<Room?> onRoomChange;
+  final FocusNode? focusNode;
 
-  const PendingRoomSelector({super.key, this.selectedRoom, required this.onRoomChange});
+  const PendingRoomSelector({super.key, this.selectedRoom, this.focusNode, required this.onRoomChange});
 
   @override
   State<PendingRoomSelector> createState() => _PendingRoomSelectorState();
@@ -25,7 +26,7 @@ class RoomOption {
 class _PendingRoomSelectorState extends State<PendingRoomSelector> {
   Room? _selectedRoom;
   final _autoCompleteController = TextEditingController();
-  final _focusNode = FocusNode();
+  FocusNode _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
 
   @override
@@ -33,6 +34,9 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
     super.initState();
     _selectedRoom = widget.selectedRoom;
     _autoCompleteController.text = _selectedRoom?.name ?? '';
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+    }
   }
 
   @override

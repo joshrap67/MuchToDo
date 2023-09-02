@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/create_contact.dart';
 import 'package:provider/provider.dart';
@@ -178,16 +179,8 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
   }
 
   Future<void> addContact() async {
-    // todo use popup
     hideKeyboard();
-    Contact? createdContact = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreateContact(
-          name: _autoCompleteController.text,
-        ),
-      ),
-    );
+    Contact? createdContact = await Dialogs.promptAddContact(context, _autoCompleteController.text);
     if (createdContact != null) {
       setState(() {
         _selectedContacts.add(createdContact);

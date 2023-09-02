@@ -17,7 +17,7 @@ class RoomList extends StatefulWidget {
 }
 
 class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin {
-  RoomSortOptions _sortByValue = RoomSortOptions.name;
+  RoomSortOption _sortByValue = RoomSortOption.name;
   SortDirection _sortDirectionValue = SortDirection.ascending;
 
   @override
@@ -147,16 +147,16 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
                             ),
                             child: DropdownButtonHideUnderline(
-                              child: DropdownButton<RoomSortOptions>(
+                              child: DropdownButton<RoomSortOption>(
                                 value: _sortByValue,
-                                onChanged: (RoomSortOptions? value) {
+                                onChanged: (RoomSortOption? value) {
                                   setState(() {
                                     _sortByValue = value!;
                                   });
                                 },
-                                items: RoomSortOptions.values
-                                    .map<DropdownMenuItem<RoomSortOptions>>((RoomSortOptions value) {
-                                  return DropdownMenuItem<RoomSortOptions>(value: value, child: Text(value.label));
+                                items: RoomSortOption.values
+                                    .map<DropdownMenuItem<RoomSortOption>>((RoomSortOption value) {
+                                  return DropdownMenuItem<RoomSortOption>(value: value, child: Text(value.label));
                                 }).toList(),
                               ),
                             ),

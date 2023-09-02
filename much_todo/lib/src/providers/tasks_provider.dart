@@ -11,7 +11,7 @@ class TasksProvider with ChangeNotifier {
   List<Task> _filteredTasks = [];
   bool _isLoading = true;
   FilterTaskOptions _filters = FilterTaskOptions.named(
-    sortByValue: TaskSortOptions.creationDate, // todo shared prefs?
+    sortByValue: TaskSortOption.creationDate,
     sortDirectionValue: SortDirection.descending,
   );
 
@@ -57,6 +57,10 @@ class TasksProvider with ChangeNotifier {
   void removeTask(Task task) {
     _allTasks.removeWhere((t) => t.id == task.id);
     filterAndNotify();
+  }
+
+  void notify() {
+    notifyListeners();
   }
 
   void removeTagFromTasks(Tag tag) {
@@ -132,7 +136,7 @@ class TasksProvider with ChangeNotifier {
         }
       }
       if (_filters.effortFilter != null) {
-        bool match = equalityCheckNumber(EqualityComparisons.equalTo, _filters.effortFilter!.value, task.effort);
+        bool match = equalityCheckNumber(EqualityComparison.equalTo, _filters.effortFilter!.value, task.effort);
         if (!match) {
           return false;
         }

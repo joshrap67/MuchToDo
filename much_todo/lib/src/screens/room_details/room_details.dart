@@ -1,11 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
-import 'package:much_todo/src/screens/room_details/room_completed_tasks.dart';
+import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -30,15 +29,15 @@ class _RoomDetailsState extends State<RoomDetails> {
   late Room _room;
   late List<Task> _tasks;
 
-  TaskSortOptions _sortByValue = TaskSortOptions.creationDate;
+  TaskSortOption _sortByValue = TaskSortOption.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
-  final List<DropdownMenuItem<TaskSortOptions>> _sortEntries = <DropdownMenuItem<TaskSortOptions>>[];
+  final List<DropdownMenuItem<TaskSortOption>> _sortEntries = <DropdownMenuItem<TaskSortOption>>[];
 
   @override
   void initState() {
     super.initState();
-    for (var value in TaskSortOptions.values) {
-      _sortEntries.add(DropdownMenuItem<TaskSortOptions>(
+    for (var value in TaskSortOption.values) {
+      _sortEntries.add(DropdownMenuItem<TaskSortOption>(
         value: value,
         child: Text(value.label),
       ));
@@ -183,65 +182,67 @@ class _RoomDetailsState extends State<RoomDetails> {
       context: context,
       barrierDismissible: !isLoading,
       builder: (ctx) {
-        return StatefulBuilder(builder: (dialogContext, setState) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              if (!isLoading)
+        return StatefulBuilder(
+          builder: (dialogContext, setState) {
+            return AlertDialog.adaptive(
+              actions: <Widget>[
+                if (!isLoading)
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: const Text('CANCEL'),
+                  ),
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('CANCEL'),
-                ),
-              TextButton(
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    await editRoom(dialogContext, nameController.text, noteController.text);
-                    setState(() {
-                      isLoading = false;
-                    });
-                    if (dialogContext.mounted) {
-                      Navigator.pop(dialogContext);
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await editRoom(dialogContext, nameController.text, noteController.text);
+                      setState(() {
+                        isLoading = false;
+                      });
+                      if (dialogContext.mounted) {
+                        Navigator.pop(dialogContext);
+                      }
                     }
-                  }
-                },
-                child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
-              )
-            ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Edit Room'),
-            content: Form(
-              key: formKey,
-              child: SizedBox(
-                width: MediaQuery.of(dialogContext).size.width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Room name *'),
-                        border: OutlineInputBorder(),
+                  },
+                  child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
+                )
+              ],
+              insetPadding: const EdgeInsets.all(8.0),
+              title: const Text('Edit Room'),
+              content: Form(
+                key: formKey,
+                child: SizedBox(
+                  width: MediaQuery.of(dialogContext).size.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Room name *'),
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.name,
+                        controller: nameController,
+                        validator: validRoomName,
                       ),
-                      keyboardType: TextInputType.name,
-                      controller: nameController,
-                      validator: validRoomName,
-                    ),
-                    const Padding(padding: EdgeInsets.all(8)),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Note'),
-                        border: OutlineInputBorder(),
+                      const Padding(padding: EdgeInsets.all(8)),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Note'),
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: noteController,
+                        validator: validRoomNote,
                       ),
-                      controller: noteController,
-                      validator: validRoomNote,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       },
     );
   }
@@ -270,76 +271,77 @@ class _RoomDetailsState extends State<RoomDetails> {
 
   void promptSortTasks() {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context, 'OK');
-                  sortRoomTasks();
-                  setState(() {});
-                },
-                child: const Text('APPLY'),
-              )
-            ],
-            title: const Text('Sort Tasks'),
-            content: StatefulBuilder(
-              builder: (statefulContext, setState) {
-                return SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InputDecorator(
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                                labelText: 'Sort By',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<TaskSortOptions>(
-                                  value: _sortByValue,
-                                  onChanged: (TaskSortOptions? value) {
-                                    setState(() {
-                                      _sortByValue = value!;
-                                    });
-                                  },
-                                  items: TaskSortOptions.values
-                                      .map<DropdownMenuItem<TaskSortOptions>>((TaskSortOptions value) {
-                                    return DropdownMenuItem<TaskSortOptions>(value: value, child: Text(value.label));
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SortDirectionButton(
-                              sortDirection: _sortDirectionValue,
-                              onChange: (sort) {
-                                setState(() {
-                                  _sortDirectionValue = sort;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('CANCEL'),
             ),
-          );
-        });
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, 'OK');
+                sortRoomTasks();
+                setState(() {});
+              },
+              child: const Text('APPLY'),
+            )
+          ],
+          title: const Text('Sort Tasks'),
+          content: StatefulBuilder(
+            builder: (statefulContext, setState) {
+              return SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                              labelText: 'Sort By',
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<TaskSortOption>(
+                                value: _sortByValue,
+                                onChanged: (TaskSortOption? value) {
+                                  setState(() {
+                                    _sortByValue = value!;
+                                  });
+                                },
+                                items: TaskSortOption.values
+                                    .map<DropdownMenuItem<TaskSortOption>>((TaskSortOption value) {
+                                  return DropdownMenuItem<TaskSortOption>(value: value, child: Text(value.label));
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SortDirectionButton(
+                            sortDirection: _sortDirectionValue,
+                            onChange: (sort) {
+                              setState(() {
+                                _sortDirectionValue = sort;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   void sortRoomTasks() {
@@ -379,34 +381,35 @@ class _RoomDetailsState extends State<RoomDetails> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RoomCompletedTasks(room: _room),
+        builder: (context) => CompletedTasks(room: _room),
       ),
     );
   }
 
   void promptDeleteRoom() {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  deleteRoom();
-                },
-                child: const Text('DELETE'),
-              )
-            ],
-            title: const Text('Delete Room'),
-            content: const Text(
-                'Are you sure you wish to delete this room?\n\n\ALL tasks associated with this room will be deleted!'),
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                deleteRoom();
+              },
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Room'),
+          content: const Text(
+              'Are you sure you wish to delete this room?\n\nALL tasks associated with this room will be deleted!'),
+        );
+      },
+    );
   }
 
   Future<void> deleteRoom() async {

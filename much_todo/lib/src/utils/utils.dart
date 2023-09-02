@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -63,33 +64,33 @@ double getEffortPercentage(int effort) {
   return effort / 3;
 }
 
-bool equalityCheckNumber(EqualityComparisons equalityType, num filterValue, num taskValue) {
+bool equalityCheckNumber(EqualityComparison equalityType, num filterValue, num taskValue) {
   switch (equalityType) {
-    case EqualityComparisons.equalTo:
+    case EqualityComparison.equalTo:
       if (taskValue != filterValue) {
         return false;
       } else {
         return true;
       }
-    case EqualityComparisons.greaterThan:
+    case EqualityComparison.greaterThan:
       if (taskValue <= filterValue) {
         return false;
       } else {
         return true;
       }
-    case EqualityComparisons.greaterThanOrEqualTo:
+    case EqualityComparison.greaterThanOrEqualTo:
       if (taskValue < filterValue) {
         return false;
       } else {
         return true;
       }
-    case EqualityComparisons.lessThan:
+    case EqualityComparison.lessThan:
       if (taskValue >= filterValue) {
         return false;
       } else {
         return true;
       }
-    case EqualityComparisons.lessThanOrEqualTo:
+    case EqualityComparison.lessThanOrEqualTo:
       if (taskValue > filterValue) {
         return false;
       } else {
@@ -98,21 +99,21 @@ bool equalityCheckNumber(EqualityComparisons equalityType, num filterValue, num 
   }
 }
 
-bool equalityCheckDate(DateEqualityComparisons equalityType, DateTime filterValue, DateTime taskValue) {
+bool equalityCheckDate(DateEqualityComparison equalityType, DateTime filterValue, DateTime taskValue) {
   switch (equalityType) {
-    case DateEqualityComparisons.equalTo:
+    case DateEqualityComparison.equalTo:
       if (taskValue != filterValue) {
         return false;
       } else {
         return true;
       }
-    case DateEqualityComparisons.after:
+    case DateEqualityComparison.after:
       if (taskValue.isBefore(filterValue)) {
         return false;
       } else {
         return true;
       }
-    case DateEqualityComparisons.before:
+    case DateEqualityComparison.before:
       if (taskValue.isAfter(filterValue)) {
         return false;
       } else {
@@ -121,31 +122,31 @@ bool equalityCheckDate(DateEqualityComparisons equalityType, DateTime filterValu
   }
 }
 
-void sortTasks(List<Task> tasks, TaskSortOptions sortBy, SortDirection sortDirection) {
+void sortTasks(List<Task> tasks, TaskSortOption sortBy, SortDirection sortDirection) {
   // initially ascending
   switch (sortBy) {
-    case TaskSortOptions.name:
+    case TaskSortOption.name:
       tasks.sort((a, b) => a.name.compareTo(b.name));
       break;
-    case TaskSortOptions.priority:
+    case TaskSortOption.priority:
       tasks.sort((a, b) => a.priority.compareTo(b.priority));
       break;
-    case TaskSortOptions.effort:
+    case TaskSortOption.effort:
       tasks.sort((a, b) => a.effort.compareTo(b.effort));
       break;
-    case TaskSortOptions.room:
+    case TaskSortOption.room:
       tasks.sort((a, b) => a.room.name.compareTo(b.room.name));
       break;
-    case TaskSortOptions.cost:
+    case TaskSortOption.cost:
       tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1);
       break;
-    case TaskSortOptions.creationDate:
+    case TaskSortOption.creationDate:
       tasks.sort((a, b) => a.creationDate.compareTo(b.creationDate));
       break;
-    case TaskSortOptions.dueBy:
+    case TaskSortOption.dueBy:
       tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1);
       break;
-    case TaskSortOptions.inProgress:
+    case TaskSortOption.inProgress:
       tasks.sort((a, b) {
         if (b.inProgress) {
           // ones that are in progress are on top in ascending
@@ -153,6 +154,37 @@ void sortTasks(List<Task> tasks, TaskSortOptions sortBy, SortDirection sortDirec
         }
         return -1;
       });
+      break;
+  }
+  if (sortDirection == SortDirection.descending) {
+    for (var i = 0; i < tasks.length / 2; i++) {
+      var temp = tasks[i];
+      tasks[i] = tasks[tasks.length - 1 - i];
+      tasks[tasks.length - 1 - i] = temp;
+    }
+  }
+}
+
+void sortCompletedTasks(List<CompletedTask> tasks, CompletedTaskSortOption sortBy, SortDirection sortDirection) {
+  // initially ascending
+  switch (sortBy) {
+    case CompletedTaskSortOption.name:
+      tasks.sort((a, b) => a.name.compareTo(b.name));
+      break;
+    case CompletedTaskSortOption.priority:
+      tasks.sort((a, b) => a.priority.compareTo(b.priority));
+      break;
+    case CompletedTaskSortOption.effort:
+      tasks.sort((a, b) => a.effort.compareTo(b.effort));
+      break;
+    case CompletedTaskSortOption.room:
+      tasks.sort((a, b) => a.roomName.compareTo(b.roomName));
+      break;
+    case CompletedTaskSortOption.cost:
+      tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1);
+      break;
+    case CompletedTaskSortOption.completionDate:
+      tasks.sort((a, b) => a.completionDate.compareTo(b.completionDate));
       break;
   }
   if (sortDirection == SortDirection.descending) {

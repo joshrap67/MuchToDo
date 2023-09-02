@@ -142,7 +142,8 @@ class TaskService {
     }
   }
 
-  static Future<void> completeTask(BuildContext context, Task task, DateTime completionDate) async {
+  static Future<void> completeTask(BuildContext context, Task task, DateTime completionDate,
+      {bool notifyOnFailure = false}) async {
     try {
       await TaskRepository.completeTask(task.id, CompleteTaskRequest(completeDate: completionDate));
       if (context.mounted) {
@@ -152,12 +153,16 @@ class TaskService {
       }
     } catch (e) {
       if (context.mounted) {
+        if (notifyOnFailure) {
+          // if method was used in a blind send, do this to get the data back to the ui
+          context.read<TasksProvider>().notify();
+        }
         showSnackbar('There was a problem completing the task', context);
       }
     }
   }
 
-  static Future<bool> deleteTask(BuildContext context, Task task) async {
+  static Future<bool> deleteTask(BuildContext context, Task task, {bool notifyOnFailure = false}) async {
     try {
       await TaskRepository.deleteTask(task.id);
       if (context.mounted) {
@@ -168,6 +173,10 @@ class TaskService {
       return true;
     } catch (e) {
       if (context.mounted) {
+        if (notifyOnFailure) {
+          // if method was used in a blind send, do this to get the data back to the ui
+          context.read<TasksProvider>().notify();
+        }
         showSnackbar('There was a problem deleting the task', context);
       }
       return false;

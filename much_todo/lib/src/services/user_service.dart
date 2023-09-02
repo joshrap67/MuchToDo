@@ -94,7 +94,7 @@ class UserService {
       }
     }
 
-    return contact!;
+    return contact;
   }
 
   static Future<void> deleteTag(BuildContext context, Tag tag) async {

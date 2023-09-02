@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
-import 'package:much_todo/src/screens/home/more_screen/completed_tasks/completed_tasks.dart';
+import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
+import 'package:much_todo/src/screens/sign_in/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/screens/home/more_screen/user_contacts.dart';
 import 'package:much_todo/src/screens/home/more_screen/user_tags.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/skeletons/more_screen_skeleton.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -59,8 +62,11 @@ class _MoreScreenState extends State<MoreScreen> {
                 ],
               ),
               ListTile(
-                title: const Text('Signed in as'),
-                subtitle: Text(user.email),
+                title: Text(user.email),
+                subtitle: const Text(
+                  'ACCOUNT',
+                  style: TextStyle(fontSize: 12),
+                ),
                 trailing: accountDropdown(),
               ),
             ],
@@ -173,7 +179,13 @@ class _MoreScreenState extends State<MoreScreen> {
         signOut();
         break;
       case AccountOptions.delete:
-        promptDeleteAccount();
+        final user = FirebaseAuth.instance.currentUser;
+        bool hasPassword = user!.providerData.any((element) => element.providerId == 'password');
+        if (hasPassword) {
+          promptDeleteAccountPasswordConfirm();
+        } else {
+          promptDeleteAccountGoogle();
+        }
         break;
     }
     setState(() {});
@@ -213,9 +225,13 @@ class _MoreScreenState extends State<MoreScreen> {
     );
   }
 
-  void launchPrivacyPolicy() {}
+  void launchPrivacyPolicy() {
+    // todo
+  }
 
-  void launchTermsAndConditions() {}
+  void launchTermsAndConditions() {
+    // todo
+  }
 
   Future<void> signOut() async {
     await UserService.signOut(context);
@@ -231,29 +247,214 @@ class _MoreScreenState extends State<MoreScreen> {
     }
   }
 
-  void promptDeleteAccount() {
-    // todo prompt credentials/type to confirm
-    showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
+  Future<void> promptDeleteAccountGoogle() async {
+    final confirmController = TextEditingController();
+    bool isLoading = false;
+    final formKey = GlobalKey<FormState>();
+    String? errorText;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (dialogContext, setState) {
+            return AlertDialog.adaptive(
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('CANCEL'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      hideKeyboard();
+                      var user = FirebaseAuth.instance.currentUser!;
+                      try {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        var credential = await AuthService.getGoogleCredential();
+                        if (credential == null) {
+                          setState(() {
+                            errorText = 'Incorrect Google account';
+                          });
+                          return;
+                        }
+                        await user.reauthenticateWithCredential(credential);
+
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          deleteAccount();
+                        }
+                      } catch (e) {
+                        setState(() {
+                          errorText = 'Error';
+                        });
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    }
+                  },
+                  child: isLoading ? const CircularProgressIndicator() : const Text('DELETE'),
+                )
+              ],
+              title: const Text('Delete Account'),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                        'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'
+                        '\n\nType "Delete" to confirm.'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: 'Confirmation',
+                          errorText: errorText,
+                        ),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: confirmController,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return 'Required';
+                          } else if (val.toLowerCase() != 'delete') {
+                            return 'Invalid';
+                          }
+                          return null;
+                        },
+                        onChanged: (_) {
+                          if (errorText != null) {
+                            setState(() {
+                              errorText = null;
+                            });
+                          }
+                        },
+                        maxLines: 1,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  deleteAccount();
-                },
-                child: const Text('DELETE'),
-              )
-            ],
-            title: const Text('Delete Account'),
-            content: const Text(
-                'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'),
-          );
-        });
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> promptDeleteAccountPasswordConfirm() async {
+    final passwordController = TextEditingController();
+    bool hidePassword = true;
+    bool isLoading = false;
+    final formKey = GlobalKey<FormState>();
+    String? errorText;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (dialogContext, setState) {
+            return AlertDialog.adaptive(
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('CANCEL'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      hideKeyboard();
+                      var user = FirebaseAuth.instance.currentUser!;
+                      try {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        await user.reauthenticateWithCredential(EmailAuthProvider.credential(
+                          email: user.email!,
+                          password: passwordController.text,
+                        ));
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          deleteAccount();
+                        }
+                      } catch (e) {
+                        setState(() {
+                          errorText = 'Invalid credentials';
+                        });
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    }
+                  },
+                  child: isLoading ? const CircularProgressIndicator() : const Text('DELETE'),
+                )
+              ],
+              title: const Text('Delete Account'),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                        'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock),
+                          border: const OutlineInputBorder(),
+                          labelText: 'Password *',
+                          errorText: errorText,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  hidePassword = !hidePassword;
+                                });
+                              },
+                              child: Icon(
+                                hidePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: passwordController,
+                        obscureText: hidePassword,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return 'Required';
+                          }
+                          return null;
+                        },
+                        onChanged: (_) {
+                          if (errorText != null) {
+                            setState(() {
+                              errorText = null;
+                            });
+                          }
+                        },
+                        maxLines: 1,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

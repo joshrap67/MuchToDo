@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:much_todo/src/domain/completed_task.dart';
+import 'package:much_todo/src/repositories/completed_tasks/requests/delete_completed_tasks_request.dart';
 import 'package:much_todo/src/repositories/network/api_gateway.dart';
 
 class CompletedTaskRepository {
@@ -40,6 +41,15 @@ class CompletedTaskRepository {
       return true;
     } else {
       throw Exception('There was a problem deleting the completed task.');
+    }
+  }
+
+  static Future<bool> deleteCompletedTasks(DeleteCompletedTasksRequest request) async {
+    final apiResult = await ApiGateway.post('$baseUrl/delete-many', request);
+    if (apiResult.success) {
+      return true;
+    } else {
+      throw Exception('There was a problem deleting the completed tasks.');
     }
   }
 

@@ -210,7 +210,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                             Flexible(
                               child: RoomCardReadOnly(selectedRoom: _task.room),
                             ),
-                            // todo allow click to go to room?
                           ],
                         ),
                         if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
@@ -312,27 +311,27 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   void promptDeleteTask() {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  deleteTask();
-                },
-                child: const Text('DELETE'),
-              )
-            ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Delete Task'),
-            content: const Text('Are you sure you wish to delete this task?'),
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                deleteTask();
+              },
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Task'),
+          content: const Text('Are you sure you wish to delete this task?'),
+        );
+      },
+    );
   }
 
   Future<void> promptCompleteTask() async {
@@ -348,7 +347,7 @@ class _TaskDetailsState extends State<TaskDetails> {
         await TaskService.completeTask(context, _task, pickDate);
         if (context.mounted) {
           closePopup(context);
-          Navigator.of(context).pop; // todo not popping for some reason...
+          Navigator.of(context).pop();
         }
       }
     }
@@ -392,8 +391,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> duplicateTask() async {
-    // todo route to new task?
-    List<task_domain.Task>? result = await Navigator.push(
+    task_domain.Task? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CreateTask(
@@ -401,9 +399,16 @@ class _TaskDetailsState extends State<TaskDetails> {
         ),
       ),
     );
-    if (result != null && result.isNotEmpty && context.mounted) {
-      var msg = result.length == 1 ? 'Task created' : '${result.length} Tasks created';
-      showSnackbar(msg, context);
+    if (result != null && context.mounted) {
+      showSnackbar('Task duplicated', context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TaskDetails(
+            task: result,
+          ),
+        ),
+      );
     }
   }
 }

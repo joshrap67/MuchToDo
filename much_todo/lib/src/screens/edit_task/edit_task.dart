@@ -45,6 +45,7 @@ class _EditTaskState extends State<EditTask> {
   List<Tag> _tags = [];
 
   final _formKey = GlobalKey<FormState>();
+  final _roomFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -117,6 +118,7 @@ class _EditTaskState extends State<EditTask> {
                               hint: 'Name of Task',
                               label: 'Name *',
                               name: _name,
+                              nextFocus: _roomFocusNode,
                               onChange: (name) {
                                 setState(() {
                                   _name = name;
@@ -128,6 +130,7 @@ class _EditTaskState extends State<EditTask> {
                         PendingRoomSelector(
                           selectedRoom: _selectedRoom,
                           key: ValueKey(_selectedRoom),
+                          focusNode: _roomFocusNode,
                           onRoomChange: (room) {
                             setState(() {
                               _selectedRoom = room;

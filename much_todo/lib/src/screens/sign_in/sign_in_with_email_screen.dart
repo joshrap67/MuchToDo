@@ -20,6 +20,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
 
   bool _hidePassword = true;
   bool _isSigningIn = false;
+  final _passwordFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +93,9 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                                       maxLines: 1,
                                       validator: validEmail,
                                       textInputAction: TextInputAction.next,
+                                      onFieldSubmitted: (_) {
+                                        FocusScope.of(context).requestFocus(_passwordFocusNode);
+                                      },
                                     ),
                                     const Padding(padding: EdgeInsets.all(8)),
                                     TextFormField(
@@ -114,6 +118,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                                           ),
                                         ),
                                       ),
+									  focusNode: _passwordFocusNode,
                                       autovalidateMode: AutovalidateMode.onUserInteraction,
                                       controller: _passwordController,
                                       obscureText: _hidePassword,

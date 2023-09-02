@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  static Future<bool> signInWithGoogle() async {
+  static Future<OAuthCredential?> getGoogleCredential() async {
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
     if (gUser == null) {
-      return false;
+      return null;
     }
 
     final GoogleSignInAuthentication gAuth = await gUser.authentication;
@@ -14,7 +14,16 @@ class AuthService {
     await GoogleSignIn().signOut();
 
     await FirebaseAuth.instance.signInWithCredential(credential);
-    return true;
+    return credential;
+  }
+
+  static Future<bool> signInWithCredential(OAuthCredential credential) async {
+    try {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   static Future<bool> signInWithEmailAndPassword(String email, String password) async {
@@ -47,11 +56,11 @@ class AuthService {
   }
 
   static Future<bool> sendResetEmail(String email) async {
-	  try {
-		  await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-		  return true;
-	  } catch (e) {
-		  return false;
-	  }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

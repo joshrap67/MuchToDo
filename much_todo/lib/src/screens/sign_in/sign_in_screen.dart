@@ -26,14 +26,14 @@ class _SignInScreenState extends State<SignInScreen> {
         appBar: AppBar(
           flexibleSpace: Container(
             decoration: const BoxDecoration(
-				gradient: LinearGradient(
-					begin: Alignment.topCenter,
-					end: Alignment.bottomCenter,
-					colors: [
-						Color(0xFF9890e3),
-						Color(0xFF9ea7de),
-					],
-				),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF9890e3),
+                  Color(0xFF9ea7de),
+                ],
+              ),
             ),
           ),
         ),
@@ -49,14 +49,25 @@ class _SignInScreenState extends State<SignInScreen> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                          child: ElevatedButton.icon(
-                            label: const Text('SIGN IN WITH GOOGLE'),
-                            icon: const Icon(Icons.email),
+                          child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.black,
                               backgroundColor: Colors.white,
                             ),
                             onPressed: signInWithGoogle,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/google_logo.png',
+                                  height: 24,
+                                  width: 24,
+                                  fit: BoxFit.fitHeight,
+                                ),
+                                const SizedBox(width: 15),
+                                const Text('SIGN IN WITH GOOGLE')
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -67,14 +78,25 @@ class _SignInScreenState extends State<SignInScreen> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                          child: ElevatedButton.icon(
-                            label: const Text('SIGN IN WITH EMAIL'),
-                            icon: const Icon(Icons.email),
+                          child: ElevatedButton(
+                            // label: const Text('SIGN IN WITH EMAIL'),
+                            // icon: const Icon(Icons.email),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.blue,
                             ),
                             onPressed: signInWithEmail,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.email,
+                                  size: 24,
+                                ),
+                                SizedBox(width: 15),
+                                Text('SIGN IN WITH EMAIL')
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -90,9 +112,12 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> signInWithGoogle() async {
-    var signedIn = await AuthService.signInWithGoogle();
-    if (signedIn && context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
+    var credential = await AuthService.getGoogleCredential();
+    if (credential != null) {
+      var signedIn = await AuthService.signInWithCredential(credential);
+      if (signedIn && context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
+      }
     }
   }
 

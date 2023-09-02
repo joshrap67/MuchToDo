@@ -30,16 +30,29 @@ class _TaskCardState extends State<TaskCard> {
               ],
             ),
             title: Text(widget.task.name),
-            subtitle: widget.showRoom ? Text(getRoom()) : const Text(''),
+            trailing: widget.task.inProgress
+                ? Tooltip(
+                    message: 'In Progress',
+                    child: ImageIcon(
+                      const AssetImage('assets/icons/in-progress.png'),
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                  )
+                : null,
+            subtitle: widget.showRoom ? Text(widget.task.room.name) : const Text(''),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
-                child: Text(
-                  getBottomLeftWidget(),
-                  style: const TextStyle(fontSize: 11),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: getBottomLeftWidgets(),
+                    ),
+                  ),
                 ),
               ),
               TextButton(
@@ -53,18 +66,44 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
-  // todo show one row of tags? if overflow say something like (+2)
-  String getRoom() {
-    return widget.task.room.name;
-  }
-
-  String getBottomLeftWidget() {
-    if (widget.task.completeBy == null) {
-      return '';
-    } else {
-      return 'Due ${DateFormat.yMd().format(widget.task.completeBy!)}';
+  List<Widget> getBottomLeftWidgets() {
+    List<Widget> widgets = [];
+    if (widget.task.completeBy != null) {
+      widgets.add(
+        Text(
+          'Due ${DateFormat.yMd().format(widget.task.completeBy!)}',
+          style: TextStyle(
+              fontSize: 11,
+              // bold if a week before due date or already passed todo test?
+              fontWeight: DateTime.now().difference(widget.task.completeBy!).inDays > -7 ? FontWeight.bold : null),
+        ),
+      );
     }
-    // todo bold when close to date? if past date indicate?
+    if (widget.task.tags.isNotEmpty) {
+      var toolTip = '';
+      for (final tag in widget.task.tags) {
+        toolTip += '${tag.name}\n';
+      }
+      var padding =
+          widget.task.completeBy != null ? const EdgeInsets.symmetric(horizontal: 14.0) : const EdgeInsets.all(0.0);
+      widgets.add(Padding(
+        padding: padding,
+        child: Tooltip(
+          message: toolTip.trim(),
+          child: Chip(
+            label: Text(
+              '${widget.task.tags.length} tags',
+              style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
+            deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: const VisualDensity(horizontal: 0.0, vertical: -4),
+          ),
+        ),
+      ));
+    }
+    return widgets;
   }
 
   String getTitle() {

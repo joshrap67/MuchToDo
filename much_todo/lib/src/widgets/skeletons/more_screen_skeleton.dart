@@ -57,24 +57,21 @@ class MoreScreenSkeleton extends StatelessWidget {
               leading: const Icon(Icons.brush),
               contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
               trailing: DropdownButtonHideUnderline(
-                child: DropdownMenu<ThemeMode>(
-                  onSelected: (_) {},
-                  inputDecorationTheme: const InputDecorationTheme(
-                    filled: true,
-                    fillColor: Colors.transparent,
-                  ),
-                  dropdownMenuEntries: const [
-                    DropdownMenuEntry(
+                child: DropdownButton<ThemeMode>(
+                  value: ThemeMode.dark,
+                  onChanged: (_) {},
+                  items: const [
+                    DropdownMenuItem(
                       value: ThemeMode.system,
-                      label: 'System Theme',
+                      child: Text('System Theme'),
                     ),
-                    DropdownMenuEntry(
+                    DropdownMenuItem(
                       value: ThemeMode.light,
-                      label: 'Light Theme',
+                      child: Text('Light Theme'),
                     ),
-                    DropdownMenuEntry(
+                    DropdownMenuItem(
                       value: ThemeMode.dark,
-                      label: 'Dark Theme',
+                      child: Text('Dark Theme'),
                     )
                   ],
                 ),

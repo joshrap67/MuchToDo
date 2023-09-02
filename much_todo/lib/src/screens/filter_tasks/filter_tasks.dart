@@ -22,32 +22,32 @@ class FilterTasks extends StatefulWidget {
 }
 
 class _FilterTasksState extends State<FilterTasks> {
-  TaskSortOptions _sortByValue = TaskSortOptions.creationDate;
+  TaskSortOption _sortByValue = TaskSortOption.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
 
-  EqualityComparisons _priorityEquality = EqualityComparisons.equalTo;
+  EqualityComparison _priorityEquality = EqualityComparison.equalTo;
   PriorityFilter? _priorityFilter;
 
   EffortFilter? _effortFilter;
 
   double? _costFilter;
-  EqualityComparisons _costEquality = EqualityComparisons.equalTo;
+  EqualityComparison _costEquality = EqualityComparison.equalTo;
 
   DateTime? _completeByFilter;
-  DateEqualityComparisons _completeByEquality = DateEqualityComparisons.equalTo;
+  DateEqualityComparison _completeByEquality = DateEqualityComparison.equalTo;
 
   DateTime? _creationDateFilter;
-  DateEqualityComparisons _creationDateEquality = DateEqualityComparisons.equalTo;
+  DateEqualityComparison _creationDateEquality = DateEqualityComparison.equalTo;
 
   bool _showOnlyInProgress = false;
   List<Tag> _selectedTags = [];
   List<Contact> _selectedContacts = [];
   String? _roomIdFilter;
 
-  final List<DropdownMenuItem<TaskSortOptions>> _sortEntries = <DropdownMenuItem<TaskSortOptions>>[];
-  final List<DropdownMenuItem<EqualityComparisons>> _equalityEntries = <DropdownMenuItem<EqualityComparisons>>[];
-  final List<DropdownMenuItem<DateEqualityComparisons>> _dateEqualityEntries =
-      <DropdownMenuItem<DateEqualityComparisons>>[];
+  final List<DropdownMenuItem<TaskSortOption>> _sortEntries = <DropdownMenuItem<TaskSortOption>>[];
+  final List<DropdownMenuItem<EqualityComparison>> _equalityEntries = <DropdownMenuItem<EqualityComparison>>[];
+  final List<DropdownMenuItem<DateEqualityComparison>> _dateEqualityEntries =
+      <DropdownMenuItem<DateEqualityComparison>>[];
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
   final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
   final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
@@ -55,21 +55,21 @@ class _FilterTasksState extends State<FilterTasks> {
   @override
   void initState() {
     super.initState();
-    for (var value in TaskSortOptions.values) {
-      _sortEntries.add(DropdownMenuItem<TaskSortOptions>(
+    for (var value in TaskSortOption.values) {
+      _sortEntries.add(DropdownMenuItem<TaskSortOption>(
         value: value,
         child: Text(value.label),
       ));
     }
 
-    for (var value in EqualityComparisons.values) {
-      _equalityEntries.add(DropdownMenuItem<EqualityComparisons>(
+    for (var value in EqualityComparison.values) {
+      _equalityEntries.add(DropdownMenuItem<EqualityComparison>(
         value: value,
         child: Text(value.label),
       ));
     }
-    for (var value in DateEqualityComparisons.values) {
-      _dateEqualityEntries.add(DropdownMenuItem<DateEqualityComparisons>(
+    for (var value in DateEqualityComparison.values) {
+      _dateEqualityEntries.add(DropdownMenuItem<DateEqualityComparison>(
         value: value,
         child: Text(value.label),
       ));
@@ -156,6 +156,9 @@ class _FilterTasksState extends State<FilterTasks> {
                               items: _sortEntries,
                               isExpanded: true,
                               value: _sortByValue,
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _sortByValue = value!;
@@ -201,6 +204,9 @@ class _FilterTasksState extends State<FilterTasks> {
                               items: _equalityEntries,
                               isExpanded: true,
                               value: _priorityEquality,
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _priorityEquality = value!;
@@ -215,11 +221,9 @@ class _FilterTasksState extends State<FilterTasks> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: DropdownButtonFormField(
-                              // todo these widgets are really annoying and might just need to use 3rd party lib. focus won't go away, and menu opens with offset relative to initial value
                               items: _priorityEntries,
                               isExpanded: true,
                               value: _priorityFilter,
-
                               decoration: InputDecoration(
                                 suffixIcon: _priorityFilter == null
                                     ? null
@@ -232,6 +236,9 @@ class _FilterTasksState extends State<FilterTasks> {
                                         ),
                                       ),
                               ),
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _priorityFilter = value!;
@@ -273,6 +280,9 @@ class _FilterTasksState extends State<FilterTasks> {
                                         ),
                                       ),
                               ),
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _effortFilter = value!;
@@ -314,6 +324,9 @@ class _FilterTasksState extends State<FilterTasks> {
                                         ),
                                       ),
                               ),
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _roomIdFilter = value;
@@ -343,6 +356,9 @@ class _FilterTasksState extends State<FilterTasks> {
                               items: _equalityEntries,
                               isExpanded: true,
                               value: _costEquality,
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _costEquality = value!;
@@ -414,6 +430,9 @@ class _FilterTasksState extends State<FilterTasks> {
                               items: _dateEqualityEntries,
                               isExpanded: true,
                               value: _completeByEquality,
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _completeByEquality = value!;
@@ -459,6 +478,9 @@ class _FilterTasksState extends State<FilterTasks> {
                               items: _dateEqualityEntries,
                               isExpanded: true,
                               value: _creationDateEquality,
+                              onTap: () {
+                                hideFocus();
+                              },
                               onChanged: (value) {
                                 setState(() {
                                   _creationDateEquality = value!;
@@ -501,6 +523,11 @@ class _FilterTasksState extends State<FilterTasks> {
         ],
       ),
     );
+  }
+
+  void hideFocus() {
+    // necessary to hide focus after selecting dropdown option, for some reason the hidekeyboard method doesn't work
+    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   Future<void> onSubmit() async {

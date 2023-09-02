@@ -26,3 +26,7 @@ export async function deleteCompletedTask(taskId: string, userId: string): Promi
 export async function deleteAllCompletedTasks(userId: string): Promise<void> {
     await CompletedTaskModel.deleteMany({'createdBy': userId});
 }
+
+export async function deleteManyCompletedTasks(userId: string, taskIds: string[]): Promise<void> {
+    await CompletedTaskModel.deleteMany({'_id': {$in: taskIds}, 'createdBy': userId});
+}

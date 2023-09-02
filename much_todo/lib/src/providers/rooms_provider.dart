@@ -6,13 +6,13 @@ import 'package:much_todo/src/utils/enums.dart';
 class RoomsProvider with ChangeNotifier {
   List<Room> _rooms = [];
   bool _isLoading = true;
-  RoomSortOptions _sort = RoomSortOptions.name;
+  RoomSortOption _sort = RoomSortOption.name;
   SortDirection _sortDirection = SortDirection.ascending;
 
   List<Room> get rooms => [..._rooms]; // spread since otherwise widgets could bypass mutation methods
   bool get isLoading => _isLoading;
 
-  RoomSortOptions get sort => _sort;
+  RoomSortOption get sort => _sort;
 
   SortDirection get sortDirection => _sortDirection;
 
@@ -47,7 +47,7 @@ class RoomsProvider with ChangeNotifier {
     return room;
   }
 
-  void setSort(RoomSortOptions sort, SortDirection sortDirection) {
+  void setSort(RoomSortOption sort, SortDirection sortDirection) {
     _sort = sort;
     _sortDirection = sortDirection;
     sortRooms();
@@ -56,17 +56,17 @@ class RoomsProvider with ChangeNotifier {
   void sortRooms() {
     // initially ascending
     switch (_sort) {
-      case RoomSortOptions.name:
+      case RoomSortOption.name:
         _rooms.sort((a, b) => a.name.compareTo(b.name));
         break;
-      case RoomSortOptions.taskCount:
+      case RoomSortOption.taskCount:
         _rooms.sort((a, b) => a.tasks.length.compareTo(b.tasks.length));
         break;
 
-      case RoomSortOptions.creationDate:
+      case RoomSortOption.creationDate:
         _rooms.sort((a, b) => a.creationDate.compareTo(b.creationDate));
         break;
-      case RoomSortOptions.totalCost:
+      case RoomSortOption.totalCost:
         _rooms.sort((a, b) => a.totalCost().compareTo(b.totalCost()));
         break;
     }

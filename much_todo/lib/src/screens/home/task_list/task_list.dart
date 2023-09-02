@@ -8,6 +8,7 @@ import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/screens/filter_tasks/filter_tasks.dart';
 import 'package:much_todo/src/screens/task_details/task_details.dart';
+import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/widgets/skeletons/task_list_skeleton.dart';
 import 'package:much_todo/src/widgets/task_card.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -127,8 +128,56 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                           controller: _scrollController,
                           itemBuilder: (ctx, index) {
                             var task = tasks[index];
-                            // todo swipe left to delete, swipe right to edit?
-                            return TaskCard(task: task);
+                            return Dismissible(
+                              key: UniqueKey(),
+                              confirmDismiss: (direction) async {
+                                if (direction == DismissDirection.startToEnd) {
+                                  // swiping left
+                                  bool shouldDelete = await promptDeleteTask(task);
+                                  if (!shouldDelete) {
+                                    // user said no
+                                    return shouldDelete;
+                                  }
+                                  deleteTask(task);
+                                  return true;
+                                } else {
+                                  // swiping right
+                                  DateTime? completionDate = await promptCompleteTask(task);
+                                  if (completionDate == null) {
+                                    // user said no
+                                    return false;
+                                  }
+                                  completeTask(task, completionDate);
+
+                                  return true;
+                                }
+                              },
+                              onDismissed: (direction) {
+                                // removed as a blind send, if it fails then the service will notify this widget to rebuild with server values
+                                tasks.removeWhere((element) => element.id == task.id);
+                              },
+                              background: Container(
+                                color: Colors.red,
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 16),
+                                    child: Icon(Icons.delete),
+                                  ),
+                                ),
+                              ),
+                              secondaryBackground: Container(
+                                color: Colors.green,
+                                child: const Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(right: 16),
+                                    child: Icon(Icons.check),
+                                  ),
+                                ),
+                              ),
+                              child: TaskCard(task: task),
+                            );
                           },
                         ),
                       ),
@@ -170,6 +219,55 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
     } else {
       return context.watch<TasksProvider>().filteredTasks;
     }
+  }
+
+  Future<bool> promptDeleteTask(Task task) async {
+    bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Task'),
+          content: const Text('Are you sure you wish to delete this task?'),
+        );
+      },
+    );
+    return shouldDelete ?? false;
+  }
+
+  Future<DateTime?> promptCompleteTask(Task task) async {
+    DateTime? pickDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1800),
+        helpText: 'Select Completion Date',
+        lastDate: DateTime(9999));
+    return pickDate;
+  }
+
+  Future<void> completeTask(Task task, DateTime date) async {
+    await TaskService.completeTask(context, task, date, notifyOnFailure: true);
+    if (context.mounted) {
+      // todo snackbar if failure
+    }
+    return;
+  }
+
+  Future<bool> deleteTask(Task task) async {
+    var deleted = await TaskService.deleteTask(context, task, notifyOnFailure: true);
+    if (context.mounted) {
+      // todo snackbar if failure
+    }
+    return deleted;
   }
 
   Future<void> launchAddTask() async {

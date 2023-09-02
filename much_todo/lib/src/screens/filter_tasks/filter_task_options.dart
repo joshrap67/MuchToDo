@@ -1,19 +1,19 @@
 import 'package:much_todo/src/utils/enums.dart';
 
 class FilterTaskOptions {
-  TaskSortOptions sortByValue = TaskSortOptions.creationDate;
+  TaskSortOption sortByValue = TaskSortOption.creationDate;
   SortDirection sortDirectionValue = SortDirection.descending;
 
-  EqualityComparisons priorityEquality = EqualityComparisons.equalTo;
+  EqualityComparison priorityEquality = EqualityComparison.equalTo;
   PriorityFilter? priorityFilter;
 
   EffortFilter? effortFilter;
-  EqualityComparisons costEquality = EqualityComparisons.equalTo;
+  EqualityComparison costEquality = EqualityComparison.equalTo;
 
-  DateEqualityComparisons completeByEquality = DateEqualityComparisons.equalTo;
+  DateEqualityComparison completeByEquality = DateEqualityComparison.equalTo;
   DateTime? completeBy;
 
-  DateEqualityComparisons creationDateEquality = DateEqualityComparisons.equalTo;
+  DateEqualityComparison creationDateEquality = DateEqualityComparison.equalTo;
   DateTime? creationDate;
 
   bool showOnlyInProgress = false;
@@ -25,18 +25,18 @@ class FilterTaskOptions {
   FilterTaskOptions.named({
     required this.sortByValue,
     required this.sortDirectionValue,
-    this.priorityEquality = EqualityComparisons.equalTo,
+    this.priorityEquality = EqualityComparison.equalTo,
     this.priorityFilter,
     this.effortFilter,
     this.roomIdFilter,
-    this.costEquality = EqualityComparisons.equalTo,
+    this.costEquality = EqualityComparison.equalTo,
     this.estimatedCost,
     this.selectedTags = const [],
     this.selectedContacts = const [],
     this.showOnlyInProgress = false,
-    this.completeByEquality = DateEqualityComparisons.equalTo,
+    this.completeByEquality = DateEqualityComparison.equalTo,
     this.completeBy,
-    this.creationDateEquality = DateEqualityComparisons.equalTo,
+    this.creationDateEquality = DateEqualityComparison.equalTo,
     this.creationDate,
   });
 

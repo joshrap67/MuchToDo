@@ -7,8 +7,9 @@ class TaskNameInput extends StatefulWidget {
   final String? label;
   final ValueChanged<String?> onChange;
   final String? name;
+  final FocusNode? nextFocus;
 
-  const TaskNameInput({super.key, this.hint, this.label, required this.onChange, this.name});
+  const TaskNameInput({super.key, this.hint, this.label, required this.onChange, this.name, this.nextFocus});
 
   @override
   State<TaskNameInput> createState() => _TaskNameInputState();
@@ -16,6 +17,7 @@ class TaskNameInput extends StatefulWidget {
 
 class _TaskNameInputState extends State<TaskNameInput> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -39,8 +41,15 @@ class _TaskNameInputState extends State<TaskNameInput> {
           labelText: widget.label,
           counterText: ''),
       controller: _controller,
+      focusNode: _focusNode,
       keyboardType: TextInputType.name,
       maxLength: Constants.maxNameLength,
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (_) {
+        if (widget.nextFocus != null) {
+          FocusScope.of(context).requestFocus(widget.nextFocus!);
+        }
+      },
       validator: validTaskName,
       onChanged: (name) {
         widget.onChange(name.trim());

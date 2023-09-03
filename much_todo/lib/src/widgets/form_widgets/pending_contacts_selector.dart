@@ -27,8 +27,10 @@ class ContactOption {
 class _PendingContactsCard1State extends State<PendingContactsSelector> {
   List<Contact> _selectedContacts = [];
   final _autoCompleteController = TextEditingController();
+  final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
+  bool _isReadOnly = true;
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
   @override
   void dispose() {
     _autoCompleteController.dispose();
+    _focusNode.dispose();
+	_scrollController.dispose();
     super.dispose();
   }
 
@@ -80,11 +84,23 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
               fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                 return TextFormField(
                   key: _textFieldKey,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                    labelText: "Select Contacts",
-                  ),
+                  decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.person),
+                      labelText: "Select Contacts",
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          setState(() {
+                            // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
+                            _isReadOnly = !_isReadOnly;
+                            if (_isReadOnly) {
+                              _autoCompleteController.text = '';
+                            }
+                          });
+                        },
+                      )),
+                  readOnly: _isReadOnly,
                   controller: fieldTextEditingController,
                   focusNode: fieldFocusNode,
                 );
@@ -101,7 +117,10 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                         maxHeight: 300,
                       ),
                       child: Scrollbar(
+                        thumbVisibility: true,
+                        controller: _scrollController,
                         child: ListView.builder(
+                          controller: _scrollController,
                           padding: EdgeInsets.zero,
                           itemCount: options.length,
                           shrinkWrap: true,

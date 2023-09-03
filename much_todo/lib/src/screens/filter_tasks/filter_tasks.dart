@@ -6,6 +6,7 @@ import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/screens/filter_tasks/filter_task_options.dart';
 import 'package:much_todo/src/utils/enums.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
 import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
@@ -130,397 +131,400 @@ class _FilterTasksState extends State<FilterTasks> {
         title: const Text('Filter Tasks'),
         scrolledUnderElevation: 0,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Scrollbar(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Sort By',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 3,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _sortEntries,
-                              isExpanded: true,
-                              value: _sortByValue,
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _sortByValue = value!;
-                                });
-                              },
+      body: GestureDetector(
+        onTap: () => hideKeyboard(),
+        child: Column(
+          children: [
+            Expanded(
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Sort By',
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SortDirectionButton(
-                              sortDirection: _sortDirectionValue,
-                              onChange: (sort) {
-                                setState(() {
-                                  _sortDirectionValue = sort;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(),
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Priority',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _equalityEntries,
-                              isExpanded: true,
-                              value: _priorityEquality,
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _priorityEquality = value!;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          flex: 4,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _priorityEntries,
-                              isExpanded: true,
-                              value: _priorityFilter,
-                              decoration: InputDecoration(
-                                suffixIcon: _priorityFilter == null
-                                    ? null
-                                    : IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () => setState(
-                                          () {
-                                            _priorityFilter = null;
-                                          },
-                                        ),
-                                      ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _sortEntries,
+                                isExpanded: true,
+                                value: _sortByValue,
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _sortByValue = value!;
+                                  });
+                                },
                               ),
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _priorityFilter = value!;
-                                });
-                              },
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Effort',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 5,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _effortEntries,
-                              isExpanded: true,
-                              value: _effortFilter,
-                              decoration: InputDecoration(
-                                suffixIcon: _effortFilter == null
-                                    ? null
-                                    : IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () => setState(
-                                          () {
-                                            _effortFilter = null;
-                                          },
-                                        ),
-                                      ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SortDirectionButton(
+                                sortDirection: _sortDirectionValue,
+                                onChange: (sort) {
+                                  setState(() {
+                                    _sortDirectionValue = sort;
+                                  });
+                                },
                               ),
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _effortFilter = value!;
-                                });
-                              },
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Room',
-                            textAlign: TextAlign.center,
+                        ],
+                      ),
+                      const Divider(),
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Priority',
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                        Flexible(
-                          flex: 5,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _roomEntries,
-                              isExpanded: true,
-                              value: _roomIdFilter,
-                              decoration: InputDecoration(
-                                suffixIcon: _roomIdFilter == null
-                                    ? null
-                                    : IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () => setState(
-                                          () {
-                                            _roomIdFilter = null;
-                                          },
-                                        ),
-                                      ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _priorityEquality,
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _priorityEquality = value!;
+                                  });
+                                },
                               ),
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _roomIdFilter = value;
-                                });
-                              },
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Cost',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _equalityEntries,
-                              isExpanded: true,
-                              value: _costEquality,
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _costEquality = value!;
-                                });
-                              },
+                          Flexible(
+                            flex: 4,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _priorityEntries,
+                                isExpanded: true,
+                                value: _priorityFilter,
+                                decoration: InputDecoration(
+                                  suffixIcon: _priorityFilter == null
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _priorityFilter = null;
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _priorityFilter = value!;
+                                  });
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        Flexible(
-                          flex: 4,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: MoneyInput(
-                              hintText: '\$',
-                              amount: _costFilter,
-                              showClear: true,
-                              onChange: (amount) {
-                                setState(() {
-                                  _costFilter = amount;
-                                });
-                              },
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Effort',
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    PendingTagsSelector(
-                      tags: _selectedTags,
-                      key: ValueKey(_selectedTags),
-                      showAdd: false,
-                      onChange: (tags) {
-                        _selectedTags = [...tags];
-                      },
-                    ),
-                    PendingContactsSelector(
-                      contacts: _selectedContacts,
-                      key: ValueKey(_selectedContacts),
-                      showAdd: false,
-                      onChange: (contacts) {
-                        _selectedContacts = [...contacts];
-                      },
-                    ),
-                    CheckboxListTile(
-                      value: _showOnlyInProgress,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          _showOnlyInProgress = value ?? false;
-                        });
-                      },
-                      title: const Text('Only Include In Progress Tasks'),
-                    ),
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 2,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Complete By',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _dateEqualityEntries,
-                              isExpanded: true,
-                              value: _completeByEquality,
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _completeByEquality = value!;
-                                });
-                              },
+                          Flexible(
+                            flex: 5,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _effortEntries,
+                                isExpanded: true,
+                                value: _effortFilter,
+                                decoration: InputDecoration(
+                                  suffixIcon: _effortFilter == null
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _effortFilter = null;
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _effortFilter = value!;
+                                  });
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        Flexible(
-                          flex: 3,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DatePicker(
-                              key: ValueKey(_completeByFilter),
-                              selectedDate: _completeByFilter,
-                              onChange: (date) {
-                                setState(() {
-                                  _completeByFilter = date;
-                                });
-                              },
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Room',
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        const Flexible(
-                          flex: 2,
-                          fit: FlexFit.tight,
-                          child: Text(
-                            'Creation Date',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField(
-                              items: _dateEqualityEntries,
-                              isExpanded: true,
-                              value: _creationDateEquality,
-                              onTap: () {
-                                hideFocus();
-                              },
-                              onChanged: (value) {
-                                setState(() {
-                                  _creationDateEquality = value!;
-                                });
-                              },
+                          Flexible(
+                            flex: 5,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _roomEntries,
+                                isExpanded: true,
+                                value: _roomIdFilter,
+                                decoration: InputDecoration(
+                                  suffixIcon: _roomIdFilter == null
+                                      ? null
+                                      : IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(
+                                            () {
+                                              _roomIdFilter = null;
+                                            },
+                                          ),
+                                        ),
+                                ),
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _roomIdFilter = value;
+                                  });
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                        Flexible(
-                          flex: 3,
-                          fit: FlexFit.tight,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DatePicker(
-                              key: ValueKey(_creationDateFilter),
-                              selectedDate: _creationDateFilter,
-                              onChange: (date) {
-                                setState(() {
-                                  _creationDateFilter = date;
-                                });
-                              },
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Cost',
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _equalityEntries,
+                                isExpanded: true,
+                                value: _costEquality,
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _costEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 4,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: MoneyInput(
+                                hintText: '\$',
+                                amount: _costFilter,
+                                showClear: true,
+                                onChange: (amount) {
+                                  setState(() {
+                                    _costFilter = amount;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      PendingTagsSelector(
+                        tags: _selectedTags,
+                        key: ValueKey(_selectedTags),
+                        showAdd: false,
+                        onChange: (tags) {
+                          _selectedTags = [...tags];
+                        },
+                      ),
+                      PendingContactsSelector(
+                        contacts: _selectedContacts,
+                        key: ValueKey(_selectedContacts),
+                        showAdd: false,
+                        onChange: (contacts) {
+                          _selectedContacts = [...contacts];
+                        },
+                      ),
+                      CheckboxListTile(
+                        value: _showOnlyInProgress,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _showOnlyInProgress = value ?? false;
+                          });
+                        },
+                        title: const Text('Only Include In Progress Tasks'),
+                      ),
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Complete By',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _dateEqualityEntries,
+                                isExpanded: true,
+                                value: _completeByEquality,
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _completeByEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DatePicker(
+                                key: ValueKey(_completeByFilter),
+                                selectedDate: _completeByFilter,
+                                onChange: (date) {
+                                  setState(() {
+                                    _completeByFilter = date;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Flexible(
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Text(
+                              'Creation Date',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DropdownButtonFormField(
+                                items: _dateEqualityEntries,
+                                isExpanded: true,
+                                value: _creationDateEquality,
+                                onTap: () {
+                                  hideFocus();
+                                },
+                                onChanged: (value) {
+                                  setState(() {
+                                    _creationDateEquality = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: DatePicker(
+                                key: ValueKey(_creationDateFilter),
+                                selectedDate: _creationDateFilter,
+                                onChange: (date) {
+                                  setState(() {
+                                    _creationDateFilter = date;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: LoadingButton(
-              onSubmit: onSubmit,
-              label: 'APPLY FILTERS',
-              icon: const Icon(Icons.check),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: LoadingButton(
+                onSubmit: onSubmit,
+                label: 'APPLY FILTERS',
+                icon: const Icon(Icons.check),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

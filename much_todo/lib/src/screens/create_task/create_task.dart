@@ -87,173 +87,176 @@ class _CreateTaskState extends State<CreateTask> {
           title: const Text('Create Task'),
           scrolledUnderElevation: 0,
         ),
-        body: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Scrollbar(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-                          child: Text(
-                            'REQUIRED',
-                            style: TextStyle(
+        body: GestureDetector(
+          onTap: () => hideKeyboard(),
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Scrollbar(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                            child: Text(
+                              'REQUIRED',
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TaskNameInput(
+                                hint: 'Name of Task',
+                                label: 'Name *',
+                                name: _name,
+                                nextFocus: _roomFocusNode,
+                                onChange: (name) {
+                                  setState(() {
+                                    _name = name;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          PendingRoomSelector(
+                            selectedRoom: _selectedRoom,
+                            key: ValueKey(_selectedRoom),
+                            focusNode: _roomFocusNode,
+                            onRoomChange: (room) {
+                              setState(() {
+                                _selectedRoom = room;
+                              });
+                            },
+                          ),
+                          PriorityPicker(
+                            priority: _priority,
+                            onChange: (p) {
+                              setState(() {
+                                hideKeyboard();
+                                _priority = p;
+                              });
+                            },
+                          ),
+                          EffortPicker(
+                            effort: _effort,
+                            onChange: (e) {
+                              setState(() {
+                                hideKeyboard();
+                                _effort = e;
+                              });
+                            },
+                          ),
+                          const Divider(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                            child: Text(
+                              'OPTIONAL',
+                              style: TextStyle(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontSize: 18,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TaskNameInput(
-                              hint: 'Name of Task',
-                              label: 'Name *',
-                              name: _name,
-                              nextFocus: _roomFocusNode,
-                              onChange: (name) {
-                                setState(() {
-                                  _name = name;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        PendingRoomSelector(
-                          selectedRoom: _selectedRoom,
-                          key: ValueKey(_selectedRoom),
-                          focusNode: _roomFocusNode,
-                          onRoomChange: (room) {
-                            setState(() {
-                              _selectedRoom = room;
-                            });
-                          },
-                        ),
-                        PriorityPicker(
-                          priority: _priority,
-                          onChange: (p) {
-                            setState(() {
-                              hideKeyboard();
-                              _priority = p;
-                            });
-                          },
-                        ),
-                        EffortPicker(
-                          effort: _effort,
-                          onChange: (e) {
-                            setState(() {
-                              hideKeyboard();
-                              _effort = e;
-                            });
-                          },
-                        ),
-                        const Divider(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-                          child: Text(
-                            'OPTIONAL',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        PendingTagsSelector(
-                          tags: _tags,
-                          key: ValueKey(_tags),
-                          onChange: (tags) {
-                            _tags = [...tags];
-                          },
-                        ),
-                        PendingContactsSelector(
-                          contacts: _contacts,
-                          key: ValueKey(_contacts),
-                          onChange: (contacts) {
-                            _contacts = [...contacts];
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                                  child: MoneyInput(
-                                    hintText: 'Estimated cost',
-                                    labelText: 'Cost',
-                                    prefixIcon: const Icon(Icons.attach_money),
-                                    amount: _estimatedCost,
-                                    onChange: (amount) {
-                                      setState(() {
-                                        _estimatedCost = amount;
-                                      });
-                                    },
-                                  ),
-                                ),
+                                fontWeight: FontWeight.w400,
                               ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                                  child: DatePicker(
-                                    label: 'Complete By',
-                                    hint: 'Complete By',
-                                    key: ValueKey(_completeBy),
-                                    selectedDate: _completeBy,
-                                    onChange: (date) {
-                                      setState(() {
-                                        _completeBy = date;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TaskNoteInput(
-                              hint: 'Note',
-                              label: 'Note',
-                              note: _note,
-                              onChange: (note) {
-                                setState(() {
-                                  _note = note;
-                                });
-                              },
                             ),
                           ),
-                        ),
-                        PendingLinksPicker(
-                          links: _links,
-                          onChange: (links) {
-                            _links = [...links];
-                          },
-                        ),
-                      ],
+                          PendingTagsSelector(
+                            tags: _tags,
+                            key: ValueKey(_tags),
+                            onChange: (tags) {
+                              _tags = [...tags];
+                            },
+                          ),
+                          PendingContactsSelector(
+                            contacts: _contacts,
+                            key: ValueKey(_contacts),
+                            onChange: (contacts) {
+                              _contacts = [...contacts];
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                                    child: MoneyInput(
+                                      hintText: 'Estimated cost',
+                                      labelText: 'Cost',
+                                      prefixIcon: const Icon(Icons.attach_money),
+                                      amount: _estimatedCost,
+                                      onChange: (amount) {
+                                        setState(() {
+                                          _estimatedCost = amount;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                                    child: DatePicker(
+                                      label: 'Complete By',
+                                      hint: 'Complete By',
+                                      key: ValueKey(_completeBy),
+                                      selectedDate: _completeBy,
+                                      onChange: (date) {
+                                        setState(() {
+                                          _completeBy = date;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TaskNoteInput(
+                                hint: 'Note',
+                                label: 'Note',
+                                note: _note,
+                                onChange: (note) {
+                                  setState(() {
+                                    _note = note;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          PendingLinksPicker(
+                            links: _links,
+                            onChange: (links) {
+                              _links = [...links];
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: LoadingButton(
-                  onSubmit: onSubmit,
-                  label: 'CREATE',
-                  icon: const Icon(Icons.add),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: LoadingButton(
+                    onSubmit: onSubmit,
+                    label: 'CREATE',
+                    icon: const Icon(Icons.add),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

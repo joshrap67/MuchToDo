@@ -92,8 +92,8 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                     key: _textFieldKey,
                     decoration: InputDecoration(
                         border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.house),
-                        labelText: "Room *",
+                        prefixIcon: const Icon(Icons.room),
+                        labelText: 'Room *',
                         suffixIcon: _autoCompleteController.text.isNotEmpty
                             ? IconButton(
                                 onPressed: () {

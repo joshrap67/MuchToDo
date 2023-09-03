@@ -26,8 +26,10 @@ class TagOption {
 class _PendingTagsSelectorState extends State<PendingTagsSelector> {
   List<Tag> _selectedTags = [];
   final _autoCompleteController = TextEditingController();
+  final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
+  bool _isReadOnly = true;
 
   @override
   void initState() {
@@ -38,6 +40,8 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
   @override
   void dispose() {
     _autoCompleteController.dispose();
+	_scrollController.dispose();
+	_focusNode.dispose();
     super.dispose();
   }
 
@@ -79,13 +83,26 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
               fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                 return TextFormField(
                   key: _textFieldKey,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.tag),
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.tag),
                     labelText: "Select Tags",
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        setState(() {
+                          // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
+                          _isReadOnly = !_isReadOnly;
+                          if (_isReadOnly) {
+                            _autoCompleteController.text = '';
+                          }
+                        });
+                      },
+                    ),
                   ),
                   controller: fieldTextEditingController,
                   focusNode: fieldFocusNode,
+                  readOnly: _isReadOnly,
                 );
               },
               optionsViewBuilder: (context, onSelected, options) {
@@ -100,7 +117,10 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                         maxHeight: 300,
                       ),
                       child: Scrollbar(
+						  controller: _scrollController,
+						thumbVisibility: true,
                         child: ListView.builder(
+							controller: _scrollController,
                           padding: EdgeInsets.zero,
                           itemCount: options.length,
                           shrinkWrap: true,

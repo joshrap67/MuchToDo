@@ -29,7 +29,7 @@ class UserService {
       if (context.mounted) {
         Navigator.pushNamedAndRemoveUntil(context, CreateAccountScreen.routeName, (route) => false);
       }
-    } on Exception catch (e) {
+    } on Exception {
       if (context.mounted) {
         showSnackbar('There was a problem loading user data', context);
       }
@@ -42,7 +42,8 @@ class UserService {
 
   static Future<void> createUser(BuildContext context, List<Room> rooms) async {
     try {
-      await UserRepository.createUser(CreateUserRequest(rooms.map((e) => CreateRoomRequest(e.name, e.note)).toList()));
+      await UserRepository.createUser(
+          CreateUserRequest(rooms.map((e) => CreateRoomRequest(e.name.trim(), e.note?.trim())).toList()));
       if (context.mounted) {
         Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
       }
@@ -69,7 +70,7 @@ class UserService {
   static Future<Tag?> createTag(BuildContext context, String name) async {
     Tag? tag;
     try {
-      tag = await UserRepository.createTag(SetTagRequest(name));
+      tag = await UserRepository.createTag(SetTagRequest(name.trim()));
       if (context.mounted) {
         context.read<UserProvider>().addTag(tag);
       }
@@ -84,7 +85,7 @@ class UserService {
   static Future<Contact?> createContact(BuildContext context, String name, String? email, String? number) async {
     Contact? contact;
     try {
-      contact = await UserRepository.createContact(SetContactRequest(name, email, number));
+      contact = await UserRepository.createContact(SetContactRequest(name.trim(), email?.trim(), number?.trim()));
       if (context.mounted) {
         context.read<UserProvider>().addContact(contact);
       }
@@ -113,7 +114,7 @@ class UserService {
 
   static Future<void> updateTag(BuildContext context, Tag tag) async {
     try {
-      await UserRepository.updateTag(tag.id, SetTagRequest(tag.name));
+      await UserRepository.updateTag(tag.id, SetTagRequest(tag.name.trim()));
       if (context.mounted) {
         context.read<UserProvider>().updateTag(tag);
         context.read<TasksProvider>().updateTagForTasks(tag);
@@ -140,9 +141,9 @@ class UserService {
   }
 
   static Future<void> updateContact(
-      BuildContext context, String id, String name, String email, String phoneNumber) async {
+      BuildContext context, String id, String name, String? email, String? phoneNumber) async {
     try {
-      await UserRepository.updateContact(id, SetContactRequest(name, email, phoneNumber));
+      await UserRepository.updateContact(id, SetContactRequest(name.trim(), email?.trim(), phoneNumber?.trim()));
       if (context.mounted) {
         context.read<UserProvider>().updateContact(id, name, email, phoneNumber);
         context.read<TasksProvider>().updateContactForTasks(id, name, email, phoneNumber);

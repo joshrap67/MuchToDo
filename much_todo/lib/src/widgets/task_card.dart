@@ -44,17 +44,20 @@ class _TaskCardState extends State<TaskCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 16.0, 8.0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: getBottomLeftWidgets(),
-                    ),
-                  ),
-                ),
-              ),
+              widget.task.completeBy != null
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+                      child: Text(
+                        'Due ${DateFormat.yMd().format(widget.task.completeBy!)}',
+                        style: TextStyle(
+                            fontSize: 11,
+                            // bold if a week before due date or already passed todo test?
+                            fontWeight: DateTime.now().difference(widget.task.completeBy!).inDays > -7
+                                ? FontWeight.bold
+                                : null),
+                      ),
+                    )
+                  : const Text(''),
               TextButton(
                 onPressed: openTask,
                 child: const Text('OPEN'),

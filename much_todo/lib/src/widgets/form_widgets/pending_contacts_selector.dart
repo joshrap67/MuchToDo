@@ -42,7 +42,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
   void dispose() {
     _autoCompleteController.dispose();
     _focusNode.dispose();
-	_scrollController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -85,21 +85,22 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                 return TextFormField(
                   key: _textFieldKey,
                   decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.person),
-                      labelText: "Select Contacts",
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () {
-                          setState(() {
-                            // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
-                            _isReadOnly = !_isReadOnly;
-                            if (_isReadOnly) {
-                              _autoCompleteController.text = '';
-                            }
-                          });
-                        },
-                      )),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.person),
+                    labelText: "Select Contacts",
+                    suffixIcon: IconButton(
+                      icon: _isReadOnly ? const Icon(Icons.search) : const Icon(Icons.search_off),
+                      onPressed: () {
+                        setState(() {
+                          // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
+                          _isReadOnly = !_isReadOnly;
+                          if (_isReadOnly) {
+                            _autoCompleteController.text = '';
+                          }
+                        });
+                      },
+                    ),
+                  ),
                   readOnly: _isReadOnly,
                   controller: fieldTextEditingController,
                   focusNode: fieldFocusNode,

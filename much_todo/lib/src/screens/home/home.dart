@@ -32,8 +32,8 @@ class _HomeState extends State<Home> {
     _navStack.add(_selectedIndex);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       UserService.loadUser(context);
-	  RoomsService.getAllRooms(context);
-	  TaskService.getAllTasks(context);
+      RoomsService.getAllRooms(context);
+      TaskService.getAllTasks(context);
     });
   }
 
@@ -93,10 +93,15 @@ class _HomeState extends State<Home> {
   }
 
   void onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+    if (index != 0) {
+      // home is always at bottom of the stack
+      _navStack.removeWhere((element) => element == index);
       _navStack.insert(0, index);
+    }
+
+    setState(() {
       switchPages(index);
+      _selectedIndex = index;
     });
   }
 

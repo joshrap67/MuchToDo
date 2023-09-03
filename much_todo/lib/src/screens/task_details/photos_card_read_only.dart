@@ -23,7 +23,7 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
           ListTile(
             title: const Text('Photos'),
             contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-            trailing: ElevatedButton(onPressed: setPhotos, child: const Text('SET PHOTOS')),
+            trailing: TextButton(onPressed: setPhotos, child: const Text('SET PHOTOS')),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

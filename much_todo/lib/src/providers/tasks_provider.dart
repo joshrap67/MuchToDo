@@ -80,7 +80,7 @@ class TasksProvider with ChangeNotifier {
     filterAndNotify();
   }
 
-  void updateContactForTasks(String id, String name, String email, String phoneNumber) {
+  void updateContactForTasks(String id, String name, String? email, String? phoneNumber) {
     for (var task in _allTasks) {
       var index = task.contacts.indexWhere((p) => p.id == id);
       if (index >= 0) {

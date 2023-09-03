@@ -195,6 +195,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                           ),
                         Row(
                           children: [
+                            Flexible(
+                              child: RoomCardReadOnly(selectedRoom: _task.room),
+                            ),
                             if (_task.estimatedCost != null)
                               Flexible(
                                 child: Card(
@@ -207,9 +210,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                                   ),
                                 ),
                               ),
-                            Flexible(
-                              child: RoomCardReadOnly(selectedRoom: _task.room),
-                            ),
                           ],
                         ),
                         if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
@@ -401,7 +401,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     );
     if (result != null && context.mounted) {
       showSnackbar('Task duplicated', context);
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => TaskDetails(

@@ -41,6 +41,16 @@ class _MinimalCompletedTaskCardState extends State<MinimalCompletedTaskCard> {
                     style: const TextStyle(fontSize: 11),
                   ),
                 ),
+                Visibility(
+                  visible: false,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text('OPEN'),
+                  ),
+                )
               ],
             ),
           ],

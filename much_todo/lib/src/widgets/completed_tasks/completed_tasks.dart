@@ -80,30 +80,43 @@ class _CompletedTasksState extends State<CompletedTasks> {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!_deleteMode)
-                  ListTile(
-                    title: Text('${_completedTasks.length} Total Tasks'),
-                    subtitle: Text(
-                      '${NumberFormat.currency(symbol: '\$').format(totalCost())} Total Estimated Cost',
-                      style: const TextStyle(fontSize: 12),
+                Row(
+                  children: [
+                    Visibility(
+                      visible: _deleteMode,
+                      child: Checkbox(
+                        value: _deleteAll,
+                        checkColor: Colors.white,
+                        activeColor: Theme.of(context).colorScheme.error,
+                        onChanged: (newValue) {
+                          _tasksToDelete.clear();
+                          if (newValue!) {
+                            _tasksToDelete.addAll(_completedTasks.map((e) => e.id));
+                            _deleteAll = true;
+                          } else {
+                            _deleteAll = false;
+                          }
+                          setState(() {});
+                        },
+                      ),
                     ),
-                  ),
-                if (_deleteMode)
-                  Checkbox(
-                    value: _deleteAll,
-                    checkColor: Colors.white,
-                    activeColor: Theme.of(context).colorScheme.error,
-                    onChanged: (newValue) {
-                      _tasksToDelete.clear();
-                      if (newValue!) {
-                        _tasksToDelete.addAll(_completedTasks.map((e) => e.id));
-                        _deleteAll = true;
-                      } else {
-                        _deleteAll = false;
-                      }
-                      setState(() {});
-                    },
-                  ),
+                    Expanded(
+                      child: Visibility(
+                        visible: !_deleteMode,
+                        maintainAnimation: true,
+                        maintainSize: true,
+                        maintainState: true,
+                        child: ListTile(
+                          title: Text('${_completedTasks.length} Total Tasks'),
+                          subtitle: Text(
+                            '${NumberFormat.currency(symbol: '\$').format(totalCost())} Total Estimated Cost',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 if (_completedTasks.isEmpty)
                   const Center(
                     child: Text('No completed tasks'),

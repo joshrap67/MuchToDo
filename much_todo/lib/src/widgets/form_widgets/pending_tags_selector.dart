@@ -40,8 +40,8 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
   @override
   void dispose() {
     _autoCompleteController.dispose();
-	_scrollController.dispose();
-	_focusNode.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -88,7 +88,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                     prefixIcon: const Icon(Icons.tag),
                     labelText: "Select Tags",
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.search),
+                      icon: _isReadOnly ? const Icon(Icons.search) : const Icon(Icons.search_off),
                       onPressed: () {
                         setState(() {
                           // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
@@ -117,10 +117,10 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                         maxHeight: 300,
                       ),
                       child: Scrollbar(
-						  controller: _scrollController,
-						thumbVisibility: true,
+                        controller: _scrollController,
+                        thumbVisibility: true,
                         child: ListView.builder(
-							controller: _scrollController,
+                          controller: _scrollController,
                           padding: EdgeInsets.zero,
                           itemCount: options.length,
                           shrinkWrap: true,

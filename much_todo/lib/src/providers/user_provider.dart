@@ -45,7 +45,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateContact(String id, String name, String email, String phoneNumber) {
+  void updateContact(String id, String name, String? email, String? phoneNumber) {
     var index = _user?.contacts.indexWhere((p) => p.id == id) ?? -1;
     if (index >= 0) {
       _user?.contacts[index].update(name, email, phoneNumber);

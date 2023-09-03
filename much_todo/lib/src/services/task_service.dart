@@ -47,14 +47,14 @@ class TaskService {
       updatedTask = await TaskRepository.updateTask(
           originalTask.id,
           UpdateTaskRequest(
-            name,
+            name.trim(),
             priority,
             effort,
             estimatedCost,
             tags.map((e) => e.id).toList(),
             contacts.map((e) => e.id).toList(),
             room.id,
-            note,
+            note?.trim(),
             links,
             completeBy,
           ));
@@ -82,14 +82,14 @@ class TaskService {
     Task? createdTask;
     try {
       createdTask = await TaskRepository.createTask(CreateTasksRequest(
-        name,
+        name.trim(),
         priority,
         effort,
         tags.map((e) => e.id).toList(),
         contacts.map((e) => e.id).toList(),
         room.id,
         estimatedCost,
-        note,
+        note?.trim(),
         links,
         false,
         completeBy,

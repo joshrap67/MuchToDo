@@ -31,7 +31,7 @@ class RoomsService {
   static Future<Room?> createRoom(BuildContext context, String name, {String? note}) async {
     Room? room;
     try {
-      room = await RoomRepository.createRoom(CreateRoomRequest(name, note));
+      room = await RoomRepository.createRoom(CreateRoomRequest(name.trim(), note?.trim()));
       if (context.mounted) {
         context.read<RoomsProvider>().addRoom(room);
         context.read<UserProvider>().addRoom(room);
@@ -48,7 +48,7 @@ class RoomsService {
     Room? room;
 
     try {
-      await RoomRepository.updateRoom(id, UpdateRoomRequest(name, note));
+      await RoomRepository.updateRoom(id, UpdateRoomRequest(name.trim(), note?.trim()));
       if (context.mounted) {
         room = context.read<RoomsProvider>().updateRoom(id, name, note);
         context.read<TasksProvider>().updateRoom(id, name);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/screens/home/room_list/room_info_card.dart';
+import 'package:much_todo/src/screens/room_list/room_info_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class RoomsListSkeleton extends StatelessWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
-import 'package:much_todo/src/screens/home/room_list/room_info_card.dart';
+import 'package:much_todo/src/screens/room_list/room_info_card.dart';
 import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/widgets/skeletons/rooms_list_skeleton.dart';

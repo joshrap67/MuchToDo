@@ -9,6 +9,7 @@ import 'package:much_todo/src/repositories/tasks/requests/set_task_photos_reques
 import 'package:much_todo/src/repositories/tasks/requests/set_task_progress_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/update_task_request.dart';
 import 'package:much_todo/src/repositories/tasks/task_repository.dart';
+import 'package:much_todo/src/utils/result.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/domain/contact.dart';
@@ -16,7 +17,7 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 
 class TaskService {
-  static Future<void> getAllTasks(BuildContext context) async {
+  static Future<void> getAllTasksBlindSend(BuildContext context) async {
     try {
       context.read<TasksProvider>().setLoading(true);
       var tasks = await TaskRepository.getAllTasksByUser();
@@ -34,54 +35,16 @@ class TaskService {
     }
   }
 
-  static Future<Task?> editTask(
-      BuildContext context, Task originalTask, String name, int priority, int effort, Room room,
+  static Future<Result<Task>> createTask(BuildContext context, String name, int priority, int effort, Room room,
       {double? estimatedCost,
       String? note,
       DateTime? completeBy,
       List<String> links = const [],
       List<Tag> tags = const [],
       List<Contact> contacts = const []}) async {
-    Task? updatedTask;
+    var result = Result<Task>();
     try {
-      updatedTask = await TaskRepository.updateTask(
-          originalTask.id,
-          UpdateTaskRequest(
-            name.trim(),
-            priority,
-            effort,
-            estimatedCost,
-            tags.map((e) => e.id).toList(),
-            contacts.map((e) => e.id).toList(),
-            room.id,
-            note?.trim(),
-            links,
-            completeBy,
-          ));
-      if (context.mounted) {
-        context.read<TasksProvider>().updateTask(updatedTask);
-        context.read<RoomsProvider>().updateTask(updatedTask, originalTask.room.id);
-        context.read<UserProvider>().updateTask(updatedTask);
-      }
-    } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem updating the task', context);
-      }
-    }
-
-    return updatedTask;
-  }
-
-  static Future<Task?> createTask(BuildContext context, String name, int priority, int effort, Room room,
-      {double? estimatedCost,
-      String? note,
-      DateTime? completeBy,
-      List<String> links = const [],
-      List<Tag> tags = const [],
-      List<Contact> contacts = const []}) async {
-    Task? createdTask;
-    try {
-      createdTask = await TaskRepository.createTask(CreateTasksRequest(
+      var createdTask = await TaskRepository.createTask(CreateTasksRequest(
         name.trim(),
         priority,
         effort,
@@ -94,40 +57,76 @@ class TaskService {
         false,
         completeBy,
       ));
+      result.setData(createdTask);
       if (context.mounted) {
         context.read<TasksProvider>().addTask(createdTask);
         context.read<RoomsProvider>().addTask(createdTask);
         context.read<UserProvider>().addTask(createdTask);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating the task', context);
-      }
+      result.setErrorMessage('There was a problem creating the task');
     }
 
-    return createdTask;
+    return result;
   }
 
-  static Future<Task?> setTaskPhotos(
-      BuildContext context, String taskId, List<String> photosToUpload, List<String> deletedPhotos) async {
-    Task? task;
+  static Future<Result<Task>> editTask(
+      BuildContext context, Task originalTask, String name, int priority, int effort, Room room,
+      {double? estimatedCost,
+      String? note,
+      DateTime? completeBy,
+      List<String> links = const [],
+      List<Tag> tags = const [],
+      List<Contact> contacts = const []}) async {
+    var result = Result<Task>();
     try {
-      task = await TaskRepository.setTaskPhotos(
+      var updatedTask = await TaskRepository.updateTask(
+        originalTask.id,
+        UpdateTaskRequest(
+          name.trim(),
+          priority,
+          effort,
+          estimatedCost,
+          tags.map((e) => e.id).toList(),
+          contacts.map((e) => e.id).toList(),
+          room.id,
+          note?.trim(),
+          links,
+          completeBy,
+        ),
+      );
+      result.setData(updatedTask);
+      if (context.mounted) {
+        context.read<TasksProvider>().updateTask(updatedTask);
+        context.read<RoomsProvider>().updateTask(updatedTask, originalTask.room.id);
+        context.read<UserProvider>().updateTask(updatedTask);
+      }
+    } catch (e) {
+      result.setErrorMessage('There was a problem updating the task');
+    }
+
+    return result;
+  }
+
+  static Future<Result<Task>> setTaskPhotos(
+      BuildContext context, String taskId, List<String> photosToUpload, List<String> deletedPhotos) async {
+    var result = Result<Task>();
+    try {
+      var task = await TaskRepository.setTaskPhotos(
         taskId,
         SetTaskPhotosRequest(photosToUpload: photosToUpload, deletedPhotos: deletedPhotos),
       );
+      result.setData(result.data!);
       if (context.mounted) {
         context.read<TasksProvider>().updateTask(task);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating tasks', context);
-      }
+      result.setErrorMessage('There was a problem creating tasks');
     }
-    return task;
+    return result;
   }
 
-  static Future<void> setTaskProgress(BuildContext context, String taskId, bool inProgress) async {
+  static Future<void> setTaskProgressBlindSend(BuildContext context, String taskId, bool inProgress) async {
     try {
       // blind send
       context.read<TasksProvider>().updateTaskProgress(taskId, inProgress);
@@ -142,8 +141,9 @@ class TaskService {
     }
   }
 
-  static Future<void> completeTask(BuildContext context, Task task, DateTime completionDate,
+  static Future<Result<void>> completeTask(BuildContext context, Task task, DateTime completionDate,
       {bool notifyOnFailure = false}) async {
+    var result = Result<void>();
     try {
       await TaskRepository.completeTask(task.id, CompleteTaskRequest(completeDate: completionDate));
       if (context.mounted) {
@@ -152,17 +152,17 @@ class TaskService {
         context.read<UserProvider>().removeTask(task);
       }
     } catch (e) {
-      if (context.mounted) {
-        if (notifyOnFailure) {
-          // if method was used in a blind send, do this to get the data back to the ui
-          context.read<TasksProvider>().notify();
-        }
-        showSnackbar('There was a problem completing the task', context);
+      result.setErrorMessage('There was a problem completing the task');
+      if (context.mounted && notifyOnFailure) {
+        // if method was used in a blind send, do this to get the correct data back to the ui
+        context.read<TasksProvider>().notify();
       }
     }
+    return result;
   }
 
-  static Future<bool> deleteTask(BuildContext context, Task task, {bool notifyOnFailure = false}) async {
+  static Future<Result<void>> deleteTask(BuildContext context, Task task, {bool notifyOnFailure = false}) async {
+    var result = Result<void>();
     try {
       await TaskRepository.deleteTask(task.id);
       if (context.mounted) {
@@ -170,16 +170,14 @@ class TaskService {
         context.read<RoomsProvider>().removeTask(task);
         context.read<UserProvider>().removeTask(task);
       }
-      return true;
     } catch (e) {
-      if (context.mounted) {
-        if (notifyOnFailure) {
-          // if method was used in a blind send, do this to get the data back to the ui
-          context.read<TasksProvider>().notify();
-        }
-        showSnackbar('There was a problem deleting the task', context);
+      result.setErrorMessage('There was a problem deleting the task');
+      if (context.mounted && notifyOnFailure) {
+        // if method was used in a blind send, do this to get the correct data back to the ui
+        context.read<TasksProvider>().notify();
       }
-      return false;
     }
+
+    return result;
   }
 }

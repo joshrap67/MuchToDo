@@ -321,15 +321,17 @@ class _EditTaskState extends State<EditTask> {
     }
 
     hideKeyboard();
-    Task? task = await TaskService.editTask(context, widget.task, _name!, _priority, _effort, _selectedRoom!,
+    var result = await TaskService.editTask(context, widget.task, _name!, _priority, _effort, _selectedRoom!,
         contacts: _contacts,
         note: _note,
         links: _links,
         completeBy: _completeBy,
         estimatedCost: _estimatedCost,
         tags: _tags);
-    if (context.mounted && task != null) {
-      Navigator.of(context).pop(task);
+    if (context.mounted && result.success) {
+      Navigator.of(context).pop(result.data!);
+    } else if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 }

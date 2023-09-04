@@ -173,12 +173,15 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
 
   Future<void> deleteTask() async {
     showLoadingDialog(context, msg: 'Deleting...');
-    var deleted = await CompletedTaskService.deleteCompletedTask(context, widget.task);
+    var result = await CompletedTaskService.deleteCompletedTask(widget.task);
     if (context.mounted) {
       closePopup(context);
-    }
-    if (context.mounted && deleted) {
-      Navigator.of(context).pop(true);
+
+      if (result.success) {
+        Navigator.of(context).pop(true);
+      } else {
+        showSnackbar(result.errorMessage!, context);
+      }
     }
   }
 }

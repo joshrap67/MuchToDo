@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
-import 'package:much_todo/src/screens/sign_in/auth_service.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/screens/more_screen/user_contacts.dart';
@@ -234,16 +234,20 @@ class _MoreScreenState extends State<MoreScreen> {
   }
 
   Future<void> signOut() async {
-    await UserService.signOut(context);
-    if (context.mounted) {
+    var result = await UserService.signOut(context);
+    if (context.mounted && result.success) {
       Navigator.pushNamedAndRemoveUntil(context, SignInScreen.routeName, (route) => false);
+    } else if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 
   Future<void> deleteAccount() async {
-    await UserService.deleteUser(context);
-    if (context.mounted) {
+    var result = await UserService.deleteUser(context);
+    if (context.mounted && result.success) {
       Navigator.pushNamedAndRemoveUntil(context, SignInScreen.routeName, (route) => false);
+    } else if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 
@@ -273,14 +277,15 @@ class _MoreScreenState extends State<MoreScreen> {
                         setState(() {
                           isLoading = true;
                         });
-                        var credential = await AuthService.getGoogleCredential();
-                        if (credential == null) {
+                        var googleSignInResult = await AuthService.getGoogleCredential();
+                        if (googleSignInResult.failure) {
                           setState(() {
+                            isLoading = false;
                             errorText = 'Incorrect Google account';
                           });
                           return;
                         }
-                        await user.reauthenticateWithCredential(credential);
+                        await user.reauthenticateWithCredential(googleSignInResult.data!);
 
                         if (context.mounted) {
                           Navigator.pop(context);

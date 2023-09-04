@@ -1,56 +1,52 @@
-import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/repositories/completed_tasks/completed_task_repository.dart';
 import 'package:much_todo/src/repositories/completed_tasks/requests/delete_completed_tasks_request.dart';
-import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/utils/result.dart';
 
 class CompletedTaskService {
-  static Future<List<CompletedTask>> getCompletedTasksByRoom(BuildContext context, Room room) async {
+  static Future<Result<List<CompletedTask>>> getCompletedTasksByRoom(Room room) async {
+    var result = Result<List<CompletedTask>>();
     List<CompletedTask> tasks = [];
     try {
       tasks = await CompletedTaskRepository.getAllCompletedTasksByRoom(room.id);
+      result.setData(tasks);
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem getting completed tasks for this room', context);
-      }
+      // todo log
+      result.setErrorMessage('There was a problem getting completed tasks for this room');
     }
-    return tasks;
+    return result;
   }
 
-  static Future<List<CompletedTask>> getAllCompletedTasks(BuildContext context) async {
+  static Future<Result<List<CompletedTask>>> getAllCompletedTasks() async {
+    var result = Result<List<CompletedTask>>();
     List<CompletedTask> tasks = [];
     try {
       tasks = await CompletedTaskRepository.getAllCompletedTasksByUser();
+      result.setData(tasks);
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem getting completed tasks', context);
-      }
+      result.setErrorMessage('There was a problem getting completed tasks');
     }
-    return tasks;
+    return result;
   }
 
-  static Future<bool> deleteCompletedTasks(BuildContext context, List<String> taskIds) async {
+  static Future<Result<void>> deleteCompletedTasks(List<String> taskIds) async {
+    var result = Result<void>();
     try {
       await CompletedTaskRepository.deleteCompletedTasks(DeleteCompletedTasksRequest(taskIds: taskIds));
-      return true;
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem deleting the completed task', context);
-      }
-      return false;
+      result.setErrorMessage('There was a problem deleting the completed tasks');
     }
+    return result;
   }
 
-  static Future<bool> deleteCompletedTask(BuildContext context, CompletedTask task) async {
+  static Future<Result<void>> deleteCompletedTask(CompletedTask task) async {
+    var result = Result<void>();
     try {
       await CompletedTaskRepository.deleteCompletedTask(task.id);
-      return true;
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem deleting the completed task', context);
-      }
-      return false;
+      result.setErrorMessage('There was a problem deleting the completed task');
     }
+    return result;
   }
 }

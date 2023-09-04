@@ -255,19 +255,17 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<void> completeTask(Task task, DateTime date) async {
-    await TaskService.completeTask(context, task, date, notifyOnFailure: true);
-    if (context.mounted) {
-      // todo snackbar if failure
+    var result = await TaskService.completeTask(context, task, date, notifyOnFailure: true);
+    if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
-    return;
   }
 
-  Future<bool> deleteTask(Task task) async {
-    var deleted = await TaskService.deleteTask(context, task, notifyOnFailure: true);
+  Future<void> deleteTask(Task task) async {
+    var result = await TaskService.deleteTask(context, task, notifyOnFailure: true);
     if (context.mounted) {
-      // todo snackbar if failure
+      showSnackbar(result.errorMessage!, context);
     }
-    return deleted;
   }
 
   Future<void> launchAddTask() async {

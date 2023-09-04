@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/screens/sign_in/auth_service.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/unverified_screen.dart';
 import 'package:much_todo/src/utils/constants.dart';
@@ -207,12 +207,14 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _isSigningUp = true;
     });
-    var signedUp =
+
+    var result =
         await AuthService.signUpWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
     setState(() {
       _isSigningUp = false;
     });
-    if (signedUp) {
+
+    if (result.success) {
       if (FirebaseAuth.instance.currentUser!.emailVerified && context.mounted) {
         Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
       } else if (context.mounted) {

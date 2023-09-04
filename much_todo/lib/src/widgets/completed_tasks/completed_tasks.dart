@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/utils/enums.dart';
+import 'package:much_todo/src/utils/result.dart';
 import 'package:much_todo/src/widgets/completed_tasks/minimal_completed_task_card.dart';
 import 'package:much_todo/src/services/completed_tasks_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -193,10 +194,17 @@ class _CompletedTasksState extends State<CompletedTasks> {
       _loading = true;
     });
     List<CompletedTask> tasks = [];
+    Result<List<CompletedTask>> result;
     if (widget.room != null) {
-      tasks = await CompletedTaskService.getCompletedTasksByRoom(context, widget.room!);
+      result = await CompletedTaskService.getCompletedTasksByRoom(widget.room!);
     } else {
-      tasks = await CompletedTaskService.getAllCompletedTasks(context);
+      result = await CompletedTaskService.getAllCompletedTasks();
+    }
+
+    if (result.success) {
+      tasks = result.data!;
+    } else if (context.mounted) {
+      showSnackbar(result.errorMessage!, context);
     }
 
     setState(() {
@@ -240,11 +248,16 @@ class _CompletedTasksState extends State<CompletedTasks> {
     setState(() {
       _loading = true;
     });
-    bool deleted = await CompletedTaskService.deleteCompletedTasks(context, _tasksToDelete);
-    if (deleted) {
+    var result = await CompletedTaskService.deleteCompletedTasks(_tasksToDelete);
+    if (result.success) {
       setState(() {
         _completedTasks.removeWhere((element) => _tasksToDelete.contains(element.id));
         _tasksToDelete.clear();
+        _loading = false;
+      });
+    } else if (context.mounted) {
+      showSnackbar(result.errorMessage!, context);
+      setState(() {
         _loading = false;
       });
     }

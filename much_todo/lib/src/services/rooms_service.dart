@@ -5,19 +5,20 @@ import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 import 'package:much_todo/src/repositories/rooms/room_repository.dart';
+import 'package:much_todo/src/utils/result.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 
 class RoomsService {
-  static Future<void> getAllRooms(BuildContext context) async {
+  static Future<void> getAllRoomsBlindSend(BuildContext context) async {
     try {
       context.read<RoomsProvider>().setLoading(true);
       var rooms = await RoomRepository.getAllRoomsByUser();
       if (context.mounted) {
         context.read<RoomsProvider>().setRooms(rooms);
       }
-    } on Exception catch (e) {
+    } on Exception {
       if (context.mounted) {
         showSnackbar('There was a problem loading rooms', context);
       }
@@ -28,40 +29,38 @@ class RoomsService {
     }
   }
 
-  static Future<Room?> createRoom(BuildContext context, String name, {String? note}) async {
-    Room? room;
+  static Future<Result<Room>> createRoom(BuildContext context, String name, {String? note}) async {
+    var result = Result<Room>();
     try {
-      room = await RoomRepository.createRoom(CreateRoomRequest(name.trim(), note?.trim()));
+      var room = await RoomRepository.createRoom(CreateRoomRequest(name.trim(), note?.trim()));
+      result.setData(room);
       if (context.mounted) {
         context.read<RoomsProvider>().addRoom(room);
         context.read<UserProvider>().addRoom(room);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating the room', context);
-      }
+      result.setErrorMessage('There was a problem creating the room');
     }
-    return room!;
+    return result;
   }
 
-  static Future<Room?> editRoom(BuildContext context, String id, String name, String? note) async {
-    Room? room;
+  static Future<Result<void>> editRoom(BuildContext context, String id, String name, String? note) async {
+    var result = Result<void>();
 
     try {
       await RoomRepository.updateRoom(id, UpdateRoomRequest(name.trim(), note?.trim()));
       if (context.mounted) {
-        room = context.read<RoomsProvider>().updateRoom(id, name, note);
+        context.read<RoomsProvider>().updateRoom(id, name, note);
         context.read<TasksProvider>().updateRoom(id, name);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem updating the room', context);
-      }
+      result.setErrorMessage('There was a problem updating the room');
     }
-    return room;
+    return result;
   }
 
-  static Future<bool> deleteRoom(BuildContext context, Room room) async {
+  static Future<Result<void>> deleteRoom(BuildContext context, Room room) async {
+    var result = Result<void>();
     try {
       await RoomRepository.deleteRoom(room.id);
       if (context.mounted) {
@@ -69,12 +68,9 @@ class RoomsService {
         context.read<TasksProvider>().removeTasksFromRoomId(room.id);
         context.read<UserProvider>().removeRoom(room);
       }
-      return true;
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem deleting the room', context);
-      }
-      return false;
+      result.setErrorMessage('There was a problem deleting the room');
     }
+    return result;
   }
 }

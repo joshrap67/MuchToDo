@@ -37,10 +37,10 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTag(Tag tag) {
-    var index = _user?.tags.indexWhere((t) => t.id == tag.id) ?? -1;
+  void updateTag(String id, String newName) {
+    var index = _user?.tags.indexWhere((t) => t.id == id) ?? -1;
     if (index >= 0) {
-      _user?.tags[index].update(tag.name);
+      _user?.tags[index].update(newName);
     }
     notifyListeners();
   }

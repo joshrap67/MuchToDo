@@ -275,7 +275,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   void setStatus(StatusOptions status) {
-    TaskService.setTaskProgress(context, _task.id, status == StatusOptions.started);
+    TaskService.setTaskProgressBlindSend(context, _task.id, status == StatusOptions.started);
   }
 
   Future<List<String>> loadPhotos() async {
@@ -344,10 +344,15 @@ class _TaskDetailsState extends State<TaskDetails> {
     if (pickDate != null) {
       if (context.mounted) {
         showLoadingDialog(context, msg: 'Completing...');
-        await TaskService.completeTask(context, _task, pickDate);
+        var result = await TaskService.completeTask(context, _task, pickDate);
         if (context.mounted) {
           closePopup(context);
+        }
+
+        if (context.mounted && result.success) {
           Navigator.of(context).pop();
+        } else if (context.mounted && result.failure) {
+          showSnackbar(result.errorMessage!, context);
         }
       }
     }
@@ -355,12 +360,14 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   Future<void> deleteTask() async {
     showLoadingDialog(context, msg: 'Deleting...');
-    var deleted = await TaskService.deleteTask(context, _task);
+    var result = await TaskService.deleteTask(context, _task);
     if (context.mounted) {
       closePopup(context);
     }
-    if (context.mounted && deleted) {
+    if (context.mounted && result.success) {
       Navigator.of(context).pop();
+    } else if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 

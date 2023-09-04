@@ -3,7 +3,6 @@ import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
-import 'package:much_todo/src/widgets/create_contact.dart';
 import 'package:provider/provider.dart';
 
 class PendingContactsSelector extends StatefulWidget {

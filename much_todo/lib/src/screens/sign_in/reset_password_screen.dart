@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/screens/sign_in/auth_service.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
@@ -103,13 +103,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       setState(() {
         _isLoading = true;
       });
+
       hideKeyboard();
-      await AuthService.sendResetEmail(_emailController.text.trim());
-      if (context.mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+      var result = await AuthService.sendResetEmail(_emailController.text.trim());
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (result.success && context.mounted) {
         showSnackbar('Reset email sent. Check your inbox.', context);
+      } else if (context.mounted) {
+        showSnackbar(result.errorMessage!, context);
       }
     }
   }

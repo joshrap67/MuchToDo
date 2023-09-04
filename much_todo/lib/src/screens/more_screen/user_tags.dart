@@ -188,12 +188,13 @@ class _UserTagsState extends State<UserTags> {
       _isLoading = true;
     });
 
-    await UserService.deleteTag(context, tag);
+    var result = await UserService.deleteTag(context, tag);
+    setState(() {
+      _isLoading = false;
+    });
 
-    if (context.mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+    if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 
@@ -226,16 +227,22 @@ class _UserTagsState extends State<UserTags> {
               TextButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    await renameTag(dialogContext, tag, nameController.text);
-                    setState(() {
-                      isLoading = false;
-                    });
-                    if (dialogContext.mounted) {
-                      Navigator.pop(dialogContext);
-                    }
+					  setState(() {
+						  isLoading = true;
+					  });
+
+					  hideKeyboard();
+					  var result = await UserService.updateTag(context, tag.id, nameController.text.trim());
+					  setState(() {
+						  isLoading = false;
+					  });
+
+					  if (dialogContext.mounted && result.success) {
+						  Navigator.pop(dialogContext);
+					  } else if (dialogContext.mounted && result.failure) {
+						  Navigator.pop(dialogContext);
+						  showSnackbar(result.errorMessage!, context);
+					  }
                   }
                 },
                 child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
@@ -261,10 +268,5 @@ class _UserTagsState extends State<UserTags> {
         });
       },
     );
-  }
-
-  Future<void> renameTag(BuildContext context, Tag tag, String tagName) async {
-    hideKeyboard();
-    await UserService.updateTag(context, tag);
   }
 }

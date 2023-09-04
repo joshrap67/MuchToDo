@@ -134,8 +134,8 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
 
   Future<void> addPhoto() async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-	// todo max file size?
-	// todo compression
+    // todo max file size?
+    // todo compression
     if (image != null) {
       setState(() {
         _photos.add(PhotoWrapper(localPhoto: image));
@@ -156,13 +156,16 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
       uploadedPhotos.add(base64Encode(bytes as List<int>));
     }
     if (context.mounted) {
-      Task? task = await TaskService.setTaskPhotos(context, widget.taskId, uploadedPhotos, _removedPhotos);
+      var result = await TaskService.setTaskPhotos(context, widget.taskId, uploadedPhotos, _removedPhotos);
 
-      if (task != null && context.mounted) {
-        closePopup(context); // todo ugh
-        Navigator.pop(context, task);
-      } else if (context.mounted) {
+      if (context.mounted) {
         closePopup(context);
+      }
+
+      if (context.mounted && result.success) {
+        Navigator.pop(context, result.data!);
+      } else if (context.mounted && result.failure) {
+        showSnackbar(result.errorMessage!, context);
       }
     }
   }

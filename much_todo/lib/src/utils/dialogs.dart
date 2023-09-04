@@ -34,12 +34,18 @@ class Dialogs {
                     setState(() {
                       isLoading = true;
                     });
-                    var tag = await _addTag(context, nameController.text);
+
+                    hideKeyboard();
+                    var result = await UserService.createTag(context, nameController.text.trim());
                     setState(() {
                       isLoading = false;
                     });
-                    if (context.mounted) {
-                      Navigator.pop(context, tag);
+
+                    if (dialogContext.mounted && result.success) {
+                      Navigator.pop(dialogContext, result.data!);
+                    } else if (dialogContext.mounted && result.failure) {
+                      Navigator.pop(dialogContext, null);
+                      showSnackbar(result.errorMessage!, context);
                     }
                   }
                 },
@@ -95,13 +101,19 @@ class Dialogs {
                     setState(() {
                       isLoading = true;
                     });
-                    var tag = await _addContact(
+
+                    hideKeyboard();
+                    var result = await UserService.createContact(
                         context, nameController.text, emailController.text, phoneNumberController.text);
                     setState(() {
                       isLoading = false;
                     });
-                    if (context.mounted) {
-                      Navigator.pop(context, tag);
+
+                    if (dialogContext.mounted && result.success) {
+                      Navigator.pop(dialogContext, result.data!);
+                    } else if (dialogContext.mounted && result.failure) {
+                      Navigator.pop(dialogContext, null);
+                      showSnackbar(result.errorMessage!, context); // todo test
                     }
                   }
                 },
@@ -188,12 +200,18 @@ class Dialogs {
                     setState(() {
                       isLoading = true;
                     });
-                    var room = await _createRoom(dialogContext, nameController.text, noteController.text);
+
+                    hideKeyboard();
+                    var result = await RoomsService.createRoom(context, nameController.text, note: noteController.text);
                     setState(() {
                       isLoading = false;
                     });
-                    if (dialogContext.mounted) {
-                      Navigator.pop(dialogContext, room);
+
+                    if (dialogContext.mounted && result.success) {
+                      Navigator.pop(dialogContext, result.data!);
+                    } else if (dialogContext.mounted && result.failure) {
+                      Navigator.pop(dialogContext, null);
+                      showSnackbar(result.errorMessage!, context); // todo test
                     }
                   }
                 },
@@ -236,22 +254,5 @@ class Dialogs {
       },
     );
     return room;
-  }
-
-  static Future<Room?> _createRoom(BuildContext context, String name, String note) async {
-    hideKeyboard();
-    return await RoomsService.createRoom(context, name, note: note);
-  }
-
-  static Future<Tag?> _addTag(BuildContext context, String text) async {
-    hideKeyboard();
-    var tag = await UserService.createTag(context, text);
-    return tag;
-  }
-
-  static Future<Contact?> _addContact(BuildContext context, String name, String email, String phoneNumber) async {
-    hideKeyboard();
-    var contact = await UserService.createContact(context, name, email, phoneNumber);
-    return contact;
   }
 }

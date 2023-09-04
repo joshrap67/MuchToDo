@@ -11,14 +11,14 @@ import 'package:much_todo/src/repositories/user/requests/create_user_request.dar
 import 'package:much_todo/src/repositories/user/requests/set_contact_request.dart';
 import 'package:much_todo/src/repositories/user/requests/set_tag_request.dart';
 import 'package:much_todo/src/repositories/user/user_repository.dart';
-import 'package:much_todo/src/screens/home/home.dart';
 import 'package:much_todo/src/screens/sign_in/create_account.dart';
+import 'package:much_todo/src/utils/result.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/domain/contact.dart';
 
 class UserService {
-  static Future<void> loadUser(BuildContext context) async {
+  static Future<void> loadUserBlindSend(BuildContext context) async {
     try {
       context.read<UserProvider>().setLoading(true);
       var user = await UserRepository.getUser();
@@ -40,65 +40,61 @@ class UserService {
     }
   }
 
-  static Future<void> createUser(BuildContext context, List<Room> rooms) async {
+  static Future<Result<void>> createUser(List<Room> rooms) async {
+    var result = Result<void>();
     try {
       await UserRepository.createUser(
           CreateUserRequest(rooms.map((e) => CreateRoomRequest(e.name.trim(), e.note?.trim())).toList()));
-      if (context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
-      }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating the account', context);
-      }
+      result.setErrorMessage('There was a problem creating the account');
     }
+    return result;
   }
 
-  static Future<void> deleteUser(BuildContext context) async {
+  static Future<Result<void>> deleteUser(BuildContext context) async {
+    var result = Result<void>();
     try {
       await UserRepository.deleteUser();
       if (context.mounted) {
-        signOut(context);
+        await signOut(context);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating the account', context);
-      }
+      result.setErrorMessage('There was a problem creating the account');
     }
+    return result;
   }
 
-  static Future<Tag?> createTag(BuildContext context, String name) async {
-    Tag? tag;
+  static Future<Result<Tag>> createTag(BuildContext context, String name) async {
+    var result = Result<Tag>();
     try {
-      tag = await UserRepository.createTag(SetTagRequest(name.trim()));
+      var tag = await UserRepository.createTag(SetTagRequest(name.trim()));
+      result.setData(tag);
       if (context.mounted) {
         context.read<UserProvider>().addTag(tag);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating the tag', context);
-      }
+      result.setErrorMessage('There was a problem creating the tag');
     }
-    return tag;
+    return result;
   }
 
-  static Future<Contact?> createContact(BuildContext context, String name, String? email, String? number) async {
-    Contact? contact;
+  static Future<Result<Contact>> createContact(BuildContext context, String name, String? email, String? number) async {
+    var result = Result<Contact>();
     try {
-      contact = await UserRepository.createContact(SetContactRequest(name.trim(), email?.trim(), number?.trim()));
+      var contact = await UserRepository.createContact(SetContactRequest(name.trim(), email?.trim(), number?.trim()));
+      result.setData(contact);
       if (context.mounted) {
         context.read<UserProvider>().addContact(contact);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem creating the contact', context);
-      }
+      result.setErrorMessage('There was a problem creating the contact');
     }
 
-    return contact;
+    return result;
   }
 
-  static Future<void> deleteTag(BuildContext context, Tag tag) async {
+  static Future<Result<void>> deleteTag(BuildContext context, Tag tag) async {
+    var result = Result<void>();
     try {
       await UserRepository.deleteTag(tag.id);
       if (context.mounted) {
@@ -106,27 +102,27 @@ class UserService {
         context.read<TasksProvider>().removeTagFromTasks(tag);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem deleting the tag', context);
-      }
+      result.setErrorMessage('There was a problem deleting the tag');
     }
+    return result;
   }
 
-  static Future<void> updateTag(BuildContext context, Tag tag) async {
+  static Future<Result<void>> updateTag(BuildContext context, String id, String newName) async {
+    var result = Result<void>();
     try {
-      await UserRepository.updateTag(tag.id, SetTagRequest(tag.name.trim()));
+      await UserRepository.updateTag(id, SetTagRequest(newName.trim()));
       if (context.mounted) {
-        context.read<UserProvider>().updateTag(tag);
-        context.read<TasksProvider>().updateTagForTasks(tag);
+        context.read<UserProvider>().updateTag(id, newName);
+        context.read<TasksProvider>().updateTagForTasks(id, newName);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem updating the tag', context);
-      }
+      result.setErrorMessage('There was a problem updating the tag');
     }
+    return result;
   }
 
-  static Future<void> deleteContact(BuildContext context, Contact contact) async {
+  static Future<Result<void>> deleteContact(BuildContext context, Contact contact) async {
+    var result = Result<void>();
     try {
       await UserRepository.deleteContact(contact.id);
       if (context.mounted) {
@@ -134,32 +130,39 @@ class UserService {
         context.read<TasksProvider>().removeContactFromTasks(contact);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem deleting the contact', context);
-      }
+      result.setErrorMessage('There was a problem deleting the contact');
     }
+    return result;
   }
 
-  static Future<void> updateContact(
+  static Future<Result<void>> updateContact(
       BuildContext context, String id, String name, String? email, String? phoneNumber) async {
+    var result = Result<void>();
     try {
       await UserRepository.updateContact(id, SetContactRequest(name.trim(), email?.trim(), phoneNumber?.trim()));
       if (context.mounted) {
         context.read<UserProvider>().updateContact(id, name, email, phoneNumber);
         context.read<TasksProvider>().updateContactForTasks(id, name, email, phoneNumber);
-        showSnackbar('Contact updated.', context);
       }
     } catch (e) {
-      if (context.mounted) {
-        showSnackbar('There was a problem updating the contact', context);
-      }
+      result.setErrorMessage('There was a problem updating the contact');
     }
+    return result;
   }
 
-  static Future<void> signOut(BuildContext context) async {
-    context.read<RoomsProvider>().clearRooms();
-    context.read<TasksProvider>().clearTasks();
-    context.read<UserProvider>().clearUser();
-    await FirebaseAuth.instance.signOut();
+  static Future<Result<void>> signOut(BuildContext context) async {
+    var result = Result<void>();
+
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (context.mounted) {
+        context.read<RoomsProvider>().clearRooms();
+        context.read<TasksProvider>().clearTasks();
+        context.read<UserProvider>().clearUser();
+      }
+    } catch (e) {
+      result.setErrorMessage('There was a problem signing out');
+    }
+    return result;
   }
 }

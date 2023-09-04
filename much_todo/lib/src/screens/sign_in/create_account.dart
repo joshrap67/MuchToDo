@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/screens/home/home.dart';
 import 'package:much_todo/src/screens/sign_in/create_account_room_info_card.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/services/user_service.dart';
@@ -165,10 +166,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     setState(() {
       _isCreatingAccount = true;
     });
-    await UserService.createUser(context, _rooms);
+    var result = await UserService.createUser(_rooms);
     setState(() {
       _isCreatingAccount = false;
     });
+    if (context.mounted && result.success) {
+      Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
+    } else if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
+    }
   }
 
   void launchAddRoom() {

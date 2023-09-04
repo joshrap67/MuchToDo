@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/screens/sign_in/auth_service.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_with_email_screen.dart';
 
@@ -112,10 +112,10 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> signInWithGoogle() async {
-    var credential = await AuthService.getGoogleCredential();
-    if (credential != null) {
-      var signedIn = await AuthService.signInWithCredential(credential);
-      if (signedIn && context.mounted) {
+    var googleSignInResult = await AuthService.getGoogleCredential();
+    if (googleSignInResult.success) {
+      var signedInResult = await AuthService.signInWithCredential(googleSignInResult.data!);
+      if (signedInResult.success && context.mounted) {
         Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
       }
     }

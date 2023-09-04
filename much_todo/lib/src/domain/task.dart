@@ -152,6 +152,10 @@ class TaskTag {
     name = json['name'];
   }
 
+  void update(String newName) {
+    name = newName;
+  }
+
   @override
   String toString() {
     return 'TaskTag{id: $id, name: $name}';

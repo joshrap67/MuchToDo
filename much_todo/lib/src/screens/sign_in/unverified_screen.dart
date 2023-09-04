@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/screens/sign_in/auth_service.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
@@ -126,11 +126,13 @@ class _UnverifiedScreenState extends State<UnverifiedScreen> {
     setState(() {
       _isEmailSending = true;
     });
-    var emailSent = await AuthService.sendEmailVerification();
+
+    var result = await AuthService.sendEmailVerification();
     setState(() {
       _isEmailSending = false;
     });
-    if (emailSent && context.mounted) {
+
+    if (result.success && context.mounted) {
       showSnackbar('Email sent, check your inbox', context);
     }
   }

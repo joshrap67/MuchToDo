@@ -1,9 +1,27 @@
 class Result<T> {
-  late bool success;
-  T? data;
-  String? errorMessage;
+  late bool _success;
+  T? _data;
+  String? _errorMessage;
 
-  Result.success({required this.data}) : success = true;
+  Result({T? data})
+      : _data = data,
+        _success = true;
 
-  Result.failure({this.errorMessage}) : success = false;
+  bool get success => _success;
+
+  bool get failure => !_success;
+
+  T? get data => _data;
+
+  String? get errorMessage => _errorMessage;
+
+  void setData(T data) {
+    _data = data;
+    _success = true;
+  }
+
+  void setErrorMessage(String errorMessage) {
+    _errorMessage = errorMessage;
+    _success = false;
+  }
 }

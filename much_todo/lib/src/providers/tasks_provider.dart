@@ -70,11 +70,11 @@ class TasksProvider with ChangeNotifier {
     filterAndNotify();
   }
 
-  void updateTagForTasks(Tag tag) {
+  void updateTagForTasks(String id, String newName) {
     for (var task in _allTasks) {
-      var index = task.tags.indexWhere((t) => t.id == tag.id);
+      var index = task.tags.indexWhere((t) => t.id == id);
       if (index >= 0) {
-        task.tags[index] = tag.convert();
+        task.tags[index].update(newName);
       }
     }
     filterAndNotify();

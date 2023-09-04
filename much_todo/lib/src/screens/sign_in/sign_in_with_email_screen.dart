@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/screens/sign_in/auth_service.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/reset_password_screen.dart';
 import 'package:much_todo/src/screens/sign_in/sign_up_screen.dart';
@@ -118,7 +118,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                                           ),
                                         ),
                                       ),
-									  focusNode: _passwordFocusNode,
+                                      focusNode: _passwordFocusNode,
                                       autovalidateMode: AutovalidateMode.onUserInteraction,
                                       controller: _passwordController,
                                       obscureText: _hidePassword,
@@ -252,12 +252,14 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
       _isSigningIn = true;
     });
     hideKeyboard();
-    var signedIn =
+
+    var result =
         await AuthService.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());
     setState(() {
       _isSigningIn = false;
     });
-    if (signedIn && context.mounted) {
+
+    if (result.success && context.mounted) {
       Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
     } else if (context.mounted) {
       showSnackbar('Invalid email or password', context);

@@ -31,9 +31,9 @@ class _HomeState extends State<Home> {
     _screens = <Widget>[const TaskList(), const RoomList(), MoreScreen(controller: widget.controller)];
     _navStack.add(_selectedIndex);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      UserService.loadUser(context);
-      RoomsService.getAllRooms(context);
-      TaskService.getAllTasks(context);
+      UserService.loadUserBlindSend(context);
+      RoomsService.getAllRoomsBlindSend(context);
+      TaskService.getAllTasksBlindSend(context);
     });
   }
 

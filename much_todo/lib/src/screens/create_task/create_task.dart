@@ -312,15 +312,17 @@ class _CreateTaskState extends State<CreateTask> {
     }
 
     hideKeyboard();
-    var createdTask = await TaskService.createTask(context, _name!, _priority, _effort, _selectedRoom!,
+    var result = await TaskService.createTask(context, _name!, _priority, _effort, _selectedRoom!,
         contacts: _contacts,
         note: _note,
         links: _links,
         completeBy: _completeBy,
         estimatedCost: _estimatedCost,
         tags: _tags);
-    if (context.mounted && createdTask != null) {
-      Navigator.of(context).pop(createdTask);
+    if (context.mounted && result.success) {
+      Navigator.of(context).pop(result.data!);
+    } else if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 }

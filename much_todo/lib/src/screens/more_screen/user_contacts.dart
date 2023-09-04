@@ -206,13 +206,19 @@ class _UserContactsState extends State<UserContacts> {
                     setState(() {
                       isLoading = true;
                     });
-                    await editContact(
-                        contact.id, nameController.text, emailController.text, phoneNumberController.text);
+
+                    hideKeyboard();
+                    var result = await UserService.updateContact(
+                        context, contact.id, nameController.text, emailController.text, phoneNumberController.text);
                     setState(() {
                       isLoading = false;
                     });
-                    if (dialogContext.mounted) {
+
+                    if (dialogContext.mounted && result.success) {
                       Navigator.pop(dialogContext);
+                    } else if (dialogContext.mounted && result.failure) {
+                      Navigator.pop(dialogContext);
+                      showSnackbar(result.errorMessage!, context); // todo test
                     }
                   }
                 },
@@ -274,22 +280,18 @@ class _UserContactsState extends State<UserContacts> {
     );
   }
 
-  Future<void> editContact(String id, String name, String email, String phoneNumber) async {
-    hideKeyboard();
-    await UserService.updateContact(context, id, name, email, phoneNumber);
-  }
-
   Future<void> deleteContact(Contact contact) async {
     setState(() {
       _isLoading = true;
     });
 
-    await UserService.deleteContact(context, contact);
+    var result = await UserService.deleteContact(context, contact);
+    setState(() {
+      _isLoading = false;
+    });
 
-    if (context.mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+    if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 }

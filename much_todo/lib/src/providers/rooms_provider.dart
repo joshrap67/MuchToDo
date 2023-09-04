@@ -36,15 +36,12 @@ class RoomsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Room? updateRoom(String id, String name, String? note) {
-    Room? room;
+  void updateRoom(String id, String name, String? note) {
     var index = _rooms.indexWhere((element) => element.id == id);
     if (index >= 0) {
       _rooms[index].update(name, note);
-      room = _rooms[index];
       notifyListeners();
     }
-    return room;
   }
 
   void setSort(RoomSortOption sort, SortDirection sortDirection) {

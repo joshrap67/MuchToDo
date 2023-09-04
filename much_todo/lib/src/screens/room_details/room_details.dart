@@ -313,8 +313,8 @@ class _RoomDetailsState extends State<RoomDetails> {
                                     _sortByValue = value!;
                                   });
                                 },
-                                items: TaskSortOption.values
-                                    .map<DropdownMenuItem<TaskSortOption>>((TaskSortOption value) {
+                                items:
+                                    TaskSortOption.values.map<DropdownMenuItem<TaskSortOption>>((TaskSortOption value) {
                                   return DropdownMenuItem<TaskSortOption>(value: value, child: Text(value.label));
                                 }).toList(),
                               ),
@@ -369,11 +369,13 @@ class _RoomDetailsState extends State<RoomDetails> {
 
   Future<void> editRoom(BuildContext context, String name, String? note) async {
     hideKeyboard();
-    var room = await RoomsService.editRoom(context, _room.id, name, note);
-    if (room != null) {
+    var result = await RoomsService.editRoom(context, _room.id, name, note);
+    if (result.success) {
       setState(() {
-        _room = room;
+        _room.update(name.trim(), note?.trim());
       });
+    } else if (context.mounted) {
+      showSnackbar(result.errorMessage!, context);
     }
   }
 
@@ -406,7 +408,8 @@ class _RoomDetailsState extends State<RoomDetails> {
           ],
           title: const Text('Delete Room'),
           content: const Text(
-              'Are you sure you wish to delete this room?\n\nALL tasks associated with this room will be deleted!'),
+            'Are you sure you wish to delete this room?\n\nALL tasks associated with this room will be deleted!',
+          ),
         );
       },
     );
@@ -414,10 +417,13 @@ class _RoomDetailsState extends State<RoomDetails> {
 
   Future<void> deleteRoom() async {
     showLoadingDialog(context, msg: 'Deleting...');
-    await RoomsService.deleteRoom(context, _room); // todo in general need better error handling pattern from service
-    if (context.mounted) {
+    var result = await RoomsService.deleteRoom(context, _room);
+    if (context.mounted && result.success) {
       closePopup(context);
       Navigator.of(context).pop();
+    } else if (context.mounted && result.failure) {
+      closePopup(context);
+      showSnackbar(result.errorMessage!, context);
     }
   }
 }

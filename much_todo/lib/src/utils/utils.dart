@@ -45,7 +45,7 @@ void closePopup(BuildContext context) {
   Navigator.of(context, rootNavigator: true).pop('dialog');
 }
 
-String getEffortTitle(int effort) {
+String getEffortTitle(num effort) {
   if (effort == Task.lowEffort) {
     return 'Low';
   } else if (effort == Task.mediumEffort) {
@@ -202,7 +202,7 @@ Future<void> launchEmail(BuildContext context, String? email) async {
     return;
   }
 
-  final Uri uri = Uri(scheme: 'mailto', path: email);
+  var uri = Uri(scheme: 'mailto', path: email);
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri);
   } else {
@@ -218,7 +218,7 @@ Future<void> launchPhone(BuildContext context, String? phoneNumber) async {
     return;
   }
 
-  final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+  var uri = Uri(scheme: 'tel', path: phoneNumber);
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri);
   } else {

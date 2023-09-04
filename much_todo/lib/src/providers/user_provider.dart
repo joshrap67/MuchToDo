@@ -68,22 +68,22 @@ class UserProvider with ChangeNotifier {
       return;
     }
     _user!.tasks.add(createdTask.id);
-    Map<String, Tag> tagIdToTag = {};
-    Map<String, Contact> contactIdToContact = {};
+    Map<String, Tag> tagMap = {};
+    Map<String, Contact> contactMap = {};
     // for quicker lookup
     for (var tag in _user!.tags) {
-      tagIdToTag[tag.id] = tag;
+      tagMap[tag.id] = tag;
     }
     for (var contact in _user!.contacts) {
-      contactIdToContact[contact.id] = contact;
+      contactMap[contact.id] = contact;
     }
 
-    for (TaskTag taskTag in createdTask.tags) {
-      Tag? tag = tagIdToTag[taskTag.id];
+    for (var taskTag in createdTask.tags) {
+      var tag = tagMap[taskTag.id];
       tag?.tasks.add(createdTask.id);
     }
-    for (TaskContact taskContact in createdTask.contacts) {
-      Contact? contact = contactIdToContact[taskContact.id];
+    for (var taskContact in createdTask.contacts) {
+      var contact = contactMap[taskContact.id];
       contact?.tasks.add(createdTask.id);
     }
 

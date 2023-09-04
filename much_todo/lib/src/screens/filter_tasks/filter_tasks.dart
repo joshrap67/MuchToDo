@@ -113,7 +113,8 @@ class _FilterTasksState extends State<FilterTasks> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      var rooms = context.read<RoomsProvider>().rooms;
+      var rooms = context.read<RoomsProvider>().rooms.toList();
+      rooms.sort((a, b) => a.name.compareTo(b.name));
       for (var room in rooms) {
         _roomEntries.add(DropdownMenuItem<String>(
           value: room.id,
@@ -315,6 +316,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                 items: _roomEntries,
                                 isExpanded: true,
                                 value: _roomIdFilter,
+                                menuMaxHeight: 500,
                                 decoration: InputDecoration(
                                   suffixIcon: _roomIdFilter == null
                                       ? null

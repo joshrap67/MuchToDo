@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/utils/constants.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class EffortPicker extends StatefulWidget {
@@ -13,7 +15,7 @@ class EffortPicker extends StatefulWidget {
 }
 
 class _EffortPickerState extends State<EffortPicker> {
-  int _selectedEffort = 1;
+  int _selectedEffort = Constants.defaultEffort;
 
   @override
   void initState() {
@@ -42,15 +44,7 @@ class _EffortPickerState extends State<EffortPicker> {
             showTicks: true,
             showLabels: true,
             activeColor: const Color(0xFF48db63),
-            labelFormatterCallback: (dynamic actualValue, String formattedText) {
-              if (actualValue == Task.lowEffort) {
-                return 'Low';
-              } else if (actualValue == Task.mediumEffort) {
-                return 'Medium';
-              } else {
-                return 'High';
-              }
-            },
+            labelFormatterCallback: (dynamic actualValue, String formattedText) => getEffortTitle(actualValue),
             onChanged: onChange,
           ),
         )

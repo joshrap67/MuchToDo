@@ -18,16 +18,17 @@ class PendingRoomSelector extends StatefulWidget {
 
 class RoomOption {
   Room? room;
-  bool hasResults = true;
+  bool isFooter = false;
 
-  RoomOption({this.room, this.hasResults = true});
+  RoomOption({this.room, this.isFooter = false});
 }
 
 class _PendingRoomSelectorState extends State<PendingRoomSelector> {
-  Room? _selectedRoom;
-  final _autoCompleteController = TextEditingController();
-  FocusNode _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
+  final _autoCompleteController = TextEditingController();
+
+  FocusNode _focusNode = FocusNode();
+  Room? _selectedRoom;
 
   @override
   void initState() {
@@ -51,118 +52,120 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
-            return RawAutocomplete<RoomOption>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                var rooms = context.read<RoomsProvider>().rooms;
-                if (rooms.isEmpty) {
-                  // if user has none in the first place give them an option to create one from here
-                  return [RoomOption(hasResults: false)];
-                }
+          child: LayoutBuilder(
+            builder: (context, BoxConstraints constraints) {
+              return RawAutocomplete<RoomOption>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  var rooms = getOptions();
 
-                // don't show options that are already selected
-                if (textEditingValue.text == '') {
-                  return rooms.map((e) => RoomOption(room: e));
-                }
+                  if (textEditingValue.text == '') {
+                    return rooms;
+                  }
 
-                var filteredRooms =
-                    rooms.where((element) => element.name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                if (filteredRooms.isNotEmpty) {
-                  return filteredRooms.map((e) => RoomOption(room: e));
-                } else {
-                  // hack, but I want to show a footer when no results are found to allow user to create items on the fly
-                  return [RoomOption(hasResults: false)];
-                }
-              },
-              textEditingController: _autoCompleteController,
-              focusNode: _focusNode,
-              displayStringForOption: (roomOption) => roomOption.room!.name,
-              fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                return Focus(
-                  onFocusChange: (hasFocus) {
-                    if (!hasFocus) {
-                      if (_selectedRoom == null) {
-                        _autoCompleteController.clear();
-                      } else {
-                        _autoCompleteController.text = _selectedRoom!.name;
-                      }
-                    }
-                  },
-                  child: TextFormField(
-                    key: _textFieldKey,
-                    decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.room),
-                        labelText: 'Room *',
-                        suffixIcon: _autoCompleteController.text.isNotEmpty
-                            ? IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedRoom = null;
-                                    widget.onRoomChange(_selectedRoom);
-                                    _autoCompleteController.clear();
-                                  });
-                                },
-                                icon: const Icon(Icons.clear))
-                            : null),
-                    controller: fieldTextEditingController,
-                    focusNode: fieldFocusNode,
-                    validator: (_) {
-                      if (_selectedRoom == null) {
-                        return 'Required';
-                      } else {
-                        return null;
+                  var filteredRooms = rooms.where(
+                      (r) => r.isFooter || r.room!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                  return filteredRooms;
+                },
+                textEditingController: _autoCompleteController,
+                focusNode: _focusNode,
+                displayStringForOption: (roomOption) => roomOption.room!.name,
+                fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
+                  return Focus(
+                    onFocusChange: (hasFocus) {
+                      if (!hasFocus) {
+                        if (_selectedRoom == null) {
+                          _autoCompleteController.clear();
+                        } else {
+                          _autoCompleteController.text = _selectedRoom!.name;
+                        }
                       }
                     },
-                  ),
-                );
-              },
-              optionsViewBuilder: (context, onSelected, options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 10,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth,
-                        // bug with flutter, without this there is overflow on right
-                        maxHeight: 300,
-                      ),
-                      child: Scrollbar(
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: options.length,
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            final RoomOption option = options.elementAt(index);
-                            if (option.hasResults) {
-                              return ListTile(
-                                title: Text(option.room!.name),
-                                onTap: () => onSelected(option),
-                              );
-                            } else {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: OutlinedButton.icon(
-                                  label: const Text('CREATE NEW ROOM'),
-                                  onPressed: addRoom,
-                                  icon: const Icon(Icons.add),
-                                ),
-                              );
-                            }
-                          },
+                    child: TextFormField(
+                      key: _textFieldKey,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.room),
+                          labelText: 'Room *',
+                          suffixIcon: _autoCompleteController.text.isNotEmpty
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedRoom = null;
+                                      widget.onRoomChange(_selectedRoom);
+                                      _autoCompleteController.clear();
+                                    });
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                )
+                              : null),
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      validator: (_) {
+                        if (_selectedRoom == null) {
+                          return 'Required';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                  );
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 10,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth,
+                          // bug with flutter, without this there is overflow on right
+                          maxHeight: 300,
+                        ),
+                        child: Scrollbar(
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: options.length,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              final RoomOption option = options.elementAt(index);
+                              if (!option.isFooter) {
+                                return ListTile(
+                                  title: Text(option.room!.name),
+                                  onTap: () => onSelected(option),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: TextButton.icon(
+                                    label: const Text('CREATE NEW ROOM'),
+                                    onPressed: addRoom,
+                                    icon: const Icon(Icons.add),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-              onSelected: selectRoom,
-            );
-          }),
+                  );
+                },
+                onSelected: selectRoom,
+              );
+            },
+          ),
         ),
       ],
     );
+  }
+
+  List<RoomOption> getOptions() {
+    // separate method since it appears optionsBuilder uses deferred execution on the iterable defined in it, so can't call toList in it
+    List<RoomOption> options = [];
+    var rooms = context.read<RoomsProvider>().rooms;
+    options.addAll(rooms.map((e) => RoomOption(room: e)));
+    options.add(RoomOption(isFooter: true));
+    return options;
   }
 
   void selectRoom(RoomOption? roomOption) {

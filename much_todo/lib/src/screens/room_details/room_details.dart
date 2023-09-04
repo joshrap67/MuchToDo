@@ -352,7 +352,7 @@ class _RoomDetailsState extends State<RoomDetails> {
   }
 
   Future<void> launchAddTask() async {
-    Task? result = await Navigator.push(
+    var result = await Navigator.push<Task?>(
       context,
       MaterialPageRoute(
         builder: (context) => CreateTask(

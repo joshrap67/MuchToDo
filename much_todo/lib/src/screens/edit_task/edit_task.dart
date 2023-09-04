@@ -117,8 +117,8 @@ class _EditTaskState extends State<EditTask> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TaskNameInput(
-                                hint: 'Name of Task',
-                                label: 'Name *',
+                                hintText: 'Name of Task',
+                                labelText: 'Name *',
                                 name: _name,
                                 nextFocus: _roomFocusNode,
                                 onChange: (name) {
@@ -206,8 +206,8 @@ class _EditTaskState extends State<EditTask> {
                                   child: Padding(
                                     padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                                     child: DatePicker(
-                                      label: 'Complete By',
-                                      hint: 'Complete By',
+                                      labelText: 'Complete By',
+                                      hintText: 'Complete By',
                                       key: ValueKey(_completeBy),
                                       selectedDate: _completeBy,
                                       onChange: (date) {

@@ -17,6 +17,7 @@ class _LoadingButtonState extends State<LoadingButton> {
 
   @override
   Widget build(BuildContext context) {
+	  // todo fix problem with color being messed up when loading
     return OutlinedButton.icon(
       onPressed: _isLoading ? null : onSubmit,
       style: ElevatedButton.styleFrom(
@@ -31,7 +32,8 @@ class _LoadingButtonState extends State<LoadingButton> {
               width: 24,
               height: 24,
               padding: const EdgeInsets.all(2.0),
-              child: const CircularProgressIndicator(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.onPrimary,
                 strokeWidth: 3,
               ),
             )
@@ -47,7 +49,6 @@ class _LoadingButtonState extends State<LoadingButton> {
     try {
       await widget.onSubmit();
     } catch (e) {
-      print(e);
       // todo log
     } finally {
       setState(() {

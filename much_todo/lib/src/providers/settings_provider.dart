@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../services/settings_service.dart';
+import 'package:much_todo/src/services/settings_service.dart';
 
 class SettingsProvider with ChangeNotifier {
   SettingsProvider(this._settingsService);
@@ -17,8 +17,9 @@ class SettingsProvider with ChangeNotifier {
   }
 
   Future<void> updateThemeMode(ThemeMode? newThemeMode) async {
-    if (newThemeMode == null) return;
-    if (newThemeMode == _themeMode) return;
+    if (newThemeMode == null || newThemeMode == _themeMode) {
+      return;
+    }
 
     _themeMode = newThemeMode;
     notifyListeners();

@@ -4,10 +4,7 @@ class SetTaskPhotosRequest implements ApiRequest {
   List<String> photosToUpload = [];
   List<String> deletedPhotos = [];
 
-  SetTaskPhotosRequest({
-    required this.photosToUpload,
-    required this.deletedPhotos,
-  });
+  SetTaskPhotosRequest({required this.photosToUpload, required this.deletedPhotos});
 
   @override
   Map<String, dynamic> toJson() {

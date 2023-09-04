@@ -5,10 +5,10 @@ import 'package:much_todo/src/utils/utils.dart';
 class DatePicker extends StatefulWidget {
   final DateTime? selectedDate;
   final ValueChanged<DateTime?> onChange;
-  final String? hint;
-  final String? label;
+  final String? hintText;
+  final String? labelText;
 
-  const DatePicker({super.key, this.selectedDate, this.hint, this.label, required this.onChange});
+  const DatePicker({super.key, this.selectedDate, this.hintText, this.labelText, required this.onChange});
 
   @override
   State<DatePicker> createState() => _DatePickerState();
@@ -39,8 +39,8 @@ class _DatePickerState extends State<DatePicker> {
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.date_range),
         border: const OutlineInputBorder(),
-        hintText: widget.hint,
-        labelText: widget.label,
+        hintText: widget.hintText,
+        labelText: widget.labelText,
         suffixIcon: _controller.text.isNotEmpty
             ? IconButton(
                 onPressed: () {

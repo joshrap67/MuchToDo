@@ -32,8 +32,10 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
               leading: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  PriorityIndicator(priority: widget.task.priority),
-                  const Text('Priority'),
+                  Tooltip(
+                    message: 'Priority',
+                    child: PriorityIndicator(priority: widget.task.priority),
+                  ),
                 ],
               ),
               title: Text(widget.task.name),
@@ -62,7 +64,7 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
   }
 
   Future<void> openTask() async {
-    bool? deleted = await Navigator.push(
+    var deleted = await Navigator.push<bool?>(
       context,
       MaterialPageRoute(builder: (context) => CompletedTaskDetails(task: widget.task)),
     );

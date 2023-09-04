@@ -222,7 +222,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<bool> promptDeleteTask(Task task) async {
-    bool? shouldDelete = await showDialog<bool>(
+    var shouldDelete = await showDialog<bool?>(
       context: context,
       builder: (ctx) {
         return AlertDialog.adaptive(
@@ -245,7 +245,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<DateTime?> promptCompleteTask(Task task) async {
-    DateTime? pickDate = await showDatePicker(
+    var pickDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(1800),
@@ -263,13 +263,13 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
 
   Future<void> deleteTask(Task task) async {
     var result = await TaskService.deleteTask(context, task, notifyOnFailure: true);
-    if (context.mounted) {
+    if (context.mounted && result.failure) {
       showSnackbar(result.errorMessage!, context);
     }
   }
 
   Future<void> launchAddTask() async {
-    Task? result = await Navigator.push(
+    var result = await Navigator.push<Task?>(
       context,
       MaterialPageRoute(builder: (context) => const CreateTask()),
     );
@@ -307,7 +307,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<void> filterTasks() async {
-    bool? filtered = await Navigator.push(
+    var filtered = await Navigator.push<bool?>(
       context,
       MaterialPageRoute(builder: (context) => const FilterTasks()),
     );

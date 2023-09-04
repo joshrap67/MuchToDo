@@ -15,7 +15,7 @@ class TaskRepository {
     final apiResult = await ApiGateway.get(baseUrl);
     if (apiResult.success) {
       var tasks = <Task>[];
-      Iterable decodedJsonList = jsonDecode(apiResult.data);
+      var decodedJsonList = jsonDecode(apiResult.data);
       for (var jsonTask in decodedJsonList) {
         tasks.add(Task.fromJson(jsonTask));
       }

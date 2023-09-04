@@ -51,6 +51,13 @@ class MoreScreenSkeleton extends StatelessWidget {
               leading: Icon(Icons.person),
             ),
           ),
+          const Card(
+            child: ListTile(
+              title: Text('Completed Tasks'),
+              trailing: Icon(Icons.arrow_forward),
+              leading: Icon(Icons.check),
+            ),
+          ),
           Card(
             child: ListTile(
               title: const Text('Theme'),

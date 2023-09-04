@@ -84,6 +84,4 @@ class _ContactCardCompletedTaskState extends State<ContactCardCompletedTask> {
       },
     );
   }
-
-
 }

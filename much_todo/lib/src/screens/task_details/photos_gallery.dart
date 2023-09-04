@@ -56,7 +56,7 @@ class _PhotosGalleryState extends State<PhotosGallery> {
             Container(
               padding: const EdgeInsets.all(20.0),
               child: Text(
-                "Photo ${currentIndex + 1}",
+                'Photo ${currentIndex + 1}',
                 style: const TextStyle(
                   fontSize: 17.0,
                 ),

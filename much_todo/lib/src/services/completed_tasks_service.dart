@@ -31,7 +31,7 @@ class CompletedTaskService {
   }
 
   static Future<Result<void>> deleteCompletedTasks(List<String> taskIds) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await CompletedTaskRepository.deleteCompletedTasks(DeleteCompletedTasksRequest(taskIds: taskIds));
     } catch (e) {
@@ -41,7 +41,7 @@ class CompletedTaskService {
   }
 
   static Future<Result<void>> deleteCompletedTask(CompletedTask task) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await CompletedTaskRepository.deleteCompletedTask(task.id);
     } catch (e) {

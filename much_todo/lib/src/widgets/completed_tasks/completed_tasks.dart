@@ -5,7 +5,7 @@ import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/result.dart';
-import 'package:much_todo/src/widgets/completed_tasks/minimal_completed_task_card.dart';
+import 'package:much_todo/src/widgets/completed_tasks/selected_completed_task_card.dart';
 import 'package:much_todo/src/services/completed_tasks_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_task_card.dart';
@@ -147,7 +147,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
                                   },
                                 ),
                                 Expanded(
-                                  child: MinimalCompletedTaskCard(
+                                  child: SelectedCompletedTaskCard(
                                     task: task,
                                     onLongPress: () {
                                       setState(() {
@@ -193,6 +193,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
     setState(() {
       _loading = true;
     });
+
     List<CompletedTask> tasks = [];
     Result<List<CompletedTask>> result;
     if (widget.room != null) {
@@ -248,6 +249,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
     setState(() {
       _loading = true;
     });
+
     var result = await CompletedTaskService.deleteCompletedTasks(_tasksToDelete);
     if (result.success) {
       setState(() {

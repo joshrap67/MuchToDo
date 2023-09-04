@@ -12,13 +12,6 @@ class PendingLinksPicker extends StatefulWidget {
   State<PendingLinksPicker> createState() => _PendingLinksPickerState();
 }
 
-class LinkWrapper {
-  String link;
-  TextEditingController controller;
-
-  LinkWrapper(this.link, this.controller);
-}
-
 class _PendingLinksPickerState extends State<PendingLinksPicker> {
   List<String> _links = [];
   final ScrollController _scrollController = ScrollController();
@@ -31,8 +24,8 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,7 +41,7 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.link),
-              labelText: "Add Links",
+              labelText: 'Add Links',
               suffixIcon: IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
@@ -128,7 +121,6 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
                 }
               },
               child: const Text('ADD'),
-              //todo add and add another?
             )
           ],
           insetPadding: const EdgeInsets.all(8.0),

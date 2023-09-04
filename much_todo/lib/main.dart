@@ -15,6 +15,7 @@ import 'src/services/settings_service.dart';
 
 void main() async {
   final settingsProvider = SettingsProvider(SettingsService());
+  // todo need to set permissions in manifest
 
   /*
   	Load the user's preferred theme while the splash screen is displayed.
@@ -25,6 +26,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // todo uncomment when prod ready
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   // // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics

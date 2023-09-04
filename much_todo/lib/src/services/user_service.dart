@@ -41,7 +41,7 @@ class UserService {
   }
 
   static Future<Result<void>> createUser(List<Room> rooms) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await UserRepository.createUser(
           CreateUserRequest(rooms.map((e) => CreateRoomRequest(e.name.trim(), e.note?.trim())).toList()));
@@ -52,7 +52,7 @@ class UserService {
   }
 
   static Future<Result<void>> deleteUser(BuildContext context) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await UserRepository.deleteUser();
       if (context.mounted) {
@@ -94,7 +94,7 @@ class UserService {
   }
 
   static Future<Result<void>> deleteTag(BuildContext context, Tag tag) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await UserRepository.deleteTag(tag.id);
       if (context.mounted) {
@@ -108,7 +108,7 @@ class UserService {
   }
 
   static Future<Result<void>> updateTag(BuildContext context, String id, String newName) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await UserRepository.updateTag(id, SetTagRequest(newName.trim()));
       if (context.mounted) {
@@ -122,7 +122,7 @@ class UserService {
   }
 
   static Future<Result<void>> deleteContact(BuildContext context, Contact contact) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await UserRepository.deleteContact(contact.id);
       if (context.mounted) {
@@ -137,7 +137,7 @@ class UserService {
 
   static Future<Result<void>> updateContact(
       BuildContext context, String id, String name, String? email, String? phoneNumber) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await UserRepository.updateContact(id, SetContactRequest(name.trim(), email?.trim(), phoneNumber?.trim()));
       if (context.mounted) {
@@ -151,7 +151,7 @@ class UserService {
   }
 
   static Future<Result<void>> signOut(BuildContext context) async {
-    var result = Result<void>();
+    var result = Result();
 
     try {
       await FirebaseAuth.instance.signOut();

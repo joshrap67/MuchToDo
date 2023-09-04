@@ -179,7 +179,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                         ),
                       ),
                     ),
-                    const Text("DON'T HAVE ACCOUNT?"),
+                    const Text('DON\'T HAVE ACCOUNT?'),
                     Expanded(
                       child: Container(
                         margin: const EdgeInsets.only(left: 20.0, right: 10.0),

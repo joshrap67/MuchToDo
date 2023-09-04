@@ -45,7 +45,7 @@ class RoomsService {
   }
 
   static Future<Result<void>> editRoom(BuildContext context, String id, String name, String? note) async {
-    var result = Result<void>();
+    var result = Result();
 
     try {
       await RoomRepository.updateRoom(id, UpdateRoomRequest(name.trim(), note?.trim()));
@@ -60,7 +60,7 @@ class RoomsService {
   }
 
   static Future<Result<void>> deleteRoom(BuildContext context, Room room) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await RoomRepository.deleteRoom(room.id);
       if (context.mounted) {

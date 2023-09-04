@@ -143,7 +143,7 @@ class TaskService {
 
   static Future<Result<void>> completeTask(BuildContext context, Task task, DateTime completionDate,
       {bool notifyOnFailure = false}) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await TaskRepository.completeTask(task.id, CompleteTaskRequest(completeDate: completionDate));
       if (context.mounted) {
@@ -162,7 +162,7 @@ class TaskService {
   }
 
   static Future<Result<void>> deleteTask(BuildContext context, Task task, {bool notifyOnFailure = false}) async {
-    var result = Result<void>();
+    var result = Result();
     try {
       await TaskRepository.deleteTask(task.id);
       if (context.mounted) {

@@ -52,7 +52,7 @@ class _TaskNoteInputState extends State<TaskNoteInput> {
       maxLines: null,
       keyboardType: TextInputType.multiline,
       controller: _controller,
-      maxLength: Constants.maxNameLength,
+      maxLength: Constants.maxTaskNameLength,
       validator: validTaskNote,
       onChanged: (note) {
         widget.onChange(note.trim());

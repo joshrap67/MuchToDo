@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class PriorityPicker extends StatefulWidget {
@@ -12,7 +13,7 @@ class PriorityPicker extends StatefulWidget {
 }
 
 class _PriorityPickerState extends State<PriorityPicker> {
-  int _selectedPriority = 3;
+  int _selectedPriority = Constants.defaultPriority;
 
   @override
   void initState() {

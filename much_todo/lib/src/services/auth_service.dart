@@ -5,14 +5,14 @@ import 'package:much_todo/src/utils/result.dart';
 class AuthService {
   static Future<Result<OAuthCredential>> getGoogleCredential() async {
     var result = Result<OAuthCredential>();
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+    var gUser = await GoogleSignIn().signIn();
     if (gUser == null) {
       result.setErrorMessage('Could not sign into Google');
       return result;
     }
 
-    final GoogleSignInAuthentication gAuth = await gUser.authentication;
-    final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
+    var gAuth = await gUser.authentication;
+    var credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
     // we only needed to sign in to google for auth token, so sign out
     await GoogleSignIn().signOut();
 

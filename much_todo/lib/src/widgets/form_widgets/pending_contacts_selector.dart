@@ -18,17 +18,18 @@ class PendingContactsSelector extends StatefulWidget {
 
 class ContactOption {
   Contact? contact;
-  bool hasResults = true;
+  bool isFooter = false;
 
-  ContactOption({this.contact, this.hasResults = true});
+  ContactOption({this.contact, this.isFooter = false});
 }
 
 class _PendingContactsCard1State extends State<PendingContactsSelector> {
-  List<Contact> _selectedContacts = [];
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
+
+  List<Contact> _selectedContacts = [];
   bool _isReadOnly = true;
 
   @override
@@ -54,39 +55,28 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
           child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
             return RawAutocomplete<ContactOption>(
               optionsBuilder: (TextEditingValue textEditingValue) {
-                var contacts = context.read<UserProvider>().contacts;
-                if (contacts.isEmpty) {
-                  // if user has none in the first place give them an option to create one from here
-                  return [ContactOption(hasResults: false)];
-                }
-
+                var contacts = getOptions();
                 // don't show options that are already selected
                 if (textEditingValue.text == '') {
-                  return contacts
-                      .where((element) => !_selectedContacts.any((t) => t.id == element.id))
-                      .map((e) => ContactOption(contact: e));
+                  return contacts.where(
+                      (element) => element.isFooter || !_selectedContacts.any((t) => t.id == element.contact?.id));
                 }
 
-                var filteredContacts = contacts
-                    .where((element) => element.name.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                    .where((element) => !_selectedContacts.any((t) => t.id == element.id));
-                if (filteredContacts.isNotEmpty) {
-                  return filteredContacts.map((e) => ContactOption(contact: e));
-                } else {
-                  // hack, but I want to show a footer when no results are found to allow user to create items on the fly
-                  return [ContactOption(hasResults: false)];
-                }
+                var filteredContacts = contacts.where((element) =>
+                    element.isFooter ||
+                    (element.contact!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()) &&
+                        !_selectedContacts.any((t) => t.id == element.contact?.id)));
+                return filteredContacts;
               },
               textEditingController: _autoCompleteController,
               focusNode: _focusNode,
-              displayStringForOption: (contactOption) => contactOption.contact!.name,
               fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                 return TextFormField(
                   key: _textFieldKey,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.person),
-                    labelText: "Select Contacts",
+                    labelText: 'Select Contacts',
                     suffixIcon: IconButton(
                       icon: _isReadOnly ? const Icon(Icons.search) : const Icon(Icons.search_off),
                       onPressed: () {
@@ -95,6 +85,9 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                           _isReadOnly = !_isReadOnly;
                           if (_isReadOnly) {
                             _autoCompleteController.text = '';
+                            hideKeyboard();
+                          } else {
+                            FocusScope.of(context).requestFocus(_focusNode);
                           }
                         });
                       },
@@ -126,7 +119,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
                             final ContactOption option = options.elementAt(index);
-                            if (option.hasResults) {
+                            if (!option.isFooter) {
                               return ListTile(
                                 title: Text(option.contact!.name),
                                 onTap: () => onSelected(option),
@@ -134,7 +127,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                             } else if (widget.showAdd) {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: OutlinedButton.icon(
+                                child: TextButton.icon(
                                   label: const Text('CREATE NEW CONTACT'),
                                   onPressed: addContact,
                                   icon: const Icon(Icons.add),
@@ -156,28 +149,38 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
         ),
         if (_selectedContacts.isNotEmpty)
           Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-              child: Wrap(
-                spacing: 8.0, // gap between adjacent chips
-                runSpacing: 4.0, // gap between lines
-                children: [
-                  for (var i = 0; i < _selectedContacts.length; i++)
-                    Chip(
-                      label: Text(
-                        _selectedContacts[i].name,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      deleteIconColor: Theme.of(context).colorScheme.onTertiary,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      onDeleted: () {
-                        onDeleteContact(_selectedContacts[i]);
-                      },
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+            child: Wrap(
+              spacing: 8.0, // gap between adjacent chips
+              runSpacing: 4.0, // gap between lines
+              children: [
+                for (var i = 0; i < _selectedContacts.length; i++)
+                  Chip(
+                    label: Text(
+                      _selectedContacts[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
                     ),
-                ],
-              ))
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onDeleted: () {
+                      onDeleteContact(_selectedContacts[i]);
+                    },
+                  ),
+              ],
+            ),
+          )
       ],
     );
+  }
+
+  List<ContactOption> getOptions() {
+    // separate method since it appears optionsBuilder uses deferred execution on the iterable defined in it, so can't call toList in it
+    List<ContactOption> options = [];
+    var contacts = context.read<UserProvider>().contacts;
+    options.addAll(contacts.map((e) => ContactOption(contact: e)));
+    options.add(ContactOption(isFooter: true));
+    return options;
   }
 
   void selectContact(ContactOption? contactOption) {

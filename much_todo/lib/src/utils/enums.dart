@@ -90,9 +90,9 @@ enum PriorityFilter {
 }
 
 enum EffortFilter {
-  one(1, 'Low'),
-  two(2, 'Medium'),
-  three(3, 'High');
+  low(1, 'Low'),
+  medium(2, 'Medium'),
+  high(3, 'High');
 
   const EffortFilter(this.value, this.label);
 

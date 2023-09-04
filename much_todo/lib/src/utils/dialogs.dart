@@ -14,7 +14,7 @@ class Dialogs {
     hideKeyboard();
     // todo max amount check
     final formKey = GlobalKey<FormState>();
-    bool isLoading = false;
+    var isLoading = false;
     final nameController = TextEditingController(text: initialName); // shortcut for user
     var tag = await showDialog<Tag?>(
       context: context,
@@ -79,7 +79,7 @@ class Dialogs {
     hideKeyboard();
     // todo max amount check
     final formKey = GlobalKey<FormState>();
-    bool isLoading = false;
+    var isLoading = false;
     final nameController = TextEditingController(text: initialName); // shortcut for user
     final emailController = TextEditingController();
     final phoneNumberController = TextEditingController();
@@ -179,7 +179,7 @@ class Dialogs {
   static Future<Room?> promptAddRoom(BuildContext context, {String? initialName}) async {
     // todo max amount check
     final formKey = GlobalKey<FormState>();
-    bool isLoading = false;
+    var isLoading = false;
     final nameController = TextEditingController(text: initialName);
     final noteController = TextEditingController();
     var room = await showDialog<Room?>(

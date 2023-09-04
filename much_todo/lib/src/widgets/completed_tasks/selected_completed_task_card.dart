@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
-import 'package:much_todo/src/widgets/completed_tasks/completed_task_details.dart';
-import 'package:much_todo/src/widgets/priority_indicator.dart';
 
-class MinimalCompletedTaskCard extends StatefulWidget {
+class SelectedCompletedTaskCard extends StatefulWidget {
   final CompletedTask task;
   final VoidCallback? onLongPress;
 
-  const MinimalCompletedTaskCard({super.key, required this.task, this.onLongPress});
+  const SelectedCompletedTaskCard({super.key, required this.task, this.onLongPress});
 
   @override
-  State<MinimalCompletedTaskCard> createState() => _MinimalCompletedTaskCardState();
+  State<SelectedCompletedTaskCard> createState() => _SelectedCompletedTaskCardState();
 }
 
-class _MinimalCompletedTaskCardState extends State<MinimalCompletedTaskCard> {
+class _SelectedCompletedTaskCardState extends State<SelectedCompletedTaskCard> {
   @override
   Widget build(BuildContext context) {
     return Card(

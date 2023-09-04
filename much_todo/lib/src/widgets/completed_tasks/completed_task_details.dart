@@ -149,26 +149,27 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
 
   void promptDeleteTask() {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  deleteTask();
-                },
-                child: const Text('DELETE'),
-              )
-            ],
-            title: const Text('Delete Task'),
-            content: const Text('Are you sure you wish to delete this completed task? This action is irreversible.'),
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                deleteTask();
+              },
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Task'),
+          content: const Text('Are you sure you wish to delete this completed task? This action is irreversible.'),
+        );
+      },
+    );
   }
 
   Future<void> deleteTask() async {

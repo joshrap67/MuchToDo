@@ -11,7 +11,7 @@ class CompletedTaskRepository {
     final apiResult = await ApiGateway.get(baseUrl);
     if (apiResult.success) {
       var tasks = <CompletedTask>[];
-      Iterable decodedJsonList = jsonDecode(apiResult.data);
+      var decodedJsonList = jsonDecode(apiResult.data);
       for (var jsonTask in decodedJsonList) {
         tasks.add(CompletedTask.fromJson(jsonTask));
       }
@@ -22,10 +22,10 @@ class CompletedTaskRepository {
   }
 
   static Future<List<CompletedTask>> getAllCompletedTasksByRoom(String roomId) async {
-    final apiResult = await ApiGateway.get(baseUrl, queryParams: {"roomId": roomId});
+    final apiResult = await ApiGateway.get(baseUrl, queryParams: {'roomId': roomId});
     if (apiResult.success) {
       var tasks = <CompletedTask>[];
-      Iterable decodedJsonList = jsonDecode(apiResult.data);
+      var decodedJsonList = jsonDecode(apiResult.data);
       for (var jsonTask in decodedJsonList) {
         tasks.add(CompletedTask.fromJson(jsonTask));
       }

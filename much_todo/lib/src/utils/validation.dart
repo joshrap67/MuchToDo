@@ -1,4 +1,3 @@
-import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/utils/constants.dart';
 
@@ -20,29 +19,15 @@ String? validTaskName(String? name) {
 }
 
 String? validTaskNote(String? note) {
-	if (note == null && note!.length>Constants.maxTaskNoteLength) {
-		return 'Required';
-	}
-	return null;
-}
-
-String? validRoomName(String? name) {
-  if (name == null || name.isEmpty) {
+  if (note == null && note!.length > Constants.maxTaskNoteLength) {
     return 'Required';
   }
   return null;
 }
 
-String? validRoomEditName(String? name, String originalName, List<Room> rooms) {
-  if (name != null && name == originalName) {
-    return null;
-  }
-
+String? validRoomName(String? name) {
   if (name == null || name.isEmpty) {
     return 'Required';
-  }
-  if (rooms.any((r) => r.name == name)) {
-    return 'Room name already exists';
   }
   return null;
 }
@@ -63,6 +48,7 @@ String? validContactName(String? name) {
 
 String? validContactEmail(String? email) {
   if (email == null || email.isEmpty) {
+    // todo sanity max checks on backend
     return null;
   }
   return null;

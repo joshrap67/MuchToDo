@@ -3,13 +3,13 @@ import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/validation.dart';
 
 class TaskNameInput extends StatefulWidget {
-  final String? hint;
-  final String? label;
+  final String? hintText;
+  final String? labelText;
   final ValueChanged<String?> onChange;
   final String? name;
   final FocusNode? nextFocus;
 
-  const TaskNameInput({super.key, this.hint, this.label, required this.onChange, this.name, this.nextFocus});
+  const TaskNameInput({super.key, this.hintText, this.labelText, required this.onChange, this.name, this.nextFocus});
 
   @override
   State<TaskNameInput> createState() => _TaskNameInputState();
@@ -37,13 +37,13 @@ class _TaskNameInputState extends State<TaskNameInput> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.sticky_note_2),
           border: const OutlineInputBorder(),
-          hintText: widget.hint,
-          labelText: widget.label,
+          hintText: widget.hintText,
+          labelText: widget.labelText,
           counterText: ''),
       controller: _controller,
       focusNode: _focusNode,
-      keyboardType: TextInputType.name,
-      maxLength: Constants.maxNameLength,
+      maxLength: Constants.maxTaskNameLength,
+	  textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.next,
       onFieldSubmitted: (_) {
         if (widget.nextFocus != null) {

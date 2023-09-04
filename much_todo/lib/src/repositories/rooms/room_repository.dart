@@ -12,7 +12,7 @@ class RoomRepository {
     final apiResult = await ApiGateway.get(basePath);
     if (apiResult.success) {
       var rooms = <Room>[];
-      Iterable decodedJsonList = jsonDecode(apiResult.data);
+      var decodedJsonList = jsonDecode(apiResult.data);
       for (var jsonRoom in decodedJsonList) {
         rooms.add(Room.fromJson(jsonRoom));
       }

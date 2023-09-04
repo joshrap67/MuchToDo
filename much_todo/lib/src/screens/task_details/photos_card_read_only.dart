@@ -72,7 +72,7 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
   }
 
   Future<void> setPhotos() async {
-    Task? result = await Navigator.push(
+    var result = await Navigator.push<Task?>(
       context,
       MaterialPageRoute(
         builder: (context) => SetTaskPhotosScreen(

@@ -17,11 +17,11 @@ class ApiGateway {
   static Future<ApiResult> post(String route, ApiRequest body) async {
     var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
-    http.Response response = await http.post(
+    var response = await http.post(
       url,
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(body.toJson()),
     );
@@ -31,11 +31,11 @@ class ApiGateway {
   static Future<ApiResult> put(String route, ApiRequest body) async {
     var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
-    http.Response response = await http.put(
+    var response = await http.put(
       url,
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(body.toJson()),
     );
@@ -45,14 +45,14 @@ class ApiGateway {
   static Future<ApiResult> delete(String route) async {
     var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
-    http.Response response = await http.delete(url, headers: {"Authorization": "Bearer $token"});
+    var response = await http.delete(url, headers: {'Authorization': 'Bearer $token'});
     return handleResult(response);
   }
 
   static Future<ApiResult> get(String route, {Map<String, String>? queryParams}) async {
     var url = Uri.https(baseUrl, '$functionName/$route', queryParams);
     var token = await getToken();
-    http.Response response = await http.get(url, headers: {"Authorization": "Bearer $token"});
+    var response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     return handleResult(response);
   }
 

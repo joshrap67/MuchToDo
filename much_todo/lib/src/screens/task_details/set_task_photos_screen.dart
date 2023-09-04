@@ -115,7 +115,7 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
   }
 
   Future<void> openPhoto(BuildContext context, PhotoWrapper photo) async {
-    bool? deleted = await Navigator.push(
+    var deleted = await Navigator.push<bool?>(
       context,
       MaterialPageRoute(
         builder: (context) => TaskPhotoView(

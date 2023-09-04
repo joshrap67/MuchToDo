@@ -372,7 +372,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> editTask() async {
-    task_domain.Task? result = await Navigator.push(
+    var result = await Navigator.push<task_domain.Task?>(
       context,
       MaterialPageRoute(
         builder: (context) => EditTask(
@@ -398,7 +398,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> duplicateTask() async {
-    task_domain.Task? result = await Navigator.push(
+    var result = await Navigator.push<task_domain.Task?>(
       context,
       MaterialPageRoute(
         builder: (context) => CreateTask(

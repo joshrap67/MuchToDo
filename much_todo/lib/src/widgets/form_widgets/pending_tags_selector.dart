@@ -18,17 +18,17 @@ class PendingTagsSelector extends StatefulWidget {
 
 class TagOption {
   Tag? tag;
-  bool hasResults = true;
+  bool isFooter = false;
 
-  TagOption({this.tag, this.hasResults = true});
+  TagOption({this.tag, this.isFooter = false});
 }
 
 class _PendingTagsSelectorState extends State<PendingTagsSelector> {
-  List<Tag> _selectedTags = [];
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
   final _textFieldKey = GlobalKey();
+  List<Tag> _selectedTags = [];
   bool _isReadOnly = true;
 
   @override
@@ -54,39 +54,28 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
           child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
             return RawAutocomplete<TagOption>(
               optionsBuilder: (TextEditingValue textEditingValue) {
-                var tags = context.read<UserProvider>().tags;
-                if (tags.isEmpty) {
-                  // if user has none in the first place give them an option to create one from here
-                  return [TagOption(hasResults: false)];
-                }
-
+                var tags = getOptions();
                 // don't show options that are already selected
                 if (textEditingValue.text == '') {
                   return tags
-                      .where((element) => !_selectedTags.any((t) => t.id == element.id))
-                      .map((e) => TagOption(tag: e));
+                      .where((element) => element.isFooter || !_selectedTags.any((t) => t.id == element.tag?.id));
                 }
 
-                var filteredTags = tags
-                    .where((element) => element.name.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                    .where((element) => !_selectedTags.any((t) => t.id == element.id));
-                if (filteredTags.isNotEmpty) {
-                  return filteredTags.map((e) => TagOption(tag: e));
-                } else {
-                  // hack, but I want to show a footer when no results are found to allow user to create items on the fly
-                  return [TagOption(hasResults: false)];
-                }
+                var filteredTags = tags.where((element) =>
+                    element.isFooter ||
+                    (element.tag!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()) &&
+                        !_selectedTags.any((t) => t.id == element.tag?.id)));
+                return filteredTags;
               },
               textEditingController: _autoCompleteController,
               focusNode: _focusNode,
-              displayStringForOption: (tagOption) => tagOption.tag!.name,
               fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                 return TextFormField(
                   key: _textFieldKey,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.tag),
-                    labelText: "Select Tags",
+                    labelText: 'Select Tags',
                     suffixIcon: IconButton(
                       icon: _isReadOnly ? const Icon(Icons.search) : const Icon(Icons.search_off),
                       onPressed: () {
@@ -95,6 +84,9 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                           _isReadOnly = !_isReadOnly;
                           if (_isReadOnly) {
                             _autoCompleteController.text = '';
+                            hideKeyboard();
+                          } else {
+                            FocusScope.of(context).requestFocus(_focusNode);
                           }
                         });
                       },
@@ -126,7 +118,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
                             final TagOption option = options.elementAt(index);
-                            if (option.hasResults) {
+                            if (!option.isFooter) {
                               return ListTile(
                                 title: Text(option.tag!.name),
                                 onTap: () => onSelected(option),
@@ -134,7 +126,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                             } else if (widget.showAdd) {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: OutlinedButton.icon(
+                                child: TextButton.icon(
                                   label: const Text('CREATE NEW TAG'),
                                   onPressed: addTag,
                                   icon: const Icon(Icons.add),
@@ -179,6 +171,15 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
           )
       ],
     );
+  }
+
+  List<TagOption> getOptions() {
+    // separate method since it appears optionsBuilder uses deferred execution on the iterable defined in it, so can't call toList in it
+    List<TagOption> options = [];
+    var tags = context.read<UserProvider>().tags;
+    options.addAll(tags.map((e) => TagOption(tag: e)));
+    options.add(TagOption(isFooter: true));
+    return options;
   }
 
   void selectTag(TagOption? tagOption) {

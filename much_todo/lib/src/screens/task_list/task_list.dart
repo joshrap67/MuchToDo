@@ -280,7 +280,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<void> pickRandomTask() async {
-    var tasks = context.read<TasksProvider>().allTasks.where((element) => !element.inProgress).toList();
+    var tasks = context.read<TasksProvider>().filteredTasks.where((element) => !element.inProgress).toList();
     if (tasks.isEmpty) {
       return;
     }

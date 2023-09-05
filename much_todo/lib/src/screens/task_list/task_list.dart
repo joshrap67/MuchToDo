@@ -198,7 +198,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
               child: FloatingActionButton.extended(
                 onPressed: launchAddTask,
                 icon: const Icon(Icons.add),
-                label: const Text('ADD TASK'),
+                label: const Text('NEW TASK'),
                 heroTag: 'TaskFab',
               ),
             ),

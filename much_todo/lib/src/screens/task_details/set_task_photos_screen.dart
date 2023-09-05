@@ -105,7 +105,7 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
                 child: FloatingActionButton.extended(
                   onPressed: addPhoto,
                   icon: const Icon(Icons.add),
-                  label: const Text('ADD PHOTO'),
+                  label: const Text('NEW PHOTO'),
                   heroTag: 'TaskFab',
                 )),
           )

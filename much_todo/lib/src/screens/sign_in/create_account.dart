@@ -64,7 +64,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   child: ElevatedButton.icon(
                     onPressed: launchAddRoom,
                     icon: const Icon(Icons.add),
-                    label: const Text('ADD ROOM'),
+                    label: const Text('NEW ROOM'),
                   ),
                 ),
               ),
@@ -208,7 +208,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               )
             ],
             insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Create Room'),
+            title: const Text('New Room'),
             content: Form(
               key: formKey,
               child: SizedBox(

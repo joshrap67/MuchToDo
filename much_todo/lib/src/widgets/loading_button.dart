@@ -17,16 +17,18 @@ class _LoadingButtonState extends State<LoadingButton> {
 
   @override
   Widget build(BuildContext context) {
-	  // todo fix problem with color being messed up when loading
     return OutlinedButton.icon(
       onPressed: _isLoading ? null : onSubmit,
       style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(16.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary),
+        padding: const EdgeInsets.all(16.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32.0),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        disabledBackgroundColor: Theme.of(context).colorScheme.primary,
+        disabledForegroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
       icon: _isLoading
           ? Container(
               width: 24,

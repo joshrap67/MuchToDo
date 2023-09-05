@@ -24,9 +24,9 @@ class RoomOption {
 }
 
 class _PendingRoomSelectorState extends State<PendingRoomSelector> {
-  final _textFieldKey = GlobalKey();
-  final _autoCompleteController = TextEditingController();
+  static const maxOptionsHeight = 300.0;
 
+  final _autoCompleteController = TextEditingController();
   FocusNode _focusNode = FocusNode();
   Room? _selectedRoom;
 
@@ -81,7 +81,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                       }
                     },
                     child: TextFormField(
-                      key: _textFieldKey,
+                      scrollPadding: const EdgeInsets.only(bottom: maxOptionsHeight + 50),
                       decoration: InputDecoration(
                           border: const OutlineInputBorder(),
                           prefixIcon: const Icon(Icons.room),
@@ -119,7 +119,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                         constraints: BoxConstraints(
                           maxWidth: constraints.maxWidth,
                           // bug with flutter, without this there is overflow on right
-                          maxHeight: 300,
+                          maxHeight: maxOptionsHeight,
                         ),
                         child: Scrollbar(
                           child: ListView.builder(
@@ -137,7 +137,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: TextButton.icon(
-                                    label: const Text('CREATE NEW ROOM'),
+                                    label: const Text('NEW ROOM'),
                                     onPressed: addRoom,
                                     icon: const Icon(Icons.add),
                                   ),

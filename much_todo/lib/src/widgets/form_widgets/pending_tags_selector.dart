@@ -24,12 +24,14 @@ class TagOption {
 }
 
 class _PendingTagsSelectorState extends State<PendingTagsSelector> {
+  static const maxOptionsHeight = 300.0;
+
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
-  final _textFieldKey = GlobalKey();
+
   List<Tag> _selectedTags = [];
-  bool _isReadOnly = true;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -47,129 +49,130 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
-          child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
-            return RawAutocomplete<TagOption>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                var tags = getOptions();
-                // don't show options that are already selected
-                if (textEditingValue.text == '') {
-                  return tags
-                      .where((element) => element.isFooter || !_selectedTags.any((t) => t.id == element.tag?.id));
-                }
+    return Focus(
+      onFocusChange: (hasFocus) {
+        setState(() {
+          _hasFocus = hasFocus;
+        });
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
+            child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
+              return RawAutocomplete<TagOption>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  var tags = getOptions();
+                  // don't show options that are already selected
+                  if (textEditingValue.text == '') {
+                    return tags
+                        .where((element) => element.isFooter || !_selectedTags.any((t) => t.id == element.tag?.id));
+                  }
 
-                var filteredTags = tags.where((element) =>
-                    element.isFooter ||
-                    (element.tag!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()) &&
-                        !_selectedTags.any((t) => t.id == element.tag?.id)));
-                return filteredTags;
-              },
-              textEditingController: _autoCompleteController,
-              focusNode: _focusNode,
-              fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                return TextFormField(
-                  key: _textFieldKey,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.tag),
-                    labelText: 'Select Tags',
-                    suffixIcon: IconButton(
-                      icon: _isReadOnly ? const Icon(Icons.search) : const Icon(Icons.search_off),
-                      onPressed: () {
-                        setState(() {
-                          // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
-                          _isReadOnly = !_isReadOnly;
-                          if (_isReadOnly) {
-                            _autoCompleteController.text = '';
-                            hideKeyboard();
-                          } else {
-                            FocusScope.of(context).requestFocus(_focusNode);
-                          }
-                        });
-                      },
+                  var filteredTags = tags.where((element) =>
+                      element.isFooter ||
+                      (element.tag!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()) &&
+                          !_selectedTags.any((t) => t.id == element.tag?.id)));
+                  return filteredTags;
+                },
+                textEditingController: _autoCompleteController,
+                focusNode: _focusNode,
+                fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    scrollPadding: const EdgeInsets.only(bottom: maxOptionsHeight + 50),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.tag),
+                      labelText: 'Select Tags',
+                      suffixIcon: _hasFocus
+                          ? IconButton(
+                              icon: const Icon(Icons.done),
+                              onPressed: () {
+                                setState(() {
+                                  hideKeyboard();
+                                });
+                              },
+                            )
+                          : null,
                     ),
-                  ),
-                  controller: fieldTextEditingController,
-                  focusNode: fieldFocusNode,
-                  readOnly: _isReadOnly,
-                );
-              },
-              optionsViewBuilder: (context, onSelected, options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 10,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth,
-                        // bug with flutter, without this there is overflow on right
-                        maxHeight: 300,
-                      ),
-                      child: Scrollbar(
-                        controller: _scrollController,
-                        thumbVisibility: true,
-                        child: ListView.builder(
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                  );
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 10,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth,
+                          // bug with flutter, without this there is overflow on right
+                          maxHeight: maxOptionsHeight,
+                        ),
+                        child: Scrollbar(
                           controller: _scrollController,
-                          padding: EdgeInsets.zero,
-                          itemCount: options.length,
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            final TagOption option = options.elementAt(index);
-                            if (!option.isFooter) {
-                              return ListTile(
-                                title: Text(option.tag!.name),
-                                onTap: () => onSelected(option),
-                              );
-                            } else if (widget.showAdd) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: TextButton.icon(
-                                  label: const Text('CREATE NEW TAG'),
-                                  onPressed: addTag,
-                                  icon: const Icon(Icons.add),
-                                ),
-                              );
-                            } else {
-                              return null;
-                            }
-                          },
+                          thumbVisibility: true,
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: EdgeInsets.zero,
+                            itemCount: options.length,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              final TagOption option = options.elementAt(index);
+                              if (!option.isFooter) {
+                                return ListTile(
+                                  title: Text(option.tag!.name),
+                                  onTap: () => onSelected(option),
+                                );
+                              } else if (widget.showAdd) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: TextButton.icon(
+                                    label: const Text('NEW TAG'),
+                                    onPressed: addTag,
+                                    icon: const Icon(Icons.add),
+                                  ),
+                                );
+                              } else {
+                                return null;
+                              }
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-              onSelected: selectTag,
-            );
-          }),
-        ),
-        if (_selectedTags.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-            child: Wrap(
-              spacing: 8.0, // gap between adjacent chips
-              runSpacing: 4.0, // gap between lines
-              children: [
-                for (var i = 0; i < _selectedTags.length; i++)
-                  Chip(
-                    label: Text(
-                      _selectedTags[i].name,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                  );
+                },
+                onSelected: selectTag,
+              );
+            }),
+          ),
+          if (_selectedTags.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+              child: Wrap(
+                spacing: 8.0, // gap between adjacent chips
+                runSpacing: 4.0, // gap between lines
+                children: [
+                  for (var i = 0; i < _selectedTags.length; i++)
+                    Chip(
+                      label: Text(
+                        _selectedTags[i].name,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      onDeleted: () {
+                        onDeleteTag(_selectedTags[i]);
+                      },
                     ),
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    onDeleted: () {
-                      onDeleteTag(_selectedTags[i]);
-                    },
-                  ),
-              ],
-            ),
-          )
-      ],
+                ],
+              ),
+            )
+        ],
+      ),
     );
   }
 
@@ -195,7 +198,6 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
       _selectedTags.removeWhere((t) => t.id == tag.id);
     }
     widget.onChange(_selectedTags);
-    hideKeyboard();
     setState(() {});
   }
 

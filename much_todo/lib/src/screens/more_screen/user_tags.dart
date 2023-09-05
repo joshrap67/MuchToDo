@@ -96,7 +96,7 @@ class _UserTagsState extends State<UserTags> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: addTag,
-          label: const Text('ADD TAG'),
+          label: const Text('NEW TAG'),
           icon: const Icon(Icons.add),
         ),
       ),

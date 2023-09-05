@@ -152,7 +152,7 @@ class _RoomDetailsState extends State<RoomDetails> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: launchAddTask,
-        label: const Text('CREATE NEW TASK'),
+        label: const Text('NEW TASK'),
         icon: const Icon(Icons.add),
       ),
     );

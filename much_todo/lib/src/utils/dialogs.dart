@@ -53,7 +53,7 @@ class Dialogs {
               )
             ],
             insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Create Tag'),
+            title: const Text('New Tag'),
             content: Form(
               key: formKey,
               child: SizedBox(
@@ -121,7 +121,7 @@ class Dialogs {
               )
             ],
             insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Create Contact'),
+            title: const Text('New Contact'),
             content: Form(
               key: formKey,
               child: SizedBox(
@@ -219,7 +219,7 @@ class Dialogs {
               )
             ],
             insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Create Room'),
+            title: const Text('New Room'),
             content: Form(
               key: formKey,
               child: SizedBox(

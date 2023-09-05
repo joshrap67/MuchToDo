@@ -24,13 +24,13 @@ class ContactOption {
 }
 
 class _PendingContactsCard1State extends State<PendingContactsSelector> {
+  static const maxOptionsHeight = 300.0;
+
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
-  final _textFieldKey = GlobalKey();
-
   List<Contact> _selectedContacts = [];
-  bool _isReadOnly = true;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -48,129 +48,130 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
-          child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
-            return RawAutocomplete<ContactOption>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                var contacts = getOptions();
-                // don't show options that are already selected
-                if (textEditingValue.text == '') {
-                  return contacts.where(
-                      (element) => element.isFooter || !_selectedContacts.any((t) => t.id == element.contact?.id));
-                }
+    return Focus(
+      onFocusChange: (hasFocus) {
+        setState(() {
+          _hasFocus = hasFocus;
+        });
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
+            child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
+              return RawAutocomplete<ContactOption>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  var contacts = getOptions();
+                  // don't show options that are already selected
+                  if (textEditingValue.text == '') {
+                    return contacts.where(
+                        (element) => element.isFooter || !_selectedContacts.any((t) => t.id == element.contact?.id));
+                  }
 
-                var filteredContacts = contacts.where((element) =>
-                    element.isFooter ||
-                    (element.contact!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()) &&
-                        !_selectedContacts.any((t) => t.id == element.contact?.id)));
-                return filteredContacts;
-              },
-              textEditingController: _autoCompleteController,
-              focusNode: _focusNode,
-              fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                return TextFormField(
-                  key: _textFieldKey,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.person),
-                    labelText: 'Select Contacts',
-                    suffixIcon: IconButton(
-                      icon: _isReadOnly ? const Icon(Icons.search) : const Icon(Icons.search_off),
-                      onPressed: () {
-                        setState(() {
-                          // doing this since the keyboard opening can be pretty distracting, so by default show all and give users option to search by clicking search icon
-                          _isReadOnly = !_isReadOnly;
-                          if (_isReadOnly) {
-                            _autoCompleteController.text = '';
-                            hideKeyboard();
-                          } else {
-                            FocusScope.of(context).requestFocus(_focusNode);
-                          }
-                        });
-                      },
+                  var filteredContacts = contacts.where((element) =>
+                      element.isFooter ||
+                      (element.contact!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()) &&
+                          !_selectedContacts.any((t) => t.id == element.contact?.id)));
+                  return filteredContacts;
+                },
+                textEditingController: _autoCompleteController,
+                focusNode: _focusNode,
+                fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    scrollPadding: const EdgeInsets.only(bottom: maxOptionsHeight + 50),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.person),
+                      labelText: 'Select Contacts',
+                      suffixIcon: _hasFocus
+                          ? IconButton(
+                              icon: const Icon(Icons.done),
+                              onPressed: () {
+                                setState(() {
+                                  hideKeyboard();
+                                });
+                              },
+                            )
+                          : null,
                     ),
-                  ),
-                  readOnly: _isReadOnly,
-                  controller: fieldTextEditingController,
-                  focusNode: fieldFocusNode,
-                );
-              },
-              optionsViewBuilder: (context, onSelected, options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    elevation: 10,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth,
-                        // bug with flutter, without this there is overflow on right
-                        maxHeight: 300,
-                      ),
-                      child: Scrollbar(
-                        thumbVisibility: true,
-                        controller: _scrollController,
-                        child: ListView.builder(
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                  );
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 10,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          // bug with flutter, without this there is overflow on right
+                          maxWidth: constraints.maxWidth,
+                          maxHeight: maxOptionsHeight,
+                        ),
+                        child: Scrollbar(
+                          thumbVisibility: true,
                           controller: _scrollController,
-                          padding: EdgeInsets.zero,
-                          itemCount: options.length,
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            final ContactOption option = options.elementAt(index);
-                            if (!option.isFooter) {
-                              return ListTile(
-                                title: Text(option.contact!.name),
-                                onTap: () => onSelected(option),
-                              );
-                            } else if (widget.showAdd) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: TextButton.icon(
-                                  label: const Text('CREATE NEW CONTACT'),
-                                  onPressed: addContact,
-                                  icon: const Icon(Icons.add),
-                                ),
-                              );
-                            } else {
-                              return null;
-                            }
-                          },
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: EdgeInsets.zero,
+                            itemCount: options.length,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              final ContactOption option = options.elementAt(index);
+                              if (!option.isFooter) {
+                                return ListTile(
+                                  title: Text(option.contact!.name),
+                                  onTap: () => onSelected(option),
+                                );
+                              } else if (widget.showAdd) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: TextButton.icon(
+                                    label: const Text('NEW CONTACT'),
+                                    onPressed: addContact,
+                                    icon: const Icon(Icons.add),
+                                  ),
+                                );
+                              } else {
+                                return null;
+                              }
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-              onSelected: selectContact,
-            );
-          }),
-        ),
-        if (_selectedContacts.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-            child: Wrap(
-              spacing: 8.0, // gap between adjacent chips
-              runSpacing: 4.0, // gap between lines
-              children: [
-                for (var i = 0; i < _selectedContacts.length; i++)
-                  Chip(
-                    label: Text(
-                      _selectedContacts[i].name,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                  );
+                },
+                onSelected: selectContact,
+              );
+            }),
+          ),
+          if (_selectedContacts.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+              child: Wrap(
+                spacing: 8.0, // gap between adjacent chips
+                runSpacing: 4.0, // gap between lines
+                children: [
+                  for (var i = 0; i < _selectedContacts.length; i++)
+                    Chip(
+                      label: Text(
+                        _selectedContacts[i].name,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      onDeleted: () {
+                        onDeleteContact(_selectedContacts[i]);
+                      },
                     ),
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    onDeleted: () {
-                      onDeleteContact(_selectedContacts[i]);
-                    },
-                  ),
-              ],
-            ),
-          )
-      ],
+                ],
+              ),
+            )
+        ],
+      ),
     );
   }
 
@@ -196,7 +197,6 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
       _selectedContacts.removeWhere((t) => t.id == contact.id);
     }
     widget.onChange(_selectedContacts);
-    hideKeyboard();
     setState(() {});
   }
 

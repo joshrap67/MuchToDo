@@ -75,7 +75,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
               child: FloatingActionButton.extended(
                 onPressed: promptAddRoom,
-                label: const Text('ADD ROOM'),
+                label: const Text('NEW ROOM'),
                 icon: const Icon(Icons.add),
                 heroTag: 'RoomFab',
               ),

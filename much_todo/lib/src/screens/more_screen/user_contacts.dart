@@ -88,7 +88,7 @@ class _UserContactsState extends State<UserContacts> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: addContact,
-          label: const Text('ADD CONTACT'),
+          label: const Text('NEW CONTACT'),
           icon: const Icon(Icons.add),
         ),
       ),
@@ -158,27 +158,28 @@ class _UserContactsState extends State<UserContacts> {
 
   void promptDeleteContact(Contact contact) {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  deleteContact(contact);
-                },
-                child: const Text('DELETE'),
-              )
-            ],
-            title: const Text('Delete Contact'),
-            content: const Text(
-                'Are you sure you wish to delete this contact?\n\nThis contact will be removed from ALL tasks that have them!'),
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                deleteContact(contact);
+              },
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Contact'),
+          content: const Text(
+              'Are you sure you wish to delete this contact?\n\nThis contact will be removed from ALL tasks that have them!'),
+        );
+      },
+    );
   }
 
   Future<void> promptEditContact(Contact contact) async {
@@ -188,6 +189,7 @@ class _UserContactsState extends State<UserContacts> {
     final nameController = TextEditingController(text: contact.name);
     final emailController = TextEditingController(text: contact.email);
     final phoneNumberController = TextEditingController(text: contact.phoneNumber);
+
     await showDialog<Contact?>(
       context: context,
       barrierDismissible: !isLoading,

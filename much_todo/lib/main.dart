@@ -1,7 +1,5 @@
-import 'dart:ui';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
@@ -34,6 +32,11 @@ void main() async {
   //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
   //   return true;
   // };
+  if (FirebaseAuth.instance.currentUser != null) {
+    // on off chance user's profile (e.g. email verified) was not properly updated
+    var user = FirebaseAuth.instance.currentUser;
+    await user?.reload();
+  }
 
   await settingsProvider.loadSettings();
 

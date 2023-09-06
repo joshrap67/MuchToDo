@@ -12,7 +12,7 @@ class TaskRepository {
   static const baseUrl = 'tasks';
 
   static Future<List<Task>> getAllTasksByUser() async {
-    final apiResult = await ApiGateway.get(baseUrl);
+    final apiResult = await ApiGateway.get(baseUrl, forceTokenRefresh: true);
     if (apiResult.success) {
       var tasks = <Task>[];
       var decodedJsonList = jsonDecode(apiResult.data);
@@ -21,7 +21,7 @@ class TaskRepository {
       }
       return tasks;
     } else {
-      throw Exception('There was a problem getting tasks.');
+      throw Exception('There was a problem getting tasks. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -31,7 +31,7 @@ class TaskRepository {
       Map<String, dynamic> decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem creating the task.');
+      throw Exception('There was a problem creating the task. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -41,7 +41,7 @@ class TaskRepository {
       var decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem updating the task.');
+      throw Exception('There was a problem updating the task. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -50,7 +50,7 @@ class TaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the task.');
+      throw Exception('There was a problem deleting the task. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -60,7 +60,7 @@ class TaskRepository {
       var decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem setting the photos.');
+      throw Exception('There was a problem setting the photos. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -69,16 +69,16 @@ class TaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem setting the progress.');
+      throw Exception('There was a problem setting the progress. Result status ${apiResult.statusCode}');
     }
   }
 
   static Future<bool> completeTask(String taskId, CompleteTaskRequest request) async {
-	  final apiResult = await ApiGateway.post('$baseUrl/$taskId/complete', request);
-	  if (apiResult.success) {
-		  return true;
-	  } else {
-		  throw Exception('There was a problem completing the task.');
-	  }
+    final apiResult = await ApiGateway.post('$baseUrl/$taskId/complete', request);
+    if (apiResult.success) {
+      return true;
+    } else {
+      throw Exception('There was a problem completing the task. Result status ${apiResult.statusCode}');
+    }
   }
 }

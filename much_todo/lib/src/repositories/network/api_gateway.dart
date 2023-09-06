@@ -9,8 +9,8 @@ class ApiGateway {
   static const String baseUrl = 'us-central1-muchtodo-42777.cloudfunctions.net';
   static const String functionName = '/expressApi';
 
-  static Future<String> getToken() async {
-    var token = await FirebaseAuth.instance.currentUser?.getIdToken();
+  static Future<String> getToken({bool forceRefresh = false}) async {
+    var token = await FirebaseAuth.instance.currentUser?.getIdToken(forceRefresh);
     return token!;
   }
 
@@ -49,9 +49,9 @@ class ApiGateway {
     return handleResult(response);
   }
 
-  static Future<ApiResult> get(String route, {Map<String, String>? queryParams}) async {
+  static Future<ApiResult> get(String route, {Map<String, String>? queryParams, bool forceTokenRefresh = false}) async {
     var url = Uri.https(baseUrl, '$functionName/$route', queryParams);
-    var token = await getToken();
+    var token = await getToken(forceRefresh: forceTokenRefresh);
     var response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     return handleResult(response);
   }

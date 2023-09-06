@@ -13,14 +13,15 @@ class UserRepository {
   static const basePath = 'users';
 
   static Future<User> getUser() async {
-    final apiResult = await ApiGateway.get(basePath);
+    // if user signs up via email, their email will stay unverified on token until it expires. so force a refresh
+    final apiResult = await ApiGateway.get(basePath, forceTokenRefresh: true);
     if (apiResult.success) {
       var decodedUser = jsonDecode(apiResult.data);
       return User.fromJson(decodedUser);
     } else if (apiResult.statusCode == 404) {
       throw UserNotFoundException('User does not yet exist. Re-routing...');
     } else {
-      throw Exception('There was a problem getting the user.');
+      throw Exception('There was a problem getting the user. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -30,7 +31,7 @@ class UserRepository {
       var decodedUser = jsonDecode(apiResult.data);
       return User.fromJson(decodedUser);
     } else {
-      throw Exception('There was a problem creating the user.');
+      throw Exception('There was a problem creating the user. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -38,7 +39,7 @@ class UserRepository {
     // todo delete firebase account
     final apiResult = await ApiGateway.delete(basePath);
     if (!apiResult.success) {
-      throw Exception('There was a problem deleting the user.');
+      throw Exception('There was a problem deleting the user. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -48,21 +49,21 @@ class UserRepository {
       var decodedTag = jsonDecode(apiResult.data);
       return Tag.fromJson(decodedTag);
     } else {
-      throw Exception('There was a problem creating the tag.');
+      throw Exception('There was a problem creating the tag. Result status ${apiResult.statusCode}');
     }
   }
 
   static Future<void> updateTag(String tagId, SetTagRequest request) async {
     final apiResult = await ApiGateway.put('$basePath/tags/$tagId', request);
     if (!apiResult.success) {
-      throw Exception('There was a problem updating the tag.');
+      throw Exception('There was a problem updating the tag. Result status ${apiResult.statusCode}');
     }
   }
 
   static Future<void> deleteTag(String tagId) async {
     final apiResult = await ApiGateway.delete('$basePath/tags/$tagId');
     if (!apiResult.success) {
-      throw Exception('There was a problem deleting the tag.');
+      throw Exception('There was a problem deleting the tag. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -72,21 +73,21 @@ class UserRepository {
       var decodedContact = jsonDecode(apiResult.data);
       return Contact.fromJson(decodedContact);
     } else {
-      throw Exception('There was a problem creating the contact.');
+      throw Exception('There was a problem creating the contact. Result status ${apiResult.statusCode}');
     }
   }
 
   static Future<void> updateContact(String contactId, SetContactRequest request) async {
     final apiResult = await ApiGateway.put('$basePath/contacts/$contactId', request);
     if (!apiResult.success) {
-      throw Exception('There was a problem updating the contact.');
+      throw Exception('There was a problem updating the contact. Result status ${apiResult.statusCode}');
     }
   }
 
   static Future<void> deleteContact(String contactId) async {
     final apiResult = await ApiGateway.delete('$basePath/contacts/$contactId');
     if (!apiResult.success) {
-      throw Exception('There was a problem deleting the contact.');
+      throw Exception('There was a problem deleting the contact. Result status ${apiResult.statusCode}');
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
 import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
+import 'package:much_todo/src/utils/themes.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class UnverifiedScreen extends StatefulWidget {
@@ -14,16 +15,36 @@ class UnverifiedScreen extends StatefulWidget {
   State<UnverifiedScreen> createState() => _UnverifiedScreenState();
 }
 
-class _UnverifiedScreenState extends State<UnverifiedScreen> {
+class _UnverifiedScreenState extends State<UnverifiedScreen> with WidgetsBindingObserver {
   bool _isEmailSending = false;
   bool _isReloading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    checkVerified();
+  }
+
+  @override
+  void didChangeAppLifecycleState(final AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      checkVerified();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context).height;
-    checkVerified();
     return Theme(
       data: ThemeData(
+        colorScheme: lightColorScheme,
         useMaterial3: true,
       ),
       child: Scaffold(
@@ -34,8 +55,8 @@ class _UnverifiedScreenState extends State<UnverifiedScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF9890e3),
-                  Color(0xFF9ea7de),
+                  loginGradientColor1,
+                  loginGradientColor2,
                 ],
               ),
             ),
@@ -61,15 +82,9 @@ class _UnverifiedScreenState extends State<UnverifiedScreen> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.blue,
-                            ),
                             onPressed: resendVerificationEmail,
                             child: _isEmailSending
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
+                                ? const CircularProgressIndicator()
                                 : const Text('RESEND VERIFICATION EMAIL'),
                           ),
                         ),
@@ -82,18 +97,14 @@ class _UnverifiedScreenState extends State<UnverifiedScreen> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.blue,
-                            ),
                             onPressed: () {
-                              setState(() {});
+                              setState(() {
+                                checkVerified();
+                              });
                             },
                             child: _isReloading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : const Text('RELOAD PAGE'),
+                                ? const CircularProgressIndicator()
+                                : const Text('CHECK VERIFICATION STATUS'),
                           ),
                         ),
                       ),

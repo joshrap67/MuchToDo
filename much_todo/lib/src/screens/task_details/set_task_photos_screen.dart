@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/screens/task_details/task_photo_view.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/utils/utils.dart';

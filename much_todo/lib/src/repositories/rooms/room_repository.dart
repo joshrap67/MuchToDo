@@ -9,7 +9,7 @@ class RoomRepository {
   static const basePath = 'rooms';
 
   static Future<List<Room>> getAllRoomsByUser() async {
-    final apiResult = await ApiGateway.get(basePath);
+    final apiResult = await ApiGateway.get(basePath, forceTokenRefresh: true);
     if (apiResult.success) {
       var rooms = <Room>[];
       var decodedJsonList = jsonDecode(apiResult.data);
@@ -18,7 +18,7 @@ class RoomRepository {
       }
       return rooms;
     } else {
-      throw Exception('There was a problem getting rooms.');
+      throw Exception('There was a problem getting rooms. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -28,14 +28,14 @@ class RoomRepository {
       var decodedJson = jsonDecode(apiResult.data);
       return Room.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem creating the room.');
+      throw Exception('There was a problem creating the room. Result status ${apiResult.statusCode}');
     }
   }
 
   static Future<void> updateRoom(String roomId, UpdateRoomRequest request) async {
     final apiResult = await ApiGateway.put('$basePath/$roomId', request);
     if (!apiResult.success) {
-      throw Exception('There was a problem updating the room.');
+      throw Exception('There was a problem updating the room. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -44,7 +44,7 @@ class RoomRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the room.');
+      throw Exception('There was a problem deleting the room. Result status ${apiResult.statusCode}');
     }
   }
 }

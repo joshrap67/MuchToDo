@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/utils/themes.dart';
 
 class LoginHeader extends StatelessWidget {
   final double size;
@@ -19,8 +20,8 @@ class LoginHeader extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF9ea7de),
-                  Color(0xFFb1f4cf),
+                  loginGradientColor3,
+                  loginGradientColor4,
                 ],
               ),
             ),

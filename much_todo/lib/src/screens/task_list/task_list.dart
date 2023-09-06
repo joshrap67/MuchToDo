@@ -25,7 +25,6 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   late AnimationController _diceController;
-
   bool _bounceDice = false;
 
   @override
@@ -103,6 +102,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                               ),
                               child: IconButton(
                                 onPressed: () {},
+                                // todo better way?
                                 isSelected: false,
                                 icon: SvgPicture.asset(
                                   'assets/icons/dice.svg',
@@ -199,7 +199,6 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                 onPressed: launchAddTask,
                 icon: const Icon(Icons.add),
                 label: const Text('NEW TASK'),
-                heroTag: 'TaskFab',
               ),
             ),
           )
@@ -287,7 +286,6 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
     hideKeyboard();
     setState(() {
       _bounceDice = true;
-      // there is probably a better way of doing this but for now this works
       setDiceController();
     });
     await Future.delayed(const Duration(seconds: 2), () {});

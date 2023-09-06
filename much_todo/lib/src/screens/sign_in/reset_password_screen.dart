@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
+import 'package:much_todo/src/utils/themes.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String? email;
+
+  const ResetPasswordScreen({super.key, this.email});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -16,10 +19,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.email != null) {
+      _emailController.text = widget.email!;
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context).height;
     return Theme(
       data: ThemeData(
+        colorScheme: lightColorScheme,
         useMaterial3: true,
       ),
       child: Scaffold(
@@ -30,8 +48,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF9890e3),
-                  Color(0xFF9ea7de),
+                  loginGradientColor1,
+                  loginGradientColor2,
                 ],
               ),
             ),
@@ -74,13 +92,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.blue,
-                                ),
                                 onPressed: resetPassword,
                                 child: _isLoading
-                                    ? const CircularProgressIndicator(color: Colors.white)
+                                    ? const CircularProgressIndicator()
                                     : const Text('SEND RESET PASSWORD EMAIL'),
                               ),
                             ),
@@ -105,15 +119,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       });
 
       hideKeyboard();
-      var result = await AuthService.sendResetEmail(_emailController.text.trim());
+      await AuthService.sendResetEmail(_emailController.text.trim());
       setState(() {
         _isLoading = false;
       });
 
-      if (result.success && context.mounted) {
+      if (context.mounted) {
         showSnackbar('Reset email sent. Check your inbox.', context);
-      } else if (context.mounted) {
-        showSnackbar(result.errorMessage!, context);
       }
     }
   }

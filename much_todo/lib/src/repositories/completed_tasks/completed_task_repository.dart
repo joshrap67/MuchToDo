@@ -17,7 +17,7 @@ class CompletedTaskRepository {
       }
       return tasks;
     } else {
-      throw Exception('There was a problem getting completed tasks.');
+      throw Exception('There was a problem getting completed tasks. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -31,7 +31,7 @@ class CompletedTaskRepository {
       }
       return tasks;
     } else {
-      throw Exception('There was a problem getting completed tasks.');
+      throw Exception('There was a problem getting completed tasks. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -40,7 +40,7 @@ class CompletedTaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the completed task.');
+      throw Exception('There was a problem deleting the completed task. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -49,7 +49,7 @@ class CompletedTaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the completed tasks.');
+      throw Exception('There was a problem deleting the completed tasks. Result status ${apiResult.statusCode}');
     }
   }
 
@@ -58,7 +58,7 @@ class CompletedTaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the completed tasks.');
+      throw Exception('There was a problem deleting the completed tasks. Result status ${apiResult.statusCode}');
     }
   }
 }

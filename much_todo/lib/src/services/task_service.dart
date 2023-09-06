@@ -116,12 +116,12 @@ class TaskService {
         taskId,
         SetTaskPhotosRequest(photosToUpload: photosToUpload, deletedPhotos: deletedPhotos),
       );
-      result.setData(result.data!);
+      result.setData(task);
       if (context.mounted) {
         context.read<TasksProvider>().updateTask(task);
       }
     } catch (e) {
-      result.setErrorMessage('There was a problem creating tasks');
+      result.setErrorMessage('There was a problem setting the task photos');
     }
     return result;
   }

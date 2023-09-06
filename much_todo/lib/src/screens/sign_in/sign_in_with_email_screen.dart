@@ -4,6 +4,7 @@ import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/reset_password_screen.dart';
 import 'package:much_todo/src/screens/sign_in/sign_up_screen.dart';
+import 'package:much_todo/src/utils/themes.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class SignInWithEmailScreen extends StatefulWidget {
@@ -17,16 +18,24 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
+  final _passwordFocusNode = FocusNode();
   bool _hidePassword = true;
   bool _isSigningIn = false;
-  final _passwordFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context).height;
     return Theme(
       data: ThemeData(
+        colorScheme: lightColorScheme,
         useMaterial3: true,
       ),
       child: Scaffold(
@@ -39,8 +48,8 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF9890e3),
-                  Color(0xFF9ea7de),
+                  loginGradientColor1,
+                  loginGradientColor2,
                 ],
               ),
             ),
@@ -239,7 +248,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ResetPasswordScreen(),
+        builder: (context) => ResetPasswordScreen(email: _emailController.text),
       ),
     );
   }
@@ -248,10 +257,11 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+	hideKeyboard();
     setState(() {
       _isSigningIn = true;
     });
-    hideKeyboard();
 
     var result =
         await AuthService.signInWithEmailAndPassword(_emailController.text.trim(), _passwordController.text.trim());

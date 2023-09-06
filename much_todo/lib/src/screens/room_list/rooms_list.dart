@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/screens/room_list/room_info_card.dart';
@@ -77,17 +76,12 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                 onPressed: promptAddRoom,
                 label: const Text('NEW ROOM'),
                 icon: const Icon(Icons.add),
-                heroTag: 'RoomFab',
               ),
             ),
           ),
         ],
       );
     }
-  }
-
-  void setSort() {
-    context.read<RoomsProvider>().setSort(_sortByValue, _sortDirectionValue);
   }
 
   int totalTasks() {
@@ -117,14 +111,13 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
         return AlertDialog.adaptive(
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
+              onPressed: () => Navigator.pop(context),
               child: const Text('CANCEL'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context, 'OK');
+                Navigator.pop(context);
                 setSort();
-                setState(() {});
               },
               child: const Text('APPLY'),
             )
@@ -154,8 +147,8 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                                     _sortByValue = value!;
                                   });
                                 },
-                                items: RoomSortOption.values
-                                    .map<DropdownMenuItem<RoomSortOption>>((RoomSortOption value) {
+                                items:
+                                    RoomSortOption.values.map<DropdownMenuItem<RoomSortOption>>((RoomSortOption value) {
                                   return DropdownMenuItem<RoomSortOption>(value: value, child: Text(value.label));
                                 }).toList(),
                               ),
@@ -183,6 +176,11 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
         );
       },
     );
+  }
+
+  void setSort() {
+    context.read<RoomsProvider>().setSort(_sortByValue, _sortDirectionValue);
+    setState(() {});
   }
 
   @override

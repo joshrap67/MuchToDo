@@ -30,6 +30,7 @@ class UserService {
         Navigator.pushNamedAndRemoveUntil(context, CreateAccountScreen.routeName, (route) => false);
       }
     } on Exception {
+		// todo need to properly log all exceptions
       if (context.mounted) {
         showSnackbar('There was a problem loading user data', context);
       }

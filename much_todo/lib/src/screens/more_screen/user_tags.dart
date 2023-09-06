@@ -160,27 +160,28 @@ class _UserTagsState extends State<UserTags> {
 
   void promptDeleteTag(Tag tag) {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCEL'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  deleteTag(tag);
-                },
-                child: const Text('DELETE'),
-              )
-            ],
-            title: const Text('Delete Tag'),
-            content: const Text(
-                'Are you sure you wish to delete this tag?\n\nThis tag will be removed from ALL tasks that have it!'),
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                deleteTag(tag);
+              },
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Tag'),
+          content: const Text(
+              'Are you sure you wish to delete this tag?\n\nThis tag will be removed from ALL tasks that have it!'),
+        );
+      },
+    );
   }
 
   Future<void> deleteTag(Tag tag) async {
@@ -216,56 +217,58 @@ class _UserTagsState extends State<UserTags> {
       context: context,
       barrierDismissible: !isLoading,
       builder: (ctx) {
-        return StatefulBuilder(builder: (dialogContext, setState) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              if (!isLoading)
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext, null),
-                  child: const Text('CANCEL'),
-                ),
-              TextButton(
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-					  setState(() {
-						  isLoading = true;
-					  });
-
-					  hideKeyboard();
-					  var result = await UserService.updateTag(context, tag.id, nameController.text.trim());
-					  setState(() {
-						  isLoading = false;
-					  });
-
-					  if (dialogContext.mounted && result.success) {
-						  Navigator.pop(dialogContext);
-					  } else if (dialogContext.mounted && result.failure) {
-						  Navigator.pop(dialogContext);
-						  showSnackbar(result.errorMessage!, context);
-					  }
-                  }
-                },
-                child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
-              )
-            ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Rename Tag'),
-            content: Form(
-              key: formKey,
-              child: SizedBox(
-                width: MediaQuery.of(dialogContext).size.width,
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    label: Text('Tag name'),
-                    border: OutlineInputBorder(),
+        return StatefulBuilder(
+          builder: (dialogContext, setState) {
+            return AlertDialog.adaptive(
+              actions: <Widget>[
+                if (!isLoading)
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, null),
+                    child: const Text('CANCEL'),
                   ),
-                  validator: (val) => validNewTag(val, dialogContext.read<UserProvider>().tags),
-                  controller: nameController,
+                TextButton(
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      hideKeyboard();
+                      var result = await UserService.updateTag(context, tag.id, nameController.text.trim());
+                      setState(() {
+                        isLoading = false;
+                      });
+
+                      if (dialogContext.mounted && result.success) {
+                        Navigator.pop(dialogContext);
+                      } else if (dialogContext.mounted && result.failure) {
+                        Navigator.pop(dialogContext);
+                        showSnackbar(result.errorMessage!, context);
+                      }
+                    }
+                  },
+                  child: isLoading ? const CircularProgressIndicator() : const Text('SAVE'),
+                )
+              ],
+              insetPadding: const EdgeInsets.all(8.0),
+              title: const Text('Rename Tag'),
+              content: Form(
+                key: formKey,
+                child: SizedBox(
+                  width: MediaQuery.of(dialogContext).size.width,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      label: Text('Tag name'),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (val) => validNewTag(val, dialogContext.read<UserProvider>().tags),
+                    controller: nameController,
+                  ),
                 ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       },
     );
   }

@@ -20,7 +20,6 @@ class _LoadingButtonState extends State<LoadingButton> {
     return OutlinedButton.icon(
       onPressed: _isLoading ? null : onSubmit,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.all(16.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32.0),
         ),

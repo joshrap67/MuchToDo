@@ -1,8 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:much_todo/src/domain/task.dart' as task_domain;
+import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/screens/edit_task/edit_task.dart';
 import 'package:much_todo/src/screens/task_details/contacts_card_read_only.dart';
@@ -10,13 +9,14 @@ import 'package:much_todo/src/screens/task_details/links_card_read_only.dart';
 import 'package:much_todo/src/screens/task_details/photos_card_read_only.dart';
 import 'package:much_todo/src/screens/task_details/room_card_read_only.dart';
 import 'package:much_todo/src/screens/task_details/tags_card_read_only.dart';
+import 'package:much_todo/src/services/photo_service.dart';
 import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/skeletons/photos_card_skeleton.dart';
 
 class TaskDetails extends StatefulWidget {
-  final task_domain.Task task;
+  final Task task;
 
   const TaskDetails({super.key, required this.task});
 
@@ -27,26 +27,26 @@ class TaskDetails extends StatefulWidget {
 enum TaskOptions { edit, duplicate, delete }
 
 enum StatusOptions {
-  notStarted(1, 'Not Started', Icon(Icons.cancel)),
-  started(2, 'In Progress', Icon(Icons.pending));
+  notStarted(1, 'Not Started'),
+  started(2, 'In Progress');
 
-  const StatusOptions(this.value, this.label, this.icon);
+  const StatusOptions(this.value, this.label);
 
   final int value;
   final String label;
-  final Icon icon;
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
-  late task_domain.Task _task;
+  late Task _task;
   StatusOptions _status = StatusOptions.notStarted;
-  late Future<List<String>> _photoUrls; // doing it like this to avoid hassle of having awaits everywhere to get url
+  late Future<List<String>>
+      _photoUrls; // doing it like this to avoid hassle of having awaits everywhere to get firebase url since that method is async
 
   @override
   void initState() {
     super.initState();
     _task = widget.task;
-    _photoUrls = loadPhotos();
+    _photoUrls = PhotoService.loadPhotos(_task.photos);
     if (_task.inProgress) {
       _status = StatusOptions.started;
     }
@@ -107,131 +107,126 @@ class _TaskDetailsState extends State<TaskDetails> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: InputDecorator(
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                                        labelText: 'Status',
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
-                                      ),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton<StatusOptions>(
-                                          value: _status,
-                                          onChanged: (StatusOptions? value) {
-                                            setState(() {
-                                              _status = value!;
-                                              setStatus(value);
-                                            });
-                                          },
-                                          items: StatusOptions.values
-                                              .map<DropdownMenuItem<StatusOptions>>((StatusOptions value) {
-                                            return DropdownMenuItem<StatusOptions>(
-                                                value: value, child: Text(value.label));
-                                          }).toList(),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Card(
-                                child: ListTile(
-                                  title: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: PriorityIndicator(priority: _task.priority),
-                                  ),
-                                  contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-                                  subtitle: const Text(
-                                    'Priority',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Flexible(
-                              child: Card(
-                                child: ListTile(
-                                  title: Text(getEffortTitle(_task.effort)),
-                                  contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
-                                  subtitle: const Text(
-                                    'Effort',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        if (_task.note != null && _task.note!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Row(
                             children: [
                               Expanded(
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(_task.note!),
-                                    subtitle: const Text(
-                                      'Note',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
+                                child: InputDecorator(
+                                  decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                                    labelText: 'Status',
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: RoomCardReadOnly(selectedRoom: _task.room),
-                            ),
-                            if (_task.estimatedCost != null)
-                              Flexible(
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(NumberFormat.currency(symbol: '\$').format(_task.estimatedCost)),
-                                    subtitle: const Text(
-                                      'Estimated Cost',
-                                      style: TextStyle(fontSize: 12),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<StatusOptions>(
+                                      value: _status,
+                                      onChanged: (StatusOptions? value) {
+                                        setState(() {
+                                          _status = value!;
+                                          setStatus(value);
+                                        });
+                                      },
+                                      items: StatusOptions.values
+                                          .map<DropdownMenuItem<StatusOptions>>((StatusOptions value) {
+                                        return DropdownMenuItem<StatusOptions>(value: value, child: Text(value.label));
+                                      }).toList(),
                                     ),
                                   ),
                                 ),
                               ),
-                          ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Card(
+                            child: ListTile(
+                              title: Align(
+                                alignment: Alignment.topLeft,
+                                child: PriorityIndicator(priority: _task.priority),
+                              ),
+                              contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+                              subtitle: const Text(
+                                'Priority',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
                         ),
-                        if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
-                        if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
-                        if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
-                        FutureBuilder(
-                            future: _photoUrls,
-                            builder: (BuildContext context, AsyncSnapshot<List<String>> photos) {
-                              if (photos.hasData && !photos.hasError) {
-                                return PhotosCardReadOnly(
-                                  photos: photos.data!,
-                                  taskId: _task.id,
-                                  onSetPhotos: (task) => onPhotosUpdated(task),
-                                );
-                              } else if (photos.hasError) {
-                                return const Center(child: Icon(Icons.broken_image));
-                              } else {
-                                return const PhotoCardSkeleton();
-                              }
-                            }),
+                        Flexible(
+                          child: Card(
+                            child: ListTile(
+                              title: Text(getEffortTitle(_task.effort)),
+                              contentPadding: const EdgeInsets.fromLTRB(16.0, 0.0, 12.0, 0.0),
+                              subtitle: const Text(
+                                'Effort',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        )
                       ],
-                    )
+                    ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: RoomCardReadOnly(selectedRoom: _task.room),
+                        ),
+                        if (_task.estimatedCost != null)
+                          Flexible(
+                            child: Card(
+                              child: ListTile(
+                                title: Text(NumberFormat.currency(symbol: '\$').format(_task.estimatedCost)),
+                                subtitle: const Text(
+                                  'Estimated Cost',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (_task.note != null && _task.note!.isNotEmpty)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Card(
+                              child: ListTile(
+                                title: Text(_task.note!),
+                                subtitle: const Text(
+                                  'Note',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
+                    if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
+                    if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
+                    FutureBuilder(
+                        future: _photoUrls,
+                        builder: (BuildContext context, AsyncSnapshot<List<String>> photos) {
+                          if (photos.hasData && !photos.hasError) {
+                            return PhotosCardReadOnly(
+                              photos: photos.data!,
+                              taskId: _task.id,
+                              onSetPhotos: (task) => onPhotosUpdated(task),
+                            );
+                          } else if (photos.hasError) {
+                            return const Center(child: Icon(Icons.broken_image));
+                          } else {
+                            return const PhotoCardSkeleton();
+                          }
+                        }),
                   ],
                 ),
               ),
@@ -278,23 +273,6 @@ class _TaskDetailsState extends State<TaskDetails> {
     TaskService.setTaskProgressBlindSend(context, _task.id, status == StatusOptions.started);
   }
 
-  Future<List<String>> loadPhotos() async {
-    if (_task.photos.isEmpty) {
-      return [];
-    }
-    final storageRef = FirebaseStorage.instance.ref();
-    try {
-      var urls = <String>[];
-      for (var photo in _task.photos) {
-        var url = await storageRef.child(photo).getDownloadURL();
-        urls.add(url);
-      }
-      return urls;
-    } catch (e) {
-      return Future.error('error');
-    }
-  }
-
   onOptionSelected(TaskOptions result) {
     switch (result) {
       case TaskOptions.edit:
@@ -338,7 +316,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     DateTime? pickDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(1800),
+        firstDate: DateTime(1900),
         helpText: 'Select Completion Date',
         lastDate: DateTime(9999));
     if (pickDate != null) {
@@ -372,7 +350,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> editTask() async {
-    var result = await Navigator.push<task_domain.Task?>(
+    var result = await Navigator.push<Task?>(
       context,
       MaterialPageRoute(
         builder: (context) => EditTask(
@@ -388,17 +366,17 @@ class _TaskDetailsState extends State<TaskDetails> {
     }
   }
 
-  Future<void> onPhotosUpdated(task_domain.Task? task) async {
+  Future<void> onPhotosUpdated(Task? task) async {
     if (task != null) {
       setState(() {
         _task = task;
-        _photoUrls = loadPhotos();
+        _photoUrls = PhotoService.loadPhotos(_task.photos);
       });
     }
   }
 
   Future<void> duplicateTask() async {
-    var result = await Navigator.push<task_domain.Task?>(
+    var result = await Navigator.push<Task?>(
       context,
       MaterialPageRoute(
         builder: (context) => CreateTask(

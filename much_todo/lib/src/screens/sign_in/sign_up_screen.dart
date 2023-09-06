@@ -5,6 +5,7 @@ import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/unverified_screen.dart';
 import 'package:much_todo/src/utils/constants.dart';
+import 'package:much_todo/src/utils/themes.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _SignupScreenState extends State<SignupScreen> {
     var size = MediaQuery.sizeOf(context).height;
     return Theme(
       data: ThemeData(
+        colorScheme: lightColorScheme,
         useMaterial3: true,
       ),
       child: Scaffold(
@@ -41,8 +43,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF9890e3),
-                  Color(0xFF9ea7de),
+                  loginGradientColor1,
+                  loginGradientColor2,
                 ],
               ),
             ),
@@ -204,6 +206,8 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    hideKeyboard();
     setState(() {
       _isSigningUp = true;
     });

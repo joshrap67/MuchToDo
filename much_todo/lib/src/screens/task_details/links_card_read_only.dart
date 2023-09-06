@@ -14,8 +14,8 @@ class LinksCardReadOnly extends StatefulWidget {
 }
 
 class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
-  List<String> _links = [];
   final ScrollController _scrollController = ScrollController();
+  List<String> _links = [];
 
   @override
   void initState() {
@@ -25,8 +25,8 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
 
   @override
   void dispose() {
-    super.dispose();
     _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -62,7 +62,7 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
                                   child: AutoSizeText(
                                     _links[index],
                                     maxLines: 1,
-                                    minFontSize: 12,
+                                    minFontSize: 10,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.blue,
@@ -100,27 +100,28 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
 
   Future<void> promptLaunchLink(String link) async {
     showDialog<void>(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog.adaptive(
-            actions: <Widget>[
-              TextButton(
-                child: const Text('NO'),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: const Text('YES'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  launchLink(link);
-                },
-              )
-            ],
-            insetPadding: const EdgeInsets.all(8.0),
-            title: const Text('Launch Link'),
-            content: const Text('Launch this link with an external application?'),
-          );
-        });
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              child: const Text('NO'),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: const Text('YES'),
+              onPressed: () {
+                Navigator.pop(context);
+                launchLink(link);
+              },
+            )
+          ],
+          insetPadding: const EdgeInsets.all(8.0),
+          title: const Text('Launch Link'),
+          content: const Text('Launch this link with an external application?'),
+        );
+      },
+    );
   }
 
   Future<void> launchLink(String link) async {

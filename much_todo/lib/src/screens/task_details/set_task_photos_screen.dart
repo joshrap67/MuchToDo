@@ -100,13 +100,14 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-                child: FloatingActionButton.extended(
-                  onPressed: addPhoto,
-                  icon: const Icon(Icons.add),
-                  label: const Text('NEW PHOTO'),
-                  heroTag: 'TaskFab',
-                )),
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+              child: FloatingActionButton.extended(
+                onPressed: addPhoto,
+                icon: const Icon(Icons.add),
+                label: const Text('NEW PHOTO'),
+                heroTag: 'TaskFab',
+              ),
+            ),
           )
         ],
       ),

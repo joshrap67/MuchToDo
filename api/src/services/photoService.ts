@@ -34,6 +34,6 @@ export const deletePhotos = async (deletePhotosRequest: IDeletePhotosRequest): P
 }
 
 export const deletePhotosBlindSend = (deletePhotosRequest: IDeletePhotosRequest): void => {
-    // to be used for potentially long-running operations (like when deleting a user that could have hundreds of photos)
+    // to be used for potentially long-running operations (like when deleting a user or room that could have hundreds of tasks with photos)
     axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
 }

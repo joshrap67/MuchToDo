@@ -208,6 +208,7 @@ export async function deleteUser(firebaseId: string): Promise<void> {
         await TaskModel.deleteMany({'_id': {$in: user.tasks}}).session(session);
         await RoomModel.deleteMany({'_id': {$in: user.rooms}}).session(session);
         // todo delete completed tasks (denormalize on user? maybe just don't return it to frontend since its not needed. or just do a count)
+        // todo delete firebase auth account
         deletePhotosBlindSend({taskIds: user.tasks.map(e => e.toHexString()), firebaseId: firebaseId});
 
         await session.commitTransaction();

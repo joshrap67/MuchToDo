@@ -137,7 +137,14 @@ class UserProvider with ChangeNotifier {
       return;
     }
 
+    var deletedTaskIds = room.tasks.map((e) => e.id).toSet();
     _user!.rooms.removeWhere((r) => r == room.id);
+    for (final tag in user!.tags) {
+      tag.tasks.removeWhere((t) => deletedTaskIds.contains(t));
+    }
+    for (final contact in user!.contacts) {
+      contact.tasks.removeWhere((t) => deletedTaskIds.contains(t));
+    }
     notifyListeners();
   }
 }

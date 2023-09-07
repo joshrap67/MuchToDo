@@ -76,6 +76,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                 onPressed: promptAddRoom,
                 label: const Text('NEW ROOM'),
                 icon: const Icon(Icons.add),
+                heroTag: 'NewRoom',
               ),
             ),
           ),

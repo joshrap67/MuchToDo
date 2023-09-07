@@ -199,6 +199,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                 onPressed: launchAddTask,
                 icon: const Icon(Icons.add),
                 label: const Text('NEW TASK'),
+                heroTag: 'NewTask',
               ),
             ),
           )

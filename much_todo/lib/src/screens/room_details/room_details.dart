@@ -154,6 +154,7 @@ class _RoomDetailsState extends State<RoomDetails> {
         onPressed: launchAddTask,
         label: const Text('NEW TASK'),
         icon: const Icon(Icons.add),
+        heroTag: 'NewTaskRoom',
       ),
     );
   }

@@ -78,17 +78,22 @@ export async function deleteRoom(roomId: string, firebaseId: string): Promise<vo
         session.startTransaction();
 
         const room = await RoomModel.findOneAndDelete({'_id': roomId, 'createdBy': firebaseId}).session(session);
+        const user = await UserModel.findOne({'firebaseId': firebaseId}).session(session);
 
         // task cannot have null room. delete all tasks that contained this room
         const taskIds = room.tasks.map(x => x.id);
         await TaskModel.deleteMany({'_id': {$in: taskIds}}).session(session);
         deletePhotosBlindSend({taskIds: taskIds.map(e => e.toHexString()), firebaseId: firebaseId});
-        // todo delete completed tasks? if not i need to change ui so you can still see ones of deleted rooms
 
-        await UserModel.updateOne(
-            {'firebaseId': firebaseId},
-            {$pull: {'rooms': roomId, 'tasks': {$in: taskIds}}}
-        ).session(session);
+        user.rooms = user.rooms.filter(x => x.toHexString() !== roomId);
+        // remove deleted tasks from tags/contacts
+        for (const tag of user.tags) {
+            tag.tasks = tag.tasks.filter(t => !taskIds.some(deletedTag => deletedTag.equals(t)));
+        }
+        for (const contact of user.contacts) {
+            contact.tasks = contact.tasks.filter(c => !taskIds.some(deletedTag => deletedTag.equals(c)));
+        }
+        await user.save({session});
 
         await session.commitTransaction();
     } catch (e) {

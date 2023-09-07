@@ -90,6 +90,7 @@ class _UserContactsState extends State<UserContacts> {
           onPressed: addContact,
           label: const Text('NEW CONTACT'),
           icon: const Icon(Icons.add),
+          heroTag: 'NewContact',
         ),
       ),
     );

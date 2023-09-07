@@ -39,23 +39,23 @@ export async function createTask(userId: string, request: ICreateTaskRequest): P
         const user = await UserModel.findOne({'firebaseId': userId}).session(session);
         const room = await RoomModel.findOne({'_id': request.roomId}).session(session);
 
-        const contactIdToContact: Record<string, IContact> = {};
-        const tagIdToTag: Record<string, ITag> = {};
+        const contactLookup: Record<string, IContact> = {};
+        const tagLookup: Record<string, ITag> = {};
 
         for (const tag of user.tags) {
-            tagIdToTag[tag.id] = tag;
+            tagLookup[tag.id] = tag;
         }
         for (const contact of user.contacts) {
-            contactIdToContact[contact.id] = contact;
+            contactLookup[contact.id] = contact;
         }
 
         const taskTags: ITaskTag[] = [];
         for (const tagId of request.tagIds) {
-            taskTags.push(convertTagToTaskTag(tagIdToTag[tagId]));
+            taskTags.push(convertTagToTaskTag(tagLookup[tagId]));
         }
         const taskContacts: ITaskContact[] = [];
         for (const contactId of request.contactIds) {
-            taskContacts.push(convertContactToTaskContact(contactIdToContact[contactId]));
+            taskContacts.push(convertContactToTaskContact(contactLookup[contactId]));
         }
 
         // create the task
@@ -78,11 +78,11 @@ export async function createTask(userId: string, request: ICreateTaskRequest): P
 
         // update tags/contacts of user now that we have an id
         for (const tag of task.tags) {
-            const userTag = tagIdToTag[tag.id];
+            const userTag = tagLookup[tag.id];
             userTag.tasks.push(task._id);
         }
         for (const contact of task.contacts) {
-            const userContact = contactIdToContact[contact.id];
+            const userContact = contactLookup[contact.id];
             userContact.tasks.push(task._id);
         }
         user.tasks.push(task._id);
@@ -122,23 +122,23 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
             await newRoom.save({session});
         }
 
-        const tagIdToTag: Record<string, ITag> = {};
-        const contactIdToContact: Record<string, IContact> = {};
+        const tagLookup: Record<string, ITag> = {};
+        const contactLookup: Record<string, IContact> = {};
 
         for (const tag of user.tags) {
-            tagIdToTag[tag.id] = tag;
+            tagLookup[tag.id] = tag;
         }
         for (const contact of user.contacts) {
-            contactIdToContact[contact.id] = contact;
+            contactLookup[contact.id] = contact;
         }
 
         const taskTags: ITaskTag[] = [];
         for (const tagId of request.tagIds) {
-            taskTags.push(convertTagToTaskTag(tagIdToTag[tagId]));
+            taskTags.push(convertTagToTaskTag(tagLookup[tagId]));
         }
         const taskContacts: ITaskContact[] = [];
         for (const contactId of request.contactIds) {
-            taskContacts.push(convertContactToTaskContact(contactIdToContact[contactId]));
+            taskContacts.push(convertContactToTaskContact(contactLookup[contactId]));
         }
 
         // todo validation of fields
@@ -164,11 +164,11 @@ export async function updateTask(taskId: string, request: IUpdateTaskRequest, us
         }
 
         for (const tag of task.tags) {
-            const userTag = tagIdToTag[tag.id];
+            const userTag = tagLookup[tag.id];
             userTag.tasks.push(task._id);
         }
         for (const contact of task.contacts) {
-            const userContact = contactIdToContact[contact.id];
+            const userContact = contactLookup[contact.id];
             userContact.tasks.push(task._id);
         }
         await user.save({session});

@@ -98,6 +98,7 @@ class _UserTagsState extends State<UserTags> {
           onPressed: addTag,
           label: const Text('NEW TAG'),
           icon: const Icon(Icons.add),
+          heroTag: 'NewTag',
         ),
       ),
     );

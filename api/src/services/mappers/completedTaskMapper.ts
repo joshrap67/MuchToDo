@@ -1,7 +1,7 @@
-import {ICompletedTaskResponse} from "../../controllers/responses/completedTaskResponse";
-import {ICompletedTask} from "../../domain/completedTask";
+import {CompletedTaskResponse} from "../../controllers/responses/completedTaskResponse";
+import {CompletedTask} from "../../domain/completedTask";
 
-export const mapCompletedTaskToResponse = (task: ICompletedTask): ICompletedTaskResponse => {
+export const mapCompletedTaskToResponse = (task: CompletedTask): CompletedTaskResponse => {
     return {
         id: task._id.toHexString(),
         name: task.name,
@@ -16,5 +16,5 @@ export const mapCompletedTaskToResponse = (task: ICompletedTask): ICompletedTask
         links: [...task.links],
         estimatedCost: task.estimatedCost,
         completionDate: task.completionDate,
-    };
+    } as CompletedTaskResponse;
 }

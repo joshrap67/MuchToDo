@@ -1,20 +1,19 @@
-export interface IUserResponse {
+export interface UserResponse {
     id: string;
-    firebaseId: string;
     email: string;
-    tags: ITagResponse[];
-    contacts: IContactResponse[];
+    tags: TagResponse[];
+    contacts: ContactResponse[];
     tasks: string[];
     rooms: string[];
 }
 
-export interface ITagResponse {
+export interface TagResponse {
     id: string;
     name: string;
     tasks: string[];
 }
 
-export interface IContactResponse {
+export interface ContactResponse {
     id: string;
     name: string;
     email: string;

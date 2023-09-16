@@ -1,23 +1,22 @@
 import {Schema, Types, model} from 'mongoose';
 import {tasksCollection, usersCollection} from "./utils/collections";
 
-export interface IUser {
-    _id: Types.ObjectId; // I'm not actually using this, mongo makes it a pain to set your own id so treating firebaseId as primary key
-    firebaseId: string;
+export interface User {
+    _id: string;
     email: string;
-    tags: ITag[];
-    contacts: IContact[];
+    tags: Tag[];
+    contacts: Contact[];
     tasks: Types.ObjectId[];
     rooms: Types.ObjectId[];
 }
 
-export interface ITag {
+export interface Tag {
     id: string;
     name: string;
     tasks: Types.ObjectId[];
 }
 
-export interface IContact {
+export interface Contact {
     id: string;
     name: string;
     email: string;
@@ -25,7 +24,7 @@ export interface IContact {
     tasks: Types.ObjectId[];
 }
 
-const ContactScheme = new Schema<IContact>({
+const ContactScheme = new Schema<Contact>({
     id: {type: String, required: true},
     name: {type: String, required: true},
     email: {type: String},
@@ -33,14 +32,14 @@ const ContactScheme = new Schema<IContact>({
     tasks: [{type: Schema.Types.ObjectId, ref: tasksCollection}]
 }, {_id: false});
 
-const TagScheme = new Schema<ITag>({
+const TagScheme = new Schema<Tag>({
     id: {type: String, required: true},
     name: {type: String, required: true},
     tasks: [{type: Schema.Types.ObjectId, ref: tasksCollection}]
 }, {_id: false});
 
-const UserScheme = new Schema<IUser>({
-    firebaseId: {type: String, required: true, index: true},
+const UserScheme = new Schema<User>({
+    _id: {type: String, required: true},
     email: {type: String, required: true},
     tags: [TagScheme],
     contacts: [ContactScheme],
@@ -48,4 +47,4 @@ const UserScheme = new Schema<IUser>({
     rooms: [{type: Schema.Types.ObjectId, ref: tasksCollection}]
 });
 
-export const UserModel = model<IUser>(usersCollection, UserScheme);
+export const UserModel = model<User>(usersCollection, UserScheme);

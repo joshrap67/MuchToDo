@@ -48,7 +48,6 @@ String? validContactName(String? name) {
 
 String? validContactEmail(String? email) {
   if (email == null || email.isEmpty) {
-    // todo sanity max checks on backend
     return null;
   }
   return null;

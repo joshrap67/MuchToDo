@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:much_todo/src/utils/result.dart';
 
@@ -19,7 +20,8 @@ class AuthService {
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
       result.setData(credential);
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('Could not sign in with Google');
     }
 
@@ -30,7 +32,8 @@ class AuthService {
     var result = Result();
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('Could not sign in');
     }
     return result;
@@ -61,7 +64,8 @@ class AuthService {
     var result = Result();
     try {
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem trying to send the verification. Please try again later');
     }
     return result;

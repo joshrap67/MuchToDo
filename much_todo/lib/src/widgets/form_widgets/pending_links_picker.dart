@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class PendingLinksPicker extends StatefulWidget {
@@ -101,7 +102,11 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
 
   void promptAddLink() {
     hideKeyboard();
-    // todo max amount check
+    if (_links.length > Constants.maxRooms) {
+      showSnackbar('Cannot have more than ${Constants.maxLinks} links', context);
+      return;
+    }
+
     final formKey = GlobalKey<FormState>();
     final linkController = TextEditingController();
     showDialog<void>(

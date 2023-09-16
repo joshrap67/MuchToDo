@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/services/user_service.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +14,11 @@ import 'package:provider/provider.dart';
 class Dialogs {
   static Future<Tag?> promptAddTag(BuildContext context, String initialName) async {
     hideKeyboard();
-    // todo max amount check
+    if (context.read<UserProvider>().tags.length > Constants.maxTags) {
+      showSnackbar('Cannot have more than ${Constants.maxTags} tags', context);
+      return null;
+    }
+
     final formKey = GlobalKey<FormState>();
     var isLoading = false;
     final nameController = TextEditingController(text: initialName); // shortcut for user
@@ -77,7 +83,11 @@ class Dialogs {
 
   static Future<Contact?> promptAddContact(BuildContext context, String initialName) async {
     hideKeyboard();
-    // todo max amount check
+    if (context.read<UserProvider>().contacts.length > Constants.maxContacts) {
+      showSnackbar('Cannot have more than ${Constants.maxContacts} contacts', context);
+      return null;
+    }
+
     final formKey = GlobalKey<FormState>();
     var isLoading = false;
     final nameController = TextEditingController(text: initialName); // shortcut for user
@@ -113,7 +123,7 @@ class Dialogs {
                       Navigator.pop(dialogContext, result.data!);
                     } else if (dialogContext.mounted && result.failure) {
                       Navigator.pop(dialogContext, null);
-                      showSnackbar(result.errorMessage!, context); // todo test
+                      showSnackbar(result.errorMessage!, context);
                     }
                   }
                 },
@@ -177,7 +187,11 @@ class Dialogs {
   }
 
   static Future<Room?> promptAddRoom(BuildContext context, {String? initialName}) async {
-    // todo max amount check
+    if (context.read<RoomsProvider>().rooms.length > Constants.maxRooms) {
+      showSnackbar('Cannot have more than ${Constants.maxRooms} rooms', context);
+      return null;
+    }
+
     final formKey = GlobalKey<FormState>();
     var isLoading = false;
     final nameController = TextEditingController(text: initialName);
@@ -211,7 +225,7 @@ class Dialogs {
                       Navigator.pop(dialogContext, result.data!);
                     } else if (dialogContext.mounted && result.failure) {
                       Navigator.pop(dialogContext, null);
-                      showSnackbar(result.errorMessage!, context); // todo test
+                      showSnackbar(result.errorMessage!, context);
                     }
                   }
                 },

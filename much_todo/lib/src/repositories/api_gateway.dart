@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:much_todo/src/repositories/api_request.dart';
-import 'package:much_todo/src/repositories/network/api_result.dart';
+import 'package:much_todo/src/repositories/api_result.dart';
 
 class ApiGateway {
   static const String baseUrl = 'us-central1-muchtodo-42777.cloudfunctions.net';

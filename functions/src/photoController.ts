@@ -5,7 +5,7 @@ import {IDeletePhotosRequest} from "./deletePhotosRequest";
 
 export const deletePhotos = async (req: express.Request<{}, {}, IDeletePhotosRequest>, res: express.Response) => {
     try {
-         await photoService.deletePhotos(req.body.firebaseId, req.body.taskIds);
+         await photoService.deletePhotos(req.body.userId, req.body.taskIds);
 
         return res.status(204).send();
     } catch (error) {

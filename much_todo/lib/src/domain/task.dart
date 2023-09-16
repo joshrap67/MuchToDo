@@ -1,6 +1,5 @@
 import 'package:much_todo/src/domain/room.dart';
 
-// todo date last updated?
 class Task {
   static const lowEffort = 1;
   static const mediumEffort = 2;

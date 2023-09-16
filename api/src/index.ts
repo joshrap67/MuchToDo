@@ -1,4 +1,5 @@
 import express from 'express';
+require('express-async-errors'); // todo eventually express 5 will handle this
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
@@ -8,6 +9,7 @@ import {authenticateJWT} from "./utils/httpUtils";
 import admin, {credential} from "firebase-admin";
 import {onRequest} from "firebase-functions/v2/https";
 import {setGlobalOptions} from "firebase-functions/v2";
+import {errorHandler} from "./utils/errorHandler";
 
 const app = express();
 app.use(cors({credentials: true}));
@@ -16,6 +18,7 @@ app.use(bodyParser.json({limit: '50mb'}));
 
 app.use(authenticateJWT);
 app.use('/', router());
+app.use(errorHandler);
 
 setGlobalOptions({maxInstances: 1}); // todo
 const MONGO_URL = process.env.MUCHTODO_MONGO__CONNECTIONSTRING; // DB URI

@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
@@ -24,7 +25,8 @@ class TaskService {
       if (context.mounted) {
         context.read<TasksProvider>().setTasks(tasks);
       }
-    } on Exception {
+    } on Exception catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       if (context.mounted) {
         showSnackbar('There was a problem loading tasks', context);
       }
@@ -63,7 +65,8 @@ class TaskService {
         context.read<RoomsProvider>().addTask(createdTask);
         context.read<UserProvider>().addTask(createdTask);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem creating the task');
     }
 
@@ -101,7 +104,8 @@ class TaskService {
         context.read<RoomsProvider>().updateTask(updatedTask, originalTask.room.id);
         context.read<UserProvider>().updateTask(updatedTask);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem updating the task');
     }
 
@@ -120,7 +124,8 @@ class TaskService {
       if (context.mounted) {
         context.read<TasksProvider>().updateTask(task);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem setting the task photos');
     }
     return result;
@@ -134,7 +139,8 @@ class TaskService {
         taskId,
         SetTaskProgressRequest(inProgress: inProgress),
       );
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       if (context.mounted) {
         showSnackbar('There was a problem setting the task\'s progress', context);
       }
@@ -151,7 +157,8 @@ class TaskService {
         context.read<RoomsProvider>().removeTask(task);
         context.read<UserProvider>().removeTask(task);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem completing the task');
       if (context.mounted && notifyOnFailure) {
         // if method was used in a blind send, do this to get the correct data back to the ui
@@ -170,7 +177,8 @@ class TaskService {
         context.read<RoomsProvider>().removeTask(task);
         context.read<UserProvider>().removeTask(task);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem deleting the task');
       if (context.mounted && notifyOnFailure) {
         // if method was used in a blind send, do this to get the correct data back to the ui

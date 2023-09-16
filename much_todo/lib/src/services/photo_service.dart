@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class PhotoService {
@@ -13,7 +14,8 @@ class PhotoService {
         urls.add(url);
       }
       return urls;
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       // todo need to verify this isn't tripped if file is not found since that will cause issues if user deletes it from their photos list
       return Future.error('error');
     }

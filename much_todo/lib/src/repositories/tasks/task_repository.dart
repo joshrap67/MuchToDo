@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:much_todo/src/domain/task.dart';
-import 'package:much_todo/src/repositories/network/api_gateway.dart';
+import 'package:much_todo/src/repositories/api_gateway.dart';
 import 'package:much_todo/src/repositories/tasks/requests/complete_task_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/create_tasks_request.dart';
 import 'package:much_todo/src/repositories/tasks/requests/set_task_photos_request.dart';
@@ -21,7 +21,7 @@ class TaskRepository {
       }
       return tasks;
     } else {
-      throw Exception('There was a problem getting tasks. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -31,7 +31,7 @@ class TaskRepository {
       Map<String, dynamic> decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem creating the task. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -41,7 +41,7 @@ class TaskRepository {
       var decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem updating the task. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -50,7 +50,7 @@ class TaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the task. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -60,7 +60,7 @@ class TaskRepository {
       var decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
     } else {
-      throw Exception('There was a problem setting the photos. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -69,7 +69,7 @@ class TaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem setting the progress. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -78,7 +78,7 @@ class TaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem completing the task. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 }

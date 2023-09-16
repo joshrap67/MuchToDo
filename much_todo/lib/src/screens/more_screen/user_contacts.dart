@@ -221,7 +221,7 @@ class _UserContactsState extends State<UserContacts> {
                       Navigator.pop(dialogContext);
                     } else if (dialogContext.mounted && result.failure) {
                       Navigator.pop(dialogContext);
-                      showSnackbar(result.errorMessage!, context); // todo test
+                      showSnackbar(result.errorMessage!, context);
                     }
                   }
                 },

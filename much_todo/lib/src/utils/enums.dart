@@ -7,7 +7,7 @@ enum TaskSortOption {
   room(3, 'Room Name'),
   cost(4, 'Estimated Cost'),
   creationDate(5, 'Creation Date'),
-  dueBy(6, 'Due By'), // todo refactor to completeBy
+  completeBy(6, 'Complete By'),
   inProgress(7, 'In Progress');
 
   const TaskSortOption(this.value, this.label);

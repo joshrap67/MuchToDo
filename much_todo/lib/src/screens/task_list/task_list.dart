@@ -102,7 +102,6 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                               ),
                               child: IconButton(
                                 onPressed: () {},
-                                // todo better way?
                                 isSelected: false,
                                 icon: SvgPicture.asset(
                                   'assets/icons/dice.svg',

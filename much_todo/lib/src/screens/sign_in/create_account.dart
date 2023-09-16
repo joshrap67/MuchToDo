@@ -4,6 +4,7 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/screens/home/home.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/services/user_service.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
 import 'package:uuid/uuid.dart';
@@ -207,7 +208,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   void launchAddRoom() {
-    // todo max amount check
+    if (_rooms.length > Constants.maxRooms) {
+      showSnackbar('Cannot have more than ${Constants.maxRooms} rooms', context);
+      return;
+    }
     final formKey = GlobalKey<FormState>();
     showDialog<void>(
       context: context,

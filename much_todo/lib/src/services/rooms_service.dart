@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
@@ -18,7 +19,8 @@ class RoomsService {
       if (context.mounted) {
         context.read<RoomsProvider>().setRooms(rooms);
       }
-    } on Exception {
+    } on Exception catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       if (context.mounted) {
         showSnackbar('There was a problem loading rooms', context);
       }
@@ -38,7 +40,8 @@ class RoomsService {
         context.read<RoomsProvider>().addRoom(room);
         context.read<UserProvider>().addRoom(room);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem creating the room');
     }
     return result;
@@ -53,7 +56,8 @@ class RoomsService {
         context.read<RoomsProvider>().updateRoom(id, name, note);
         context.read<TasksProvider>().updateRoom(id, name);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem updating the room');
     }
     return result;
@@ -68,7 +72,8 @@ class RoomsService {
         context.read<TasksProvider>().removeTasksFromRoomId(room.id);
         context.read<UserProvider>().removeRoom(room);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem deleting the room');
     }
     return result;

@@ -143,7 +143,7 @@ void sortTasks(List<Task> tasks, TaskSortOption sortBy, SortDirection sortDirect
     case TaskSortOption.creationDate:
       tasks.sort((a, b) => a.creationDate.compareTo(b.creationDate));
       break;
-    case TaskSortOption.dueBy:
+    case TaskSortOption.completeBy:
       tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1);
       break;
     case TaskSortOption.inProgress:

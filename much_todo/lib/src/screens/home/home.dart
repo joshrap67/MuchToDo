@@ -60,7 +60,7 @@ class _HomeState extends State<Home> {
               label: 'Tasks',
             ),
             NavigationDestination(
-              icon: Icon(Icons.room_outlined), // todo MeetingRoom icon instead?
+              icon: Icon(Icons.room_outlined),
               selectedIcon: Icon(Icons.room),
               label: 'Rooms',
             ),

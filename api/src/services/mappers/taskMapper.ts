@@ -1,15 +1,15 @@
-import {ITask} from "../../domain/task";
+import {Task} from "../../domain/task";
 import {
-    ITaskResponse, ITaskRoomResponse,
+    TaskResponse, TaskRoomResponse,
 } from "../../controllers/responses/taskResponse";
 
-export const mapTaskToResponse = (task: ITask): ITaskResponse => {
+export const mapTaskToResponse = (task: Task): TaskResponse => {
     return {
         id: task._id.toHexString(),
         name: task.name,
         createdBy: task.createdBy,
         note: task.note,
-        room: {id: task.room.id.toHexString(), name: task.room.name} as ITaskRoomResponse,
+        room: {id: task.room.id.toHexString(), name: task.room.name} as TaskRoomResponse,
         priority: task.priority,
         effort: task.effort,
         contacts: task.contacts,
@@ -20,5 +20,5 @@ export const mapTaskToResponse = (task: ITask): ITaskResponse => {
         links: [...task.links],
         estimatedCost: task.estimatedCost,
         creationDate: task._id.getTimestamp(),
-    };
+    } as TaskResponse;
 }

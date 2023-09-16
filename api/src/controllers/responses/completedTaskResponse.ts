@@ -1,4 +1,4 @@
-export interface ICompletedTaskResponse {
+export interface CompletedTaskResponse {
     id: string;
     name: string;
     createdBy: string;
@@ -9,12 +9,12 @@ export interface ICompletedTaskResponse {
     estimatedCost: number;
     note: string;
     tags: string[];
-    contacts: ICompletedTaskContactResponse[];
+    contacts: CompletedTaskContactResponse[];
     links: string[];
     completionDate: Date;
 }
 
-export interface ICompletedTaskContactResponse {
+export interface CompletedTaskContactResponse {
     name: string;
     email: string;
     phoneNumber: string;

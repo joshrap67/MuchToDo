@@ -1,14 +1,14 @@
-export interface ITaskResponse {
+export interface TaskResponse {
     id: string;
     name: string;
     createdBy: string;
     priority: number;
     effort: number;
-    room: ITaskRoomResponse;
+    room: TaskRoomResponse;
     estimatedCost: number;
     note: string;
-    tags: ITaskTagResponse[];
-    contacts: ITaskContactResponse[];
+    tags: TaskTagResponse[];
+    contacts: TaskContactResponse[];
     links: string[];
     photos: string[];
     inProgress: boolean;
@@ -16,17 +16,17 @@ export interface ITaskResponse {
     creationDate: Date;
 }
 
-export interface ITaskRoomResponse {
+export interface TaskRoomResponse {
     id: string;
     name: string;
 }
 
-export interface ITaskTagResponse {
+export interface TaskTagResponse {
     id: string;
     name: string;
 }
 
-export interface ITaskContactResponse {
+export interface TaskContactResponse {
     id: string;
     name: string;
     email: string;

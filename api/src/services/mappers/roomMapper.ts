@@ -1,10 +1,10 @@
-import {IRoom} from "../../domain/room";
-import {IRoomResponse, IRoomTaskResponse} from "../../controllers/responses/roomResponse";
+import {Room} from "../../domain/room";
+import {RoomResponse, RoomTaskResponse} from "../../controllers/responses/roomResponse";
 
-export const mapRoomToResponse = (room: IRoom): IRoomResponse => {
-    const tasks: IRoomTaskResponse[] = [];
+export const mapRoomToResponse = (room: Room): RoomResponse => {
+    const tasks: RoomTaskResponse[] = [];
     for (const task of room.tasks) {
-        tasks.push({id: task.id.toHexString(), name: task.name, estimatedCost: task.estimatedCost} as IRoomTaskResponse);
+        tasks.push({id: task.id.toHexString(), name: task.name, estimatedCost: task.estimatedCost} as RoomTaskResponse);
     }
     return {
         id: room._id.toHexString(),
@@ -13,5 +13,5 @@ export const mapRoomToResponse = (room: IRoom): IRoomResponse => {
         note: room.note,
         tasks: tasks,
         creationDate: room._id.getTimestamp()
-    };
+    } as RoomResponse;
 }

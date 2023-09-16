@@ -1,4 +1,4 @@
-import {ITag} from "../domain/user";
+import {Tag} from "../domain/user";
 import * as crypto from "crypto";
 
 export const defaultTags = [
@@ -9,4 +9,4 @@ export const defaultTags = [
     {id: crypto.randomUUID(), name: 'Painting', tasks: []},
     {id: crypto.randomUUID(), name: 'Plumbing', tasks: []},
     {id: crypto.randomUUID(), name: 'Structural', tasks: []}
-] as ITag[];
+] as Tag[];

@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -49,8 +50,8 @@ class _LoadingButtonState extends State<LoadingButton> {
     });
     try {
       await widget.onSubmit();
-    } catch (e) {
-      // todo log
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
     } finally {
       setState(() {
         _isLoading = false;

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/repositories/completed_tasks/requests/delete_completed_tasks_request.dart';
-import 'package:much_todo/src/repositories/network/api_gateway.dart';
+import 'package:much_todo/src/repositories/api_gateway.dart';
 
 class CompletedTaskRepository {
   static const baseUrl = 'completed-tasks';
@@ -17,7 +17,7 @@ class CompletedTaskRepository {
       }
       return tasks;
     } else {
-      throw Exception('There was a problem getting completed tasks. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -31,7 +31,7 @@ class CompletedTaskRepository {
       }
       return tasks;
     } else {
-      throw Exception('There was a problem getting completed tasks. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -40,7 +40,7 @@ class CompletedTaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the completed task. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -49,7 +49,7 @@ class CompletedTaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the completed tasks. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 
@@ -58,7 +58,7 @@ class CompletedTaskRepository {
     if (apiResult.success) {
       return true;
     } else {
-      throw Exception('There was a problem deleting the completed tasks. Result status ${apiResult.statusCode}');
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }
 }

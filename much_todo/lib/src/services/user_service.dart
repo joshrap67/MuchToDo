@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
@@ -29,8 +30,8 @@ class UserService {
       if (context.mounted) {
         Navigator.pushNamedAndRemoveUntil(context, CreateAccountScreen.routeName, (route) => false);
       }
-    } on Exception {
-		// todo need to properly log all exceptions
+    } on Exception catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       if (context.mounted) {
         showSnackbar('There was a problem loading user data', context);
       }
@@ -46,7 +47,8 @@ class UserService {
     try {
       await UserRepository.createUser(
           CreateUserRequest(rooms.map((e) => CreateRoomRequest(e.name.trim(), e.note?.trim())).toList()));
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem creating the account');
     }
     return result;
@@ -59,8 +61,9 @@ class UserService {
       if (context.mounted) {
         await signOut(context);
       }
-    } catch (e) {
-      result.setErrorMessage('There was a problem creating the account');
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
+      result.setErrorMessage('There was a problem deleting the account');
     }
     return result;
   }
@@ -73,7 +76,8 @@ class UserService {
       if (context.mounted) {
         context.read<UserProvider>().addTag(tag);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem creating the tag');
     }
     return result;
@@ -87,7 +91,8 @@ class UserService {
       if (context.mounted) {
         context.read<UserProvider>().addContact(contact);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem creating the contact');
     }
 
@@ -102,7 +107,8 @@ class UserService {
         context.read<UserProvider>().deleteTag(tag);
         context.read<TasksProvider>().removeTagFromTasks(tag);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem deleting the tag');
     }
     return result;
@@ -116,7 +122,8 @@ class UserService {
         context.read<UserProvider>().updateTag(id, newName);
         context.read<TasksProvider>().updateTagForTasks(id, newName);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem updating the tag');
     }
     return result;
@@ -130,7 +137,8 @@ class UserService {
         context.read<UserProvider>().deleteContact(contact);
         context.read<TasksProvider>().removeContactFromTasks(contact);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem deleting the contact');
     }
     return result;
@@ -145,7 +153,8 @@ class UserService {
         context.read<UserProvider>().updateContact(id, name, email, phoneNumber);
         context.read<TasksProvider>().updateContactForTasks(id, name, email, phoneNumber);
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem updating the contact');
     }
     return result;
@@ -161,7 +170,8 @@ class UserService {
         context.read<TasksProvider>().clearTasks();
         context.read<UserProvider>().clearUser();
       }
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem signing out');
     }
     return result;

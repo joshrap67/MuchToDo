@@ -4,7 +4,7 @@ import * as crypto from "crypto";
 import {getStorage} from "firebase-admin/storage";
 import axios from "axios";
 import * as process from "process";
-import {IDeletePhotosRequest} from "../controllers/requests/taskRequests/deletePhotosRequest";
+import {DeletePhotosRequest} from "../controllers/requests/taskRequests/deletePhotosRequest";
 
 export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -29,11 +29,11 @@ export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: stri
     });
 }
 
-export const deletePhotos = async (deletePhotosRequest: IDeletePhotosRequest): Promise<void> => {
+export const deletePhotos = async (deletePhotosRequest: DeletePhotosRequest): Promise<void> => {
     await axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
 }
 
-export const deletePhotosBlindSend = (deletePhotosRequest: IDeletePhotosRequest): void => {
+export const deletePhotosBlindSend = (deletePhotosRequest: DeletePhotosRequest): void => {
     // to be used for potentially long-running operations (like when deleting a user or room that could have hundreds of tasks with photos)
     axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
 }

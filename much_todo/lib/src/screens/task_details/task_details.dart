@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/domain/task_photo.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/screens/edit_task/edit_task.dart';
 import 'package:much_todo/src/screens/task_details/contacts_card_read_only.dart';
@@ -39,14 +40,13 @@ enum StatusOptions {
 class _TaskDetailsState extends State<TaskDetails> {
   late Task _task;
   StatusOptions _status = StatusOptions.notStarted;
-  late Future<List<String>>
-      _photoUrls; // doing it like this to avoid hassle of having awaits everywhere to get firebase url since that method is async
+  late Future<List<TaskPhoto>>_photos;
 
   @override
   void initState() {
     super.initState();
     _task = widget.task;
-    _photoUrls = PhotoService.loadPhotos(_task.photos);
+    _photos = PhotoService.loadPhotos(_task.photos);
     if (_task.inProgress) {
       _status = StatusOptions.started;
     }
@@ -213,20 +213,21 @@ class _TaskDetailsState extends State<TaskDetails> {
                     if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
                     if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
                     FutureBuilder(
-                        future: _photoUrls,
-                        builder: (BuildContext context, AsyncSnapshot<List<String>> photos) {
-                          if (photos.hasData && !photos.hasError) {
-                            return PhotosCardReadOnly(
-                              photos: photos.data!,
-                              taskId: _task.id,
-                              onSetPhotos: (task) => onPhotosUpdated(task),
-                            );
-                          } else if (photos.hasError) {
-                            return const Center(child: Icon(Icons.broken_image));
-                          } else {
-                            return const PhotoCardSkeleton();
-                          }
-                        }),
+                      future: _photos,
+                      builder: (BuildContext context, AsyncSnapshot<List<TaskPhoto>> photos) {
+                        if (photos.hasData && !photos.hasError) {
+                          return PhotosCardReadOnly(
+                            photos: photos.data!,
+                            taskId: _task.id,
+                            onSetPhotos: (task) => onPhotosUpdated(task),
+                          );
+                        } else if (photos.hasError) {
+                          return const Center(child: Icon(Icons.broken_image));
+                        } else {
+                          return const PhotoCardSkeleton();
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -370,7 +371,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     if (task != null) {
       setState(() {
         _task = task;
-        _photoUrls = PhotoService.loadPhotos(_task.photos);
+        _photos = PhotoService.loadPhotos(_task.photos);
       });
     }
   }

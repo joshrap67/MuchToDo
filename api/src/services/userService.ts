@@ -9,12 +9,12 @@ import {mapContactToResponse, mapTagToResponse, mapUserToResponse} from "./mappe
 import {SetContactRequest} from "../controllers/requests/userRequests/setContactRequest";
 import {SetTagRequest} from "../controllers/requests/userRequests/setTagRequest";
 import * as crypto from "crypto";
-import {deletePhotosBlindSend} from "./photoService";
 import {BadRequestException} from "../errors/exceptions/badRequestException";
 import {maxContacts, maxTags} from "../utils/constants";
 import {CompletedTaskModel} from "../domain/completedTask";
 import admin from "firebase-admin";
 import {ResourceNotFoundException} from "../errors/exceptions/resourceNotFoundException";
+import {deleteTaskPhotos} from "./photoService";
 
 export async function getUserById(id: string): Promise<UserResponse> {
     const user = await UserModel.findOne({'_id': id});
@@ -211,7 +211,7 @@ export async function deleteUser(userId: string): Promise<void> {
             await RoomModel.deleteMany({'_id': {$in: user.rooms}}).session(session);
             await CompletedTaskModel.deleteMany({'createdBy': userId}).session(session);
 
-            deletePhotosBlindSend({taskIds: user.tasks.map(e => e.toHexString()), userId: userId});
+            deleteTaskPhotos(userId, user.tasks.map(e => e.toHexString())); // ignore promise since this could take a while
             await admin.auth().deleteUser(userId); // todo can't get this to work locally
         });
     } finally {

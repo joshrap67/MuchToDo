@@ -2,18 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:much_todo/src/domain/task_photo.dart';
 import 'package:much_todo/src/screens/task_details/task_photo_view.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
 class PhotoWrapper {
-  String? networkUrl;
+  TaskPhoto? taskPhoto;
   XFile? localPhoto;
 
-  PhotoWrapper({this.networkUrl, this.localPhoto});
+  PhotoWrapper({this.taskPhoto, this.localPhoto});
 
   bool isNetwork() {
-    return networkUrl != null;
+    return taskPhoto != null;
   }
 
   bool isLocal() {
@@ -23,9 +25,9 @@ class PhotoWrapper {
 
 class SetTaskPhotosScreen extends StatefulWidget {
   final String taskId;
-  final List<String> firebaseUrls;
+  final List<TaskPhoto> photos;
 
-  const SetTaskPhotosScreen({super.key, required this.taskId, required this.firebaseUrls});
+  const SetTaskPhotosScreen({super.key, required this.taskId, required this.photos});
 
   @override
   State<SetTaskPhotosScreen> createState() => _SetTaskPhotosScreenState();
@@ -40,7 +42,7 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
   @override
   void initState() {
     super.initState();
-    _photos.addAll(widget.firebaseUrls.map((e) => PhotoWrapper(networkUrl: e)).toList());
+    _photos.addAll(widget.photos.map((e) => PhotoWrapper(taskPhoto: e)).toList());
   }
 
   @override
@@ -68,25 +70,12 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
               itemCount: _photos.length,
               itemBuilder: (BuildContext context, int index) {
                 var photo = _photos[index];
-                return Card(
-                  child: GestureDetector(
-                    onTap: () => openPhoto(context, photo),
+                return GestureDetector(
+                  onTap: () => openPhoto(context, photo),
+                  child: Card(
                     child: Hero(
                       tag: photo.hashCode,
-                      child: photo.isNetwork()
-                          ? Image.network(
-                              photo.networkUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                                return const Center(child: Icon(Icons.broken_image));
-                              },
-                            )
-                          : Image.file(
-                              fit: BoxFit.cover,
-                              File(
-                                photo.localPhoto!.path,
-                              ),
-                            ),
+                      child: getPhotoWidget(photo),
                     ),
                   ),
                 );
@@ -114,6 +103,27 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
     );
   }
 
+  Widget getPhotoWidget(PhotoWrapper photo) {
+    if (photo.localPhoto != null) {
+      return Image.file(
+        fit: BoxFit.cover,
+        File(
+          photo.localPhoto!.path,
+        ),
+      );
+    } else if (photo.taskPhoto != null && photo.taskPhoto!.publicUrl != null) {
+      return Image.network(
+        photo.taskPhoto!.publicUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+          return const Center(child: Icon(Icons.broken_image));
+        },
+      );
+    } else {
+      return const Center(child: Icon(Icons.broken_image));
+    }
+  }
+
   Future<void> openPhoto(BuildContext context, PhotoWrapper photo) async {
     var deleted = await Navigator.push<bool?>(
       context,
@@ -125,7 +135,7 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
     );
     if (deleted != null && deleted) {
       if (photo.isNetwork()) {
-        _removedPhotos.add(photo.networkUrl!);
+        _removedPhotos.add(photo.taskPhoto!.filePath);
       }
       _photos.remove(photo);
       setState(() {});
@@ -133,14 +143,28 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
   }
 
   Future<void> addPhoto() async {
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    // todo max file size?
-    // todo compression
-    if (image != null) {
-      setState(() {
-        _photos.add(PhotoWrapper(localPhoto: image));
-      });
+    if (_photos.length >= Constants.maxTaskPhotos) {
+      showSnackbar('Cannot have more than ${Constants.maxTaskPhotos} photos on a task', context);
+      return;
     }
+
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 25,
+    );
+    if (image == null) {
+      return;
+    }
+
+    var bytes = await image.length();
+    if (bytes > 2000000 && context.mounted) {
+      showSnackbar('Image file size is too large. Please try a smaller image', context);
+      return;
+    }
+
+    setState(() {
+      _photos.add(PhotoWrapper(localPhoto: image));
+    });
   }
 
   Future<void> save() async {
@@ -165,7 +189,7 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
       if (context.mounted && result.success) {
         Navigator.pop(context, result.data!);
       } else if (context.mounted && result.failure) {
-        showSnackbar(result.errorMessage!, context);
+        showSnackbar('Error, you may have too many photos many uploaded. Free up some space and try again', context);
       }
     }
   }

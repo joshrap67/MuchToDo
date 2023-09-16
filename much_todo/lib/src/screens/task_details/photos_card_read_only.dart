@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/task.dart';
-import 'package:much_todo/src/screens/task_details/photos_gallery.dart';
+import 'package:much_todo/src/domain/task_photo.dart';
+import 'package:much_todo/src/screens/task_details/task_photo_view_read_only.dart';
 import 'package:much_todo/src/screens/task_details/set_task_photos_screen.dart';
 
 class PhotosCardReadOnly extends StatefulWidget {
   final String taskId;
-  final List<String> photos;
+  final List<TaskPhoto> photos;
   final ValueChanged<Task?> onSetPhotos;
 
   const PhotosCardReadOnly({super.key, required this.taskId, required this.onSetPhotos, this.photos = const []});
@@ -40,13 +41,15 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
                       height: 60,
                       child: Hero(
                         tag: widget.photos[index].hashCode,
-                        child: Image.network(
-                          widget.photos[index],
-                          fit: BoxFit.cover,
-                          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                            return const Center(child: Icon(Icons.broken_image));
-                          },
-                        ),
+                        child: widget.photos[index].publicUrl != null
+                            ? Image.network(
+                                widget.photos[index].publicUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                                  return const Center(child: Icon(Icons.broken_image));
+                                },
+                              )
+                            : const Icon(Icons.broken_image),
                       ),
                     ),
                   ),
@@ -63,9 +66,8 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PhotosGallery(
-          links: widget.photos,
-          initialIndex: index,
+        builder: (context) => TaskPhotoViewReadOnly(
+          photo: widget.photos[index],
         ),
       ),
     );
@@ -77,7 +79,7 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
       MaterialPageRoute(
         builder: (context) => SetTaskPhotosScreen(
           taskId: widget.taskId,
-          firebaseUrls: widget.photos,
+          photos: widget.photos,
         ),
       ),
     );

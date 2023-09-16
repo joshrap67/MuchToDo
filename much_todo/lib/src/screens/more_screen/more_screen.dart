@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/screens/more_screen/uploaded_photos_screen.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
 import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
@@ -94,6 +95,14 @@ class _MoreScreenState extends State<MoreScreen> {
               onTap: launchCompletedTasks,
               trailing: const Icon(Icons.arrow_forward),
               leading: const Icon(Icons.check),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Uploaded Photos'),
+              onTap: launchUploadedPhotos,
+              trailing: const Icon(Icons.arrow_forward),
+              leading: const Icon(Icons.camera_alt),
             ),
           ),
           Card(
@@ -221,6 +230,17 @@ class _MoreScreenState extends State<MoreScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => const CompletedTasks(),
+      ),
+    );
+  }
+
+  void launchUploadedPhotos() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UploadedPhotosScreen(
+          userId: context.read<UserProvider>().user!.id,
+        ),
       ),
     );
   }

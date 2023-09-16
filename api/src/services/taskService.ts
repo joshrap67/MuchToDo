@@ -14,8 +14,8 @@ import {UpdateTaskRequest} from "../controllers/requests/taskRequests/updateTask
 import {TaskResponse} from "../controllers/responses/taskResponse";
 import {mapTaskToResponse} from "./mappers/taskMapper";
 import {SetPhotosRequest} from "../controllers/requests/taskRequests/setPhotosRequest";
-import {deletePhotos, uploadTaskPhoto} from "./photoService";
-import {maxTaskCount, maxTaskPhotoCount} from "../utils/constants";
+import {deletePhotos, deleteTaskPhotos, getTotalUploadSize, uploadTaskPhoto} from "./photoService";
+import {maxTaskCount, maxTaskPhotoCount, maxUploadBytes} from "../utils/constants";
 import {CompletedTaskModel, CompletedTask} from "../domain/completedTask";
 import {CompletedTaskResponse} from "../controllers/responses/completedTaskResponse";
 import {mapCompletedTaskToResponse} from "./mappers/completedTaskMapper";
@@ -185,16 +185,20 @@ export async function setPhotos(taskId: string, request: SetPhotosRequest, userI
         await session.withTransaction(async () => {
             const task = await TaskModel.findOne({'_id': taskId, 'createdBy': userId});
             if (task.photos.length + request.photosToUpload.length - request.deletedPhotos.length > maxTaskPhotoCount) {
-                throw Error(`Cannot have more than ${maxTaskPhotoCount} photos on a task.`);
+                throw new BadRequestException(`Cannot have more than ${maxTaskPhotoCount} photos on a task.`);
             }
 
             if (request.deletedPhotos && request.deletedPhotos.length) {
                 // remove photos that are to be deleted
-                task.photos = task.photos.filter(x => request.deletedPhotos.some(d => d === x));
-                await deletePhotos({taskIds: [taskId], userId: userId});
+                task.photos = task.photos.filter(x => !request.deletedPhotos.some(d => d === x));
+                await deletePhotos(request.deletedPhotos);
             }
 
-            // todo check if they have reached max byte size
+            const totalBytes = await getTotalUploadSize(userId);
+            if (totalBytes >= maxUploadBytes) {
+                throw new BadRequestException(`Cannot have more than ${maxUploadBytes} bytes uploaded`);
+            }
+
             const uploadedPhotos: string[] = [];
             for (const photo of request.photosToUpload) {
                 const fileName = await uploadTaskPhoto(photo, userId, taskId);
@@ -263,7 +267,7 @@ async function deleteAndReturnTask(session: mongoose.mongo.ClientSession, taskId
     const task = await TaskModel.findOneAndDelete({'_id': taskId, 'createdBy': userId}).session(session);
     // remove task from its room
     await RoomModel.updateOne({'_id': task.room.id}, {$pull: {'tasks': {'id': taskId}}}).session(session);
-    await deletePhotos({taskIds: [taskId], userId: userId});
+    await deleteTaskPhotos(userId, [taskId]);
 
     for (const tag of user.tags) {
         tag.tasks = tag.tasks.filter(x => !x.equals(task.id));

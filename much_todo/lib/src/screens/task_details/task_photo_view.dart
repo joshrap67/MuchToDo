@@ -25,12 +25,17 @@ class _TaskPhotoViewState extends State<TaskPhotoView> {
         ),
         child: Stack(
           children: <Widget>[
-            PhotoView(
-                heroAttributes: PhotoViewHeroAttributes(tag: widget.photo.hashCode),
-                backgroundDecoration: BoxDecoration(color: Theme.of(context).colorScheme.background),
-                imageProvider: widget.photo.isNetwork()
-                    ? NetworkImage(widget.photo.networkUrl!)
-                    : FileImage(File(widget.photo.localPhoto!.path)) as ImageProvider),
+            if (hasPhoto())
+              PhotoView(
+                  heroAttributes: PhotoViewHeroAttributes(tag: widget.photo.hashCode),
+                  backgroundDecoration: BoxDecoration(color: Theme.of(context).colorScheme.background),
+                  imageProvider: widget.photo.isNetwork()
+                      ? NetworkImage(widget.photo.taskPhoto!.publicUrl!)
+                      : FileImage(File(widget.photo.localPhoto!.path)) as ImageProvider),
+            if (!hasPhoto())
+              const Center(
+                child: Icon(Icons.broken_image),
+              ),
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
@@ -49,6 +54,11 @@ class _TaskPhotoViewState extends State<TaskPhotoView> {
         ),
       ),
     );
+  }
+
+  bool hasPhoto() {
+    return widget.photo.localPhoto != null ||
+        (widget.photo.taskPhoto != null && widget.photo.taskPhoto!.publicUrl != null);
   }
 
   void deletePhoto() {

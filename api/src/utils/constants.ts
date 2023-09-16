@@ -15,5 +15,6 @@ export const maxTagName = 100;
 export const maxEmailLength = 150;
 export const maxPhoneLength = 20;
 export const maxTaskPhotoCount = 6;
+export const maxUploadBytes = 100000000; // 100MB
 export const maxTaskCount = 1000;
 export const taskPhotoBucket = process.env.MUCHTODO_FIREBASE__TASKPHOTOBUCKET;

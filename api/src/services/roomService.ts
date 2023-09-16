@@ -5,9 +5,9 @@ import {TaskModel} from "../domain/task";
 import {maxRoomCount} from "../utils/constants";
 import {RoomResponse} from "../controllers/responses/roomResponse";
 import {mapRoomToResponse} from "./mappers/roomMapper";
-import {deletePhotosBlindSend} from "./photoService";
 import {ResourceNotFoundException} from "../errors/exceptions/resourceNotFoundException";
 import {BadRequestException} from "../errors/exceptions/badRequestException";
+import {deleteTaskPhotos} from "./photoService";
 
 export async function getRoomsByUser(userId: string): Promise<RoomResponse[]> {
     const rooms = await RoomModel.find({'createdBy': userId});
@@ -78,7 +78,7 @@ export async function deleteRoom(roomId: string, userId: string): Promise<void> 
             // task cannot have null room. delete all tasks that contained this room
             const taskIds = room.tasks.map(x => x.id);
             await TaskModel.deleteMany({'_id': {$in: taskIds}}).session(session);
-            deletePhotosBlindSend({taskIds: taskIds.map(e => e.toHexString()), userId: userId});
+            deleteTaskPhotos(userId, taskIds.map(e => e.toHexString())); // ignore promise since this could take a while
 
             user.rooms = user.rooms.filter(x => x.toHexString() !== roomId);
             // remove deleted tasks from tags/contacts

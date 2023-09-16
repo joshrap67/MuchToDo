@@ -9,4 +9,6 @@ class Constants {
   static const int defaultPriority = 3;
   static const int defaultEffort = 2;
   static const int maxTaskNoteLength = 500;
+  static const int maxTaskPhotos = 6;
+  static const int maxUploadBytes = 100000000;
 }

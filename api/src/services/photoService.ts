@@ -2,9 +2,6 @@ import {taskPhotoBucket} from "../utils/constants";
 import * as stream from "stream";
 import * as crypto from "crypto";
 import {getStorage} from "firebase-admin/storage";
-import axios from "axios";
-import * as process from "process";
-import {DeletePhotosRequest} from "../controllers/requests/taskRequests/deletePhotosRequest";
 
 export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -29,11 +26,34 @@ export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: stri
     });
 }
 
-export const deletePhotos = async (deletePhotosRequest: DeletePhotosRequest): Promise<void> => {
-    await axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
+export const getTotalUploadSize = async (userId: string): Promise<number> => {
+    const [files] = await getStorage()
+        .bucket(taskPhotoBucket)
+        .getFiles({prefix: `${userId}/`});
+    let bytes = 0;
+    for (const file of files) {
+        bytes += +file.metadata.size; // JS is so fun
+    }
+    return bytes;
 }
 
-export const deletePhotosBlindSend = (deletePhotosRequest: DeletePhotosRequest): void => {
-    // to be used for potentially long-running operations (like when deleting a user or room that could have hundreds of tasks with photos)
-    axios.post(`${process.env.MUCHTODO_URLS__DELETEPHOTOS}/photos`, deletePhotosRequest);
+export const deleteTaskPhotos = async (userId: string, taskIds: string[]): Promise<void> => {
+    for (const taskId of taskIds) {
+        await getStorage()
+            .bucket(taskPhotoBucket)
+            .deleteFiles({prefix: `${userId}/${taskId}/`});
+    }
+}
+
+export const deletePhotos = async (files: string[]): Promise<void> => {
+    for (const file of files) {
+        try {
+            await getStorage()
+                .bucket(taskPhotoBucket)
+                .file(file)
+                .delete();
+        } catch (e) {
+            console.log(`Could not delete ${file}. Error: ${e}`);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
@@ -17,7 +18,10 @@ class RoomsService {
       context.read<RoomsProvider>().setLoading(true);
       var rooms = await RoomRepository.getAllRoomsByUser();
       if (context.mounted) {
+        var sort = context.read<SettingsProvider>().roomSort;
+        var sortDirection = context.read<SettingsProvider>().roomSortDirection;
         context.read<RoomsProvider>().setRooms(rooms);
+        context.read<RoomsProvider>().setSort(sort, sortDirection);
       }
     } on Exception catch (e, s) {
       FirebaseCrashlytics.instance.recordError(e, s);

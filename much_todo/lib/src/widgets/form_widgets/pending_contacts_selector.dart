@@ -102,7 +102,8 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                   return Align(
                     alignment: Alignment.topLeft,
                     child: Material(
-                      elevation: 10,
+                      elevation: 15,
+                      color: getDropdownColor(context),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           // bug with flutter, without this there is overflow on right
@@ -204,6 +205,10 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
     hideKeyboard();
     Contact? createdContact = await Dialogs.promptAddContact(context, _autoCompleteController.text);
     if (createdContact != null) {
+      // dumb hack, but if user did not have a text when creating the contact, options list isn't rebuild
+      _autoCompleteController.text = 'a';
+      _autoCompleteController.clear();
+
       setState(() {
         _selectedContacts.add(createdContact);
         widget.onChange(_selectedContacts);

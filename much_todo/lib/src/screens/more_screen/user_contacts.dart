@@ -27,6 +27,7 @@ class _UserContactsState extends State<UserContacts> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Contacts'),
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           scrolledUnderElevation: 0.0,
         ),
         body: Stack(

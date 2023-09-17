@@ -52,28 +52,38 @@ class _HomeState extends State<Home> {
           controller: _pageController,
           children: _screens,
         ),
-        bottomNavigationBar: NavigationBar(
-          destinations: const <Widget>[
-            NavigationDestination(
-              icon: Icon(Icons.sticky_note_2_outlined),
-              selectedIcon: Icon(Icons.sticky_note_2_rounded),
-              label: 'Tasks',
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: Theme.of(context).dividerColor,
+                width: 0.175,
+              ),
             ),
-            NavigationDestination(
-              icon: Icon(Icons.room_outlined),
-              selectedIcon: Icon(Icons.room),
-              label: 'Rooms',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.more_horiz_outlined),
-              selectedIcon: Icon(Icons.more_horiz),
-              label: 'More',
-            ),
-          ],
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: onItemTapped,
-          elevation: 15,
-          surfaceTintColor: const Color(0x00000000),
+          ),
+          child: NavigationBar(
+            destinations: const <Widget>[
+              NavigationDestination(
+                icon: Icon(Icons.sticky_note_2_outlined),
+                selectedIcon: Icon(Icons.sticky_note_2_rounded),
+                label: 'Tasks',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.room_outlined),
+                selectedIcon: Icon(Icons.room),
+                label: 'Rooms',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.more_horiz_outlined),
+                selectedIcon: Icon(Icons.more_horiz),
+                label: 'More',
+              ),
+            ],
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: onItemTapped,
+            elevation: 15,
+            surfaceTintColor: const Color(0x00000000),
+          ),
         ),
       ),
     );

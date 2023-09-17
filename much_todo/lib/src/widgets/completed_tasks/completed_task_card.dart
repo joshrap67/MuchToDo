@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_task_details.dart';
 import 'package:much_todo/src/widgets/priority_indicator.dart';
 
 class CompletedTaskCard extends StatefulWidget {
   final CompletedTask task;
+  final bool showRoom;
   final VoidCallback onDelete;
   final VoidCallback? onLongPress;
 
-  const CompletedTaskCard({super.key, required this.task, required this.onDelete, this.onLongPress});
+  const CompletedTaskCard(
+      {super.key, this.showRoom = true, required this.task, required this.onDelete, this.onLongPress});
 
   @override
   State<CompletedTaskCard> createState() => _CompletedTaskCardState();
@@ -38,24 +41,36 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
                   ),
                 ],
               ),
-              title: Text(widget.task.name),
-              subtitle: Text(widget.task.roomName),
+              title: Text(
+                widget.task.name,
+                style: const TextStyle(fontSize: 20),
+              ),
+              subtitle: widget.showRoom
+                  ? Text(
+                      widget.task.roomName,
+                      style: const TextStyle(fontSize: 12),
+                    )
+                  : null,
+              contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+              trailing: Text(DateFormat.yMd().format(widget.task.completionDate)),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    'Completed: ${DateFormat.yMd().format(widget.task.completionDate)}',
-                    style: const TextStyle(fontSize: 11),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    '${getEffortTitle(widget.task.effort)} Effort',
+                    style: const TextStyle(
+                      fontSize: 10,
+                    ),
                   ),
-                ),
-                TextButton(
-                  onPressed: openTask,
-                  child: const Text('OPEN'),
-                ),
-              ],
+                  TextButton(
+                    onPressed: openTask,
+                    child: const Text('OPEN'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

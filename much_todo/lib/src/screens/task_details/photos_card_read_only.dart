@@ -45,6 +45,7 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
                             ? Image.network(
                                 widget.photos[index].publicUrl!,
                                 fit: BoxFit.cover,
+
                                 errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                                   return const Center(child: Icon(Icons.broken_image));
                                 },

@@ -29,6 +29,7 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
           maxLines: 1,
         ),
         scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         actions: [
           IconButton(onPressed: promptDeleteTask, icon: const Icon(Icons.delete)),
         ],

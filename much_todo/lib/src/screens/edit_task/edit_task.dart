@@ -90,6 +90,7 @@ class _EditTaskState extends State<EditTask> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Edit Task'),
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           scrolledUnderElevation: 0,
         ),
         body: GestureDetector(

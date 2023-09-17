@@ -61,20 +61,14 @@ class _ContactCardReadOnlyState extends State<ContactCardReadOnly> {
               ),
             ),
             ListTile(
-              title: Text(contact.email != null ? contact.email! : 'No email'),
-              subtitle: const Text(
-                'Email',
-                style: TextStyle(fontSize: 12),
-              ),
+              title: Text(contact.email != null && contact.email!.isNotEmpty ? contact.email! : 'No email'),
               leading: const Icon(Icons.email),
               onTap: () => launchEmail(context, contact.email),
             ),
             ListTile(
-              title: Text(contact.phoneNumber != null ? contact.phoneNumber! : 'No phone number'),
-              subtitle: const Text(
-                'Phone Number',
-                style: TextStyle(fontSize: 12),
-              ),
+              title: Text(contact.phoneNumber != null && contact.phoneNumber!.isNotEmpty
+                  ? contact.phoneNumber!
+                  : 'No phone number'),
               leading: const Icon(Icons.phone),
               onTap: () => launchPhone(context, contact.phoneNumber),
             ),

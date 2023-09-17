@@ -60,13 +60,14 @@ class _CompletedTasksState extends State<CompletedTasks> {
                 maxLines: 1,
               ),
         scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         actions: _deleteMode
             ? [
                 TextButton(
                   onPressed: promptDeleteCompletedTasks,
                   child: Text(
                     'DELETE',
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSecondaryContainer),
                   ),
                 )
               ]
@@ -165,6 +166,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
                           } else {
                             return CompletedTaskCard(
                               task: task,
+                              showRoom: widget.room == null,
                               onDelete: () => onDelete(task.id),
                               onLongPress: () {
                                 setState(() {
@@ -318,6 +320,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<CompletedTaskSortOption>(
                                 value: _sortByValue,
+                                dropdownColor: getDropdownColor(context),
                                 onChanged: (CompletedTaskSortOption? value) {
                                   setState(() {
                                     _sortByValue = value!;

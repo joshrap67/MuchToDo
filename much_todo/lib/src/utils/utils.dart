@@ -227,3 +227,8 @@ Future<void> launchPhone(BuildContext context, String? phoneNumber) async {
     }
   }
 }
+
+Color getDropdownColor(BuildContext context) {
+  return ElevationOverlay.applySurfaceTint(
+      Theme.of(context).colorScheme.background, Theme.of(context).colorScheme.surfaceTint, 10);
+}

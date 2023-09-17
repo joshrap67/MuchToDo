@@ -43,14 +43,15 @@ class TaskListSkeleton extends StatelessWidget {
               itemBuilder: (context, index) {
                 return TaskCard(
                   task: Task.named(
-                      id: index.toString(),
-                      name: 'Dummy Task Name',
-                      priority: 1,
-                      effort: 1,
-                      createdBy: 'createdBy',
-                      room: TaskRoom('id', 'Room Name'),
-                      completeBy: DateTime.now(),
-                      creationDate: DateTime.now()),
+                    id: index.toString(),
+                    name: 'Dummy Task Name',
+                    priority: 1,
+                    effort: 1,
+                    createdBy: 'createdBy',
+                    room: TaskRoom('id', 'Room Name'),
+                    completeBy: DateTime.now(),
+                    creationDate: DateTime.now(),
+                  ),
                 );
               },
             ),

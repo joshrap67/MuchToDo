@@ -35,6 +35,7 @@ class _UserTagsState extends State<UserTags> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Tags'),
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           scrolledUnderElevation: 0.0,
         ),
         body: Stack(

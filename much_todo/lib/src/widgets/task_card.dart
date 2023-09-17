@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/screens/task_details/task_details.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/priority_indicator.dart';
 
 class TaskCard extends StatefulWidget {
@@ -31,51 +32,58 @@ class _TaskCardState extends State<TaskCard> {
                 ),
               ],
             ),
-            title: Text(widget.task.name),
-            trailing: widget.task.inProgress
-                ? Tooltip(
-                    message: 'In Progress',
-                    child: ImageIcon(
-                      const AssetImage('assets/icons/in-progress.png'),
-                      color: Theme.of(context).iconTheme.color,
-                    ),
+            title: Text(
+              widget.task.name,
+              style: const TextStyle(fontSize: 20),
+            ),
+            leadingAndTrailingTextStyle: widget.task.completeBy != null
+                ? TextStyle(
+                    fontSize: 11,
+                    // bold if a week before due date or already passed
+                    fontWeight: widget.task.completeBy!.difference(DateTime.now()).inDays < 7 ? FontWeight.bold : null)
+                : null,
+            contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+            trailing: widget.task.completeBy != null
+                ? Text(
+                    'Due ${DateFormat.yMd().format(widget.task.completeBy!)}',style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
                   )
                 : null,
-            subtitle: widget.showRoom ? Text(widget.task.room.name) : const Text(''),
+            subtitle: widget.showRoom
+                ? Text(
+                    widget.task.room.name,
+                    style: const TextStyle(fontSize: 12),
+                  )
+                : null,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              widget.task.completeBy != null
-                  ? Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
-                      child: Text(
-                        'Due ${DateFormat.yMd().format(widget.task.completeBy!)}',
-                        style: TextStyle(
-                            fontSize: 11,
-                            // bold if a week before due date or already passed
-                            fontWeight:
-                                widget.task.completeBy!.difference(DateTime.now()).inDays < 7 ? FontWeight.bold : null),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 0, 0, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                widget.task.inProgress
+                    ? Tooltip(
+                        message: 'In Progress',
+                        child: ImageIcon(
+                          const AssetImage('assets/icons/in-progress.png'),
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                      )
+                    : Text(
+                        '${getEffortTitle(widget.task.effort)} Effort',
+                        style: const TextStyle(
+                          fontSize: 10,
+                        ),
                       ),
-                    )
-                  : const Text(''),
-              TextButton(
-                onPressed: openTask,
-                child: const Text('OPEN'),
-              ),
-            ],
+                TextButton(
+                  onPressed: openTask,
+                  child: const Text('OPEN'),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
-  }
-
-  String getTitle() {
-    if (widget.task.completeBy != null) {
-      return '${widget.task.name} - Due by ${DateFormat.yMd().format(widget.task.completeBy!)}';
-    } else {
-      return widget.task.name;
-    }
   }
 
   void openTask() {

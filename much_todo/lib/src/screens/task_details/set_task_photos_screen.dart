@@ -56,7 +56,16 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Task Photos'),
-        actions: [TextButton(onPressed: save, child: const Text('SAVE'))],
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        actions: [
+          TextButton(
+            onPressed: save,
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+            child: const Text('SAVE'),
+          )
+        ],
       ),
       body: Stack(
         alignment: Alignment.bottomRight,

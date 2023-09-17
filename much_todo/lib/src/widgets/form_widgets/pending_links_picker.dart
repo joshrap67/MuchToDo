@@ -58,6 +58,7 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
           ),
           Material(
             elevation: 3,
+            color: getDropdownColor(context),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 maxHeight: 300,

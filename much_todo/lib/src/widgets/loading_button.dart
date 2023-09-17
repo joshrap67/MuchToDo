@@ -18,7 +18,7 @@ class _LoadingButtonState extends State<LoadingButton> {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
+    return ElevatedButton.icon(
       onPressed: _isLoading ? null : onSubmit,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(

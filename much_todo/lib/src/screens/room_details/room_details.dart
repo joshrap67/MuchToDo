@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
+import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/utils/enums.dart';
@@ -51,6 +52,7 @@ class _RoomDetailsState extends State<RoomDetails> {
     return Scaffold(
       appBar: AppBar(
         title: AutoSizeText(_room.name),
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
         actions: [
           PopupMenuButton(
@@ -131,7 +133,59 @@ class _RoomDetailsState extends State<RoomDetails> {
                         padding: const EdgeInsets.only(bottom: 75),
                         itemBuilder: (ctx, index) {
                           var task = _tasks[index];
-                          return TaskCard(task: task, showRoom: false);
+                          return Dismissible(
+                            key: UniqueKey(),
+                            confirmDismiss: (direction) async {
+                              if (direction == DismissDirection.startToEnd) {
+                                // swiping left
+                                bool shouldDelete = await promptDeleteTask(task);
+                                if (!shouldDelete) {
+                                  // user said no
+                                  return shouldDelete;
+                                }
+                                deleteTask(task);
+                                return true;
+                              } else {
+                                // swiping right
+                                DateTime? completionDate = await promptCompleteTask(task);
+                                if (completionDate == null) {
+                                  // user said no
+                                  return false;
+                                }
+                                completeTask(task, completionDate);
+
+                                return true;
+                              }
+                            },
+                            onDismissed: (direction) {
+                              // removed as a blind send, if it fails then the service will notify this widget to rebuild with server values
+                              _tasks.removeWhere((element) => element.id == task.id);
+                            },
+                            background: Container(
+                              color: Colors.red,
+                              child: const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 16),
+                                  child: Icon(Icons.delete),
+                                ),
+                              ),
+                            ),
+                            secondaryBackground: Container(
+                              color: Colors.green,
+                              child: const Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: Icon(Icons.check),
+                                ),
+                              ),
+                            ),
+                            child: TaskCard(
+                              task: task,
+                              showRoom: false,
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -157,6 +211,53 @@ class _RoomDetailsState extends State<RoomDetails> {
         heroTag: 'NewTaskRoom',
       ),
     );
+  }
+
+  Future<bool> promptDeleteTask(Task task) async {
+    var shouldDelete = await showDialog<bool?>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Task'),
+          content: const Text('Are you sure you wish to delete this task?'),
+        );
+      },
+    );
+    return shouldDelete ?? false;
+  }
+
+  Future<DateTime?> promptCompleteTask(Task task) async {
+    var pickDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1800),
+        helpText: 'Select Completion Date',
+        lastDate: DateTime(9999));
+    return pickDate;
+  }
+
+  Future<void> completeTask(Task task, DateTime date) async {
+    var result = await TaskService.completeTask(context, task, date, notifyOnFailure: true);
+    if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
+    }
+  }
+
+  Future<void> deleteTask(Task task) async {
+    var result = await TaskService.deleteTask(context, task, notifyOnFailure: true);
+    if (context.mounted && result.failure) {
+      showSnackbar(result.errorMessage!, context);
+    }
   }
 
   onOptionSelected(TaskOptions result) {
@@ -309,6 +410,7 @@ class _RoomDetailsState extends State<RoomDetails> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<TaskSortOption>(
                                 value: _sortByValue,
+                                dropdownColor: getDropdownColor(context),
                                 onChanged: (TaskSortOption? value) {
                                   setState(() {
                                     _sortByValue = value!;

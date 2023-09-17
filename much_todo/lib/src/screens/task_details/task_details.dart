@@ -40,7 +40,7 @@ enum StatusOptions {
 class _TaskDetailsState extends State<TaskDetails> {
   late Task _task;
   StatusOptions _status = StatusOptions.notStarted;
-  late Future<List<TaskPhoto>>_photos;
+  late Future<List<TaskPhoto>> _photos;
 
   @override
   void initState() {
@@ -57,6 +57,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     return Scaffold(
       appBar: AppBar(
         title: getAppBarTitle(),
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
         actions: [
           PopupMenuButton(
@@ -124,6 +125,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<StatusOptions>(
                                       value: _status,
+                                      dropdownColor: getDropdownColor(context),
                                       onChanged: (StatusOptions? value) {
                                         setState(() {
                                           _status = value!;
@@ -238,8 +240,8 @@ class _TaskDetailsState extends State<TaskDetails> {
             child: ElevatedButton.icon(
               onPressed: promptCompleteTask,
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.green,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
               icon: const Icon(Icons.done),
               label: const Text('COMPLETE TASK'),

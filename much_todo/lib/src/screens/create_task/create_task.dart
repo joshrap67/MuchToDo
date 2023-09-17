@@ -89,7 +89,7 @@ class _CreateTaskState extends State<CreateTask> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('New Task'),
-		  // backgroundColor: Theme.of(context).colorScheme.secondaryContainer, todo
+		  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           scrolledUnderElevation: 0,
         ),
         body: GestureDetector(

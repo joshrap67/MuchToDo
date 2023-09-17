@@ -19,8 +19,8 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
-  final nameController = TextEditingController();
-  final noteController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _noteController = TextEditingController();
   final List<Room> _rooms = [];
   bool _isSigningOut = false;
   bool _isCreatingAccount = false;
@@ -33,8 +33,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   @override
   void dispose() {
-    nameController.dispose();
-    noteController.dispose();
+    _nameController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -43,6 +43,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Finish Account Setup'),
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -230,8 +231,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   addRoom(
                     Room(
                       const Uuid().v4(),
-                      nameController.text.trim(),
-                      noteController.text.isNotEmpty ? noteController.text.trim() : null,
+                      _nameController.text.trim(),
+                      _noteController.text.isNotEmpty ? _noteController.text.trim() : null,
                       [],
                     ),
                   );
@@ -256,7 +257,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     ),
                     validator: validRoomName,
                     keyboardType: TextInputType.name,
-                    controller: nameController,
+                    controller: _nameController,
                   ),
                   const Padding(padding: EdgeInsets.all(8)),
                   TextFormField(
@@ -265,7 +266,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (val) => validRoomNote(val),
-                    controller: noteController,
+                    controller: _noteController,
                   ),
                 ],
               ),
@@ -273,6 +274,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           ),
         );
       },
-    );
+    ).then((value) {
+      _nameController.clear();
+      _noteController.clear();
+    });
   }
 }

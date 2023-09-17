@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
+import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/screens/room_list/room_info_card.dart';
 import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/enums.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/skeletons/rooms_list_skeleton.dart';
 import 'package:much_todo/src/widgets/sort_direction_button.dart';
 import 'package:provider/provider.dart';
@@ -143,6 +145,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<RoomSortOption>(
                                 value: _sortByValue,
+                                dropdownColor: getDropdownColor(context),
                                 onChanged: (RoomSortOption? value) {
                                   setState(() {
                                     _sortByValue = value!;
@@ -181,6 +184,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
 
   void setSort() {
     context.read<RoomsProvider>().setSort(_sortByValue, _sortDirectionValue);
+    context.read<SettingsProvider>().updateRoomSort(_sortByValue, _sortDirectionValue);
     setState(() {});
   }
 

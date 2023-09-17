@@ -4,11 +4,13 @@ import 'package:much_todo/src/utils/utils.dart';
 
 class DatePicker extends StatefulWidget {
   final DateTime? selectedDate;
+  final DateTime? firstDate;
   final ValueChanged<DateTime?> onChange;
   final String? hintText;
   final String? labelText;
 
-  const DatePicker({super.key, this.selectedDate, this.hintText, this.labelText, required this.onChange});
+  const DatePicker(
+      {super.key, this.selectedDate, this.firstDate, this.hintText, this.labelText, required this.onChange});
 
   @override
   State<DatePicker> createState() => _DatePickerState();
@@ -56,7 +58,10 @@ class _DatePickerState extends State<DatePicker> {
       onTap: () async {
         hideKeyboard();
         DateTime? pickDate = await showDatePicker(
-            context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(9999));
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: widget.firstDate ?? DateTime.now(),
+            lastDate: DateTime(9999));
         if (pickDate != null) {
           setState(() {
             widget.onChange(pickDate);

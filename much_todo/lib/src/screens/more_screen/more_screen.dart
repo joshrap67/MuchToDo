@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/screens/more_screen/help_screen.dart';
 import 'package:much_todo/src/screens/more_screen/uploaded_photos_screen.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
 import 'package:much_todo/src/services/auth_service.dart';
@@ -13,6 +14,7 @@ import 'package:much_todo/src/widgets/skeletons/more_screen_skeleton.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:much_todo/src/providers/settings_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key, required this.controller});
@@ -26,7 +28,8 @@ class MoreScreen extends StatefulWidget {
 enum AccountOptions { logout, delete }
 
 class _MoreScreenState extends State<MoreScreen> {
-  String? _version;
+	final _scrollController = ScrollController();
+	String? _version;
 
   @override
   void initState() {
@@ -35,121 +38,131 @@ class _MoreScreenState extends State<MoreScreen> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     var user = context.watch<UserProvider>().user;
     if (user == null || context.watch<UserProvider>().isLoading) {
       return const MoreScreenSkeleton();
     }
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('Much To Do', style: Theme.of(context).textTheme.displayMedium),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
-                    child: Text(
-                      _version ?? '',
-                      textAlign: TextAlign.left,
+    return Scrollbar(
+		controller: _scrollController,
+		child: ListView(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Much To Do', style: Theme.of(context).textTheme.displayMedium),
                     ),
-                  )
-                ],
-              ),
-              ListTile(
-                title: Text(user.email),
-                subtitle: const Text(
-                  'ACCOUNT',
-                  style: TextStyle(fontSize: 12),
-                ),
-                trailing: accountDropdown(),
-              ),
-            ],
-          ),
-          const SizedBox(height: 25),
-          Card(
-            child: ListTile(
-              title: Text(user.tags.isNotEmpty ? '${user.tags.length} Tags' : 'No tags'),
-              onTap: launchTags,
-              trailing: const Icon(Icons.arrow_forward),
-              leading: const Icon(Icons.tag),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text(user.contacts.isNotEmpty ? '${user.contacts.length} Contacts' : 'No contacts'),
-              onTap: launchContacts,
-              trailing: const Icon(Icons.arrow_forward),
-              leading: const Icon(Icons.person),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: const Text('Completed Tasks'),
-              onTap: launchCompletedTasks,
-              trailing: const Icon(Icons.arrow_forward),
-              leading: const Icon(Icons.check),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: const Text('Uploaded Photos'),
-              onTap: launchUploadedPhotos,
-              trailing: const Icon(Icons.arrow_forward),
-              leading: const Icon(Icons.camera_alt),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: const Text('Theme'),
-              leading: const Icon(Icons.brush),
-              contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-              trailing: DropdownButtonHideUnderline(
-                child: DropdownButton<ThemeMode>(
-                  value: widget.controller.themeMode,
-                  onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
-                  items: const [
-                    DropdownMenuItem(
-                      value: ThemeMode.system,
-                      child: Text('System Theme'),
-                    ),
-                    DropdownMenuItem(
-                      value: ThemeMode.light,
-                      child: Text('Light Theme'),
-                    ),
-                    DropdownMenuItem(
-                      value: ThemeMode.dark,
-                      child: Text('Dark Theme'),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                      child: Text(
+                        _version ?? '',
+                        textAlign: TextAlign.left,
+                      ),
                     )
                   ],
                 ),
+                ListTile(
+                  title: Text(user.email),
+                  subtitle: const Text(
+                    'ACCOUNT',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  trailing: accountDropdown(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 25),
+            Card(
+              child: ListTile(
+                title: Text(user.tags.isNotEmpty ? '${user.tags.length} Tags' : 'No tags'),
+                onTap: launchTags,
+                leading: const Icon(Icons.tag),
               ),
             ),
-          ),
-          Card(
-            child: ListTile(
-              title: const Text('Privacy Policy'),
-              onTap: launchPrivacyPolicy,
-              trailing: const Icon(Icons.arrow_forward),
-              leading: const Icon(Icons.policy_outlined),
+            Card(
+              child: ListTile(
+                title: Text(user.contacts.isNotEmpty ? '${user.contacts.length} Contacts' : 'No contacts'),
+                onTap: launchContacts,
+                leading: const Icon(Icons.person),
+              ),
             ),
-          ),
-          Card(
-            child: ListTile(
-              title: const Text('Terms and Conditions'),
-              onTap: launchTermsAndConditions,
-              trailing: const Icon(Icons.arrow_forward),
-              leading: const Icon(Icons.article),
+            Card(
+              child: ListTile(
+                title: const Text('Completed Tasks'),
+                onTap: launchCompletedTasks,
+                leading: const Icon(Icons.check),
+              ),
             ),
-          ),
-          // todo "help" card?
-        ],
+            Card(
+              child: ListTile(
+                title: const Text('Uploaded Photos'),
+                onTap: launchUploadedPhotos,
+                leading: const Icon(Icons.camera_alt),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                title: const Text('Theme'),
+                leading: const Icon(Icons.brush),
+                contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+                trailing: DropdownButtonHideUnderline(
+                  child: DropdownButton<ThemeMode>(
+                    value: widget.controller.themeMode,
+                    dropdownColor: getDropdownColor(context),
+                    onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
+                    items: const [
+                      DropdownMenuItem(
+                        value: ThemeMode.system,
+                        child: Text('System Theme'),
+                      ),
+                      DropdownMenuItem(
+                        value: ThemeMode.light,
+                        child: Text('Light Theme'),
+                      ),
+                      DropdownMenuItem(
+                        value: ThemeMode.dark,
+                        child: Text('Dark Theme'),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const Divider(),
+            Card(
+              child: ListTile(
+                title: const Text('Help'),
+                onTap: launchHelp,
+                leading: const Icon(Icons.help),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                title: const Text('Privacy Policy'),
+                onTap: launchPrivacyPolicy,
+                leading: const Icon(Icons.policy_outlined),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                title: const Text('Terms and Conditions'),
+                onTap: launchTermsAndConditions,
+                leading: const Icon(Icons.article),
+              ),
+            ),
+          ],
       ),
     );
   }
@@ -245,12 +258,71 @@ class _MoreScreenState extends State<MoreScreen> {
     );
   }
 
-  void launchPrivacyPolicy() {
-    // todo
+  void launchHelp() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HelpScreen(),
+      ),
+    );
   }
 
-  void launchTermsAndConditions() {
-    // todo
+  Future<bool> promptLaunchLink(String title, String content) async {
+    var result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              child: const Text('NO'),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+            TextButton(
+              child: const Text('YES'),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            )
+          ],
+          insetPadding: const EdgeInsets.all(8.0),
+          title: Text(title),
+          content: Text(content),
+        );
+      },
+    );
+    return result ?? false;
+  }
+
+  Future<void> launchPrivacyPolicy() async {
+    var launch = await promptLaunchLink('Privacy Policy', 'Launch privacy policy with external application?');
+    if (!launch) {
+      return;
+    }
+
+    var uri = Uri.parse('https://storage.googleapis.com/much-to-do-sites/privacy_policy.html');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (context.mounted) {
+        showSnackbar('Could not launch privacy policy.', context);
+      }
+    }
+  }
+
+  Future<void> launchTermsAndConditions() async {
+    var launch = await promptLaunchLink('Terms & Conditions', 'Launch terms & conditions with external application?');
+    if (!launch) {
+      return;
+    }
+
+    var uri = Uri.parse('https://storage.googleapis.com/much-to-do-sites/terms_and_conditions.html');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (context.mounted) {
+        showSnackbar('Could not launch terms & conditions.', context);
+      }
+    }
   }
 
   Future<void> signOut() async {

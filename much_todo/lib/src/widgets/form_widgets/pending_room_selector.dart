@@ -114,7 +114,8 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                   return Align(
                     alignment: Alignment.topLeft,
                     child: Material(
-                      elevation: 10,
+                      elevation: 15,
+                      color: getDropdownColor(context),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           maxWidth: constraints.maxWidth,
@@ -177,7 +178,10 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
     _selectedRoom = room;
     widget.onRoomChange(_selectedRoom);
 
+    // dumb hack, but if user did not have a text when creating the contact, options list isn't rebuild
+    _autoCompleteController.text = 'a';
     _autoCompleteController.clear();
+
     hideKeyboard();
     setState(() {});
   }

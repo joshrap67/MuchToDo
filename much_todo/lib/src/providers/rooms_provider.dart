@@ -18,7 +18,7 @@ class RoomsProvider with ChangeNotifier {
 
   void setRooms(List<Room> rooms) {
     _rooms = rooms;
-    sortRooms();
+    sortRoomsAndNotfiy();
   }
 
   void setLoading(bool loading) {
@@ -28,7 +28,7 @@ class RoomsProvider with ChangeNotifier {
 
   void addRoom(Room room) {
     _rooms.add(room);
-    notifyListeners();
+	sortRoomsAndNotfiy();
   }
 
   void removeRoom(Room room) {
@@ -40,17 +40,17 @@ class RoomsProvider with ChangeNotifier {
     var index = _rooms.indexWhere((element) => element.id == id);
     if (index >= 0) {
       _rooms[index].update(name, note);
-      notifyListeners();
+	  sortRoomsAndNotfiy();
     }
   }
 
   void setSort(RoomSortOption sort, SortDirection sortDirection) {
     _sort = sort;
     _sortDirection = sortDirection;
-    sortRooms();
+    sortRoomsAndNotfiy();
   }
 
-  void sortRooms() {
+  void sortRoomsAndNotfiy() {
     // initially ascending
     switch (_sort) {
       case RoomSortOption.name:

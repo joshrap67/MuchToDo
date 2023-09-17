@@ -126,6 +126,7 @@ class _FilterTasksState extends State<FilterTasks> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Filter Tasks'),
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
       ),
       body: GestureDetector(
@@ -153,6 +154,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         child: DropdownButtonFormField(
                           items: _sortEntries,
                           isExpanded: true,
+                          dropdownColor: getDropdownColor(context),
                           value: _sortByValue,
                           onTap: () {
                             hideFocus();
@@ -200,6 +202,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _equalityEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _priorityEquality,
                           onTap: () {
@@ -220,6 +223,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _priorityEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _priorityFilter,
                           decoration: InputDecoration(
@@ -262,6 +266,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _effortEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _effortFilter,
                           decoration: InputDecoration(
@@ -304,6 +309,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _roomEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _roomIdFilter,
                           menuMaxHeight: 500,
@@ -347,6 +353,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _equalityEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _costEquality,
                           onTap: () {
@@ -421,6 +428,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _dateEqualityEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _completeByEquality,
                           onTap: () {
@@ -442,6 +450,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         child: DatePicker(
                           key: ValueKey(_completeByFilter),
                           selectedDate: _completeByFilter,
+                          firstDate: DateTime(1000),
                           onChange: (date) {
                             setState(() {
                               _completeByFilter = date;
@@ -469,6 +478,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField(
                           items: _dateEqualityEntries,
+                          dropdownColor: getDropdownColor(context),
                           isExpanded: true,
                           value: _creationDateEquality,
                           onTap: () {
@@ -490,6 +500,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         child: DatePicker(
                           key: ValueKey(_creationDateFilter),
                           selectedDate: _creationDateFilter,
+                          firstDate: DateTime(1000),
                           onChange: (date) {
                             setState(() {
                               _creationDateFilter = date;

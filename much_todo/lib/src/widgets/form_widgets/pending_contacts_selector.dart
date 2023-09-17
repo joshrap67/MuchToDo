@@ -24,8 +24,6 @@ class ContactOption {
 }
 
 class _PendingContactsCard1State extends State<PendingContactsSelector> {
-  static const maxOptionsHeight = 300.0;
-
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
@@ -48,6 +46,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
 
   @override
   Widget build(BuildContext context) {
+    var maxOptionsHeight = MediaQuery.sizeOf(context).height * .35;
     return Focus(
       onFocusChange: (hasFocus) {
         setState(() {
@@ -78,7 +77,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
                 focusNode: _focusNode,
                 fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                   return TextFormField(
-                    scrollPadding: const EdgeInsets.only(bottom: maxOptionsHeight + 50),
+                    scrollPadding: EdgeInsets.only(bottom: maxOptionsHeight + 50),
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       prefixIcon: const Icon(Icons.person),

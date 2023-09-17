@@ -125,6 +125,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
               child: const Text('APPLY'),
             )
           ],
+          insetPadding: const EdgeInsets.all(8.0),
           title: const Text('Sort Rooms'),
           content: StatefulBuilder(
             builder: (statefulContext, setState) {

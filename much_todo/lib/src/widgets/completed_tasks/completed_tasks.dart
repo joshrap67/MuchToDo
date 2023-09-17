@@ -301,6 +301,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
             )
           ],
           title: const Text('Sort Tasks'),
+          insetPadding: const EdgeInsets.all(8.0),
           content: StatefulBuilder(
             builder: (statefulContext, setState) {
               return SizedBox(

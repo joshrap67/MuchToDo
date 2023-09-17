@@ -55,7 +55,7 @@ class _HelpScreenState extends State<HelpScreen> {
                       child: const Scrollbar(
                         child: SingleChildScrollView(
                           child: Text(
-                              'At this time, rooms are only used for the purpose of separating tasks. Similar to tasks, rooms can be as generic as you want them to be. They can be inside or outside, small or large.'),
+                              'At this time, rooms are only used for the purpose of separating tasks. Similar to tasks, rooms can be as generic as you want them to be. They can be inside or outside, small, or large.'),
                         ),
                       ),
                     ),

@@ -28,8 +28,8 @@ class MoreScreen extends StatefulWidget {
 enum AccountOptions { logout, delete }
 
 class _MoreScreenState extends State<MoreScreen> {
-	final _scrollController = ScrollController();
-	String? _version;
+  final _scrollController = ScrollController();
+  String? _version;
 
   @override
   void initState() {
@@ -43,7 +43,6 @@ class _MoreScreenState extends State<MoreScreen> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     var user = context.watch<UserProvider>().user;
@@ -51,118 +50,118 @@ class _MoreScreenState extends State<MoreScreen> {
       return const MoreScreenSkeleton();
     }
     return Scrollbar(
-		controller: _scrollController,
-		child: ListView(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Much To Do', style: Theme.of(context).textTheme.displayMedium),
+      controller: _scrollController,
+      child: ListView(
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Much To Do', style: Theme.of(context).textTheme.displayMedium),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                    child: Text(
+                      _version ?? '',
+                      textAlign: TextAlign.left,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
-                      child: Text(
-                        _version ?? '',
-                        textAlign: TextAlign.left,
-                      ),
+                  )
+                ],
+              ),
+              ListTile(
+                title: Text(user.email),
+                subtitle: const Text(
+                  'ACCOUNT',
+                  style: TextStyle(fontSize: 12),
+                ),
+                trailing: accountDropdown(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 25),
+          Card(
+            child: ListTile(
+              title: Text(user.tags.isNotEmpty ? '${user.tags.length} Tags' : 'No tags'),
+              onTap: launchTags,
+              leading: const Icon(Icons.tag),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: Text(user.contacts.isNotEmpty ? '${user.contacts.length} Contacts' : 'No contacts'),
+              onTap: launchContacts,
+              leading: const Icon(Icons.person),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Completed Tasks'),
+              onTap: launchCompletedTasks,
+              leading: const Icon(Icons.check),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Uploaded Photos'),
+              onTap: launchUploadedPhotos,
+              leading: const Icon(Icons.camera_alt),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Theme'),
+              leading: const Icon(Icons.brush),
+              contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+              trailing: DropdownButtonHideUnderline(
+                child: DropdownButton<ThemeMode>(
+                  value: widget.controller.themeMode,
+                  dropdownColor: getDropdownColor(context),
+                  onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
+                  items: const [
+                    DropdownMenuItem(
+                      value: ThemeMode.system,
+                      child: Text('System Theme'),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.light,
+                      child: Text('Light Theme'),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.dark,
+                      child: Text('Dark Theme'),
                     )
                   ],
                 ),
-                ListTile(
-                  title: Text(user.email),
-                  subtitle: const Text(
-                    'ACCOUNT',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  trailing: accountDropdown(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 25),
-            Card(
-              child: ListTile(
-                title: Text(user.tags.isNotEmpty ? '${user.tags.length} Tags' : 'No tags'),
-                onTap: launchTags,
-                leading: const Icon(Icons.tag),
               ),
             ),
-            Card(
-              child: ListTile(
-                title: Text(user.contacts.isNotEmpty ? '${user.contacts.length} Contacts' : 'No contacts'),
-                onTap: launchContacts,
-                leading: const Icon(Icons.person),
-              ),
+          ),
+          const Divider(),
+          Card(
+            child: ListTile(
+              title: const Text('Help'),
+              onTap: launchHelp,
+              leading: const Icon(Icons.help),
             ),
-            Card(
-              child: ListTile(
-                title: const Text('Completed Tasks'),
-                onTap: launchCompletedTasks,
-                leading: const Icon(Icons.check),
-              ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Privacy Policy'),
+              onTap: launchPrivacyPolicy,
+              leading: const Icon(Icons.policy_outlined),
             ),
-            Card(
-              child: ListTile(
-                title: const Text('Uploaded Photos'),
-                onTap: launchUploadedPhotos,
-                leading: const Icon(Icons.camera_alt),
-              ),
+          ),
+          Card(
+            child: ListTile(
+              title: const Text('Terms and Conditions'),
+              onTap: launchTermsAndConditions,
+              leading: const Icon(Icons.article),
             ),
-            Card(
-              child: ListTile(
-                title: const Text('Theme'),
-                leading: const Icon(Icons.brush),
-                contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-                trailing: DropdownButtonHideUnderline(
-                  child: DropdownButton<ThemeMode>(
-                    value: widget.controller.themeMode,
-                    dropdownColor: getDropdownColor(context),
-                    onChanged: widget.controller.updateThemeMode, // rebuilds MaterialApp
-                    items: const [
-                      DropdownMenuItem(
-                        value: ThemeMode.system,
-                        child: Text('System Theme'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.light,
-                        child: Text('Light Theme'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.dark,
-                        child: Text('Dark Theme'),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const Divider(),
-            Card(
-              child: ListTile(
-                title: const Text('Help'),
-                onTap: launchHelp,
-                leading: const Icon(Icons.help),
-              ),
-            ),
-            Card(
-              child: ListTile(
-                title: const Text('Privacy Policy'),
-                onTap: launchPrivacyPolicy,
-                leading: const Icon(Icons.policy_outlined),
-              ),
-            ),
-            Card(
-              child: ListTile(
-                title: const Text('Terms and Conditions'),
-                onTap: launchTermsAndConditions,
-                leading: const Icon(Icons.article),
-              ),
-            ),
-          ],
+          ),
+        ],
       ),
     );
   }
@@ -267,38 +266,7 @@ class _MoreScreenState extends State<MoreScreen> {
     );
   }
 
-  Future<bool> promptLaunchLink(String title, String content) async {
-    var result = await showDialog<bool>(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog.adaptive(
-          actions: <Widget>[
-            TextButton(
-              child: const Text('NO'),
-              onPressed: () => Navigator.pop(context, false),
-            ),
-            TextButton(
-              child: const Text('YES'),
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-            )
-          ],
-          insetPadding: const EdgeInsets.all(8.0),
-          title: Text(title),
-          content: Text(content),
-        );
-      },
-    );
-    return result ?? false;
-  }
-
   Future<void> launchPrivacyPolicy() async {
-    var launch = await promptLaunchLink('Privacy Policy', 'Launch privacy policy with external application?');
-    if (!launch) {
-      return;
-    }
-
     var uri = Uri.parse('https://storage.googleapis.com/much-to-do-sites/privacy_policy.html');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -310,14 +278,9 @@ class _MoreScreenState extends State<MoreScreen> {
   }
 
   Future<void> launchTermsAndConditions() async {
-    var launch = await promptLaunchLink('Terms & Conditions', 'Launch terms & conditions with external application?');
-    if (!launch) {
-      return;
-    }
-
     var uri = Uri.parse('https://storage.googleapis.com/much-to-do-sites/terms_and_conditions.html');
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
         showSnackbar('Could not launch terms & conditions.', context);
@@ -398,44 +361,47 @@ class _MoreScreenState extends State<MoreScreen> {
                 )
               ],
               title: const Text('Delete Account'),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                        'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'
-                        '\n\nType "Delete" to confirm.'),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: 'Confirmation',
-                          errorText: errorText,
+              insetPadding: const EdgeInsets.all(8.0),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                          'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'
+                          '\n\nType "Delete" to confirm.'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            labelText: 'Confirmation',
+                            errorText: errorText,
+                          ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          controller: confirmController,
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return 'Required';
+                            } else if (val.toLowerCase() != 'delete') {
+                              return 'Invalid';
+                            }
+                            return null;
+                          },
+                          onChanged: (_) {
+                            if (errorText != null) {
+                              setState(() {
+                                errorText = null;
+                              });
+                            }
+                          },
+                          maxLines: 1,
+                          textInputAction: TextInputAction.done,
                         ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: confirmController,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return 'Required';
-                          } else if (val.toLowerCase() != 'delete') {
-                            return 'Invalid';
-                          }
-                          return null;
-                        },
-                        onChanged: (_) {
-                          if (errorText != null) {
-                            setState(() {
-                              errorText = null;
-                            });
-                          }
-                        },
-                        maxLines: 1,
-                        textInputAction: TextInputAction.done,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -495,57 +461,60 @@ class _MoreScreenState extends State<MoreScreen> {
                 )
               ],
               title: const Text('Delete Account'),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                        'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.lock),
-                          border: const OutlineInputBorder(),
-                          labelText: 'Password *',
-                          errorText: errorText,
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  hidePassword = !hidePassword;
-                                });
-                              },
-                              child: Icon(
-                                hidePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-                                size: 24,
+              insetPadding: const EdgeInsets.all(8.0),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                          'Are you sure you wish to delete your account? This action is permanent and all of your data will be gone!'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.lock),
+                            border: const OutlineInputBorder(),
+                            labelText: 'Password *',
+                            errorText: errorText,
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    hidePassword = !hidePassword;
+                                  });
+                                },
+                                child: Icon(
+                                  hidePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                                  size: 24,
+                                ),
                               ),
                             ),
                           ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          controller: passwordController,
+                          obscureText: hidePassword,
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return 'Required';
+                            }
+                            return null;
+                          },
+                          onChanged: (_) {
+                            if (errorText != null) {
+                              setState(() {
+                                errorText = null;
+                              });
+                            }
+                          },
+                          maxLines: 1,
+                          textInputAction: TextInputAction.done,
                         ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: passwordController,
-                        obscureText: hidePassword,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return 'Required';
-                          }
-                          return null;
-                        },
-                        onChanged: (_) {
-                          if (errorText != null) {
-                            setState(() {
-                              errorText = null;
-                            });
-                          }
-                        },
-                        maxLines: 1,
-                        textInputAction: TextInputAction.done,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );

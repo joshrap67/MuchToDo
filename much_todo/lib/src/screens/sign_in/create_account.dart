@@ -44,6 +44,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       appBar: AppBar(
         title: const Text('Finish Account Setup'),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+		  scrolledUnderElevation: 0.0,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -52,7 +53,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
               'To complete setting up your Much To Do account, add some rooms!'
-              '\n\nRooms can be as broad as you want them to be. They can be outside, inside, small or large. When you create a task you will always associate it with a room.',
+              '\n\nRooms can be as broad as you want them to be. They can be outside, inside, small, or large. When you create a task you will always associate it with a room.',
               textAlign: TextAlign.start,
             ),
           ),
@@ -243,32 +244,34 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           ],
           insetPadding: const EdgeInsets.all(8.0),
           title: const Text('New Room'),
-          content: Form(
-            key: formKey,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      label: Text('Room name *'),
-                      border: OutlineInputBorder(),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        label: Text('Room Name *'),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: validRoomName,
+                      keyboardType: TextInputType.name,
+                      controller: _nameController,
                     ),
-                    validator: validRoomName,
-                    keyboardType: TextInputType.name,
-                    controller: _nameController,
-                  ),
-                  const Padding(padding: EdgeInsets.all(8)),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      label: Text('Note'),
-                      border: OutlineInputBorder(),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        label: Text('Note'),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (val) => validRoomNote(val),
+                      controller: _noteController,
                     ),
-                    validator: (val) => validRoomNote(val),
-                    controller: _noteController,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

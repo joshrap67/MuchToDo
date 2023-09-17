@@ -24,8 +24,6 @@ class RoomOption {
 }
 
 class _PendingRoomSelectorState extends State<PendingRoomSelector> {
-  static const maxOptionsHeight = 300.0;
-
   final _autoCompleteController = TextEditingController();
   FocusNode _focusNode = FocusNode();
   Room? _selectedRoom;
@@ -48,6 +46,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
 
   @override
   Widget build(BuildContext context) {
+    var maxOptionsHeight = MediaQuery.sizeOf(context).height * .35;
     return Column(
       children: [
         Padding(
@@ -81,7 +80,7 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
                       }
                     },
                     child: TextFormField(
-                      scrollPadding: const EdgeInsets.only(bottom: maxOptionsHeight + 50),
+                      scrollPadding: EdgeInsets.only(bottom: maxOptionsHeight + 50),
                       decoration: InputDecoration(
                           border: const OutlineInputBorder(),
                           prefixIcon: const Icon(Icons.room),

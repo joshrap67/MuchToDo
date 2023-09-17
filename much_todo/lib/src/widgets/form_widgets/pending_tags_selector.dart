@@ -24,7 +24,7 @@ class TagOption {
 }
 
 class _PendingTagsSelectorState extends State<PendingTagsSelector> {
-  static const maxOptionsHeight = 300.0;
+  // static const maxOptionsHeight = 300.0;
 
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
@@ -49,6 +49,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
 
   @override
   Widget build(BuildContext context) {
+    var maxOptionsHeight = MediaQuery.sizeOf(context).height * .35;
     return Focus(
       onFocusChange: (hasFocus) {
         setState(() {
@@ -79,7 +80,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                 focusNode: _focusNode,
                 fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                   return TextFormField(
-                    scrollPadding: const EdgeInsets.only(bottom: maxOptionsHeight + 50),
+                    scrollPadding: EdgeInsets.only(bottom: maxOptionsHeight + 50),
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       prefixIcon: const Icon(Icons.tag),

@@ -116,7 +116,6 @@ class _LinksCardReadOnlyState extends State<LinksCardReadOnly> {
               },
             )
           ],
-          insetPadding: const EdgeInsets.all(8.0),
           title: const Text('Launch Link'),
           content: const Text('Launch this link with an external application?'),
         );

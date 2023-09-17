@@ -132,50 +132,52 @@ class Dialogs {
             ],
             insetPadding: const EdgeInsets.all(8.0),
             title: const Text('New Contact'),
-            content: Form(
-              key: formKey,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          label: Text('Name'),
-                          border: OutlineInputBorder(),
+            content: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            label: Text('Name'),
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.name,
+                          controller: nameController,
+                          validator: validContactName,
                         ),
-                        keyboardType: TextInputType.name,
-                        controller: nameController,
-                        validator: validContactName,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          label: Text('Email'),
-                          border: OutlineInputBorder(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            label: Text('Email'),
+                            border: OutlineInputBorder(),
+                          ),
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: validContactEmail,
                         ),
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: validContactEmail,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          label: Text('Phone Number'),
-                          border: OutlineInputBorder(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            label: Text('Phone Number'),
+                            border: OutlineInputBorder(),
+                          ),
+                          controller: phoneNumberController,
+                          keyboardType: TextInputType.phone,
+                          validator: validContactPhoneNumber,
                         ),
-                        controller: phoneNumberController,
-                        keyboardType: TextInputType.phone,
-                        validator: validContactPhoneNumber,
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -234,32 +236,34 @@ class Dialogs {
             ],
             insetPadding: const EdgeInsets.all(8.0),
             title: const Text('New Room'),
-            content: Form(
-              key: formKey,
-              child: SizedBox(
-                width: MediaQuery.of(dialogContext).size.width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Room name *'),
-                        border: OutlineInputBorder(),
+            content: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: SizedBox(
+                  width: MediaQuery.of(dialogContext).size.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Room Name *'),
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.name,
+                        controller: nameController,
+                        validator: validRoomName,
                       ),
-                      keyboardType: TextInputType.name,
-                      controller: nameController,
-                      validator: validRoomName,
-                    ),
-                    const Padding(padding: EdgeInsets.all(8)),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Note'),
-                        border: OutlineInputBorder(),
+                      const Padding(padding: EdgeInsets.all(8)),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          label: Text('Note'),
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: noteController,
+                        validator: validRoomNote,
                       ),
-                      controller: noteController,
-                      validator: validRoomNote,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

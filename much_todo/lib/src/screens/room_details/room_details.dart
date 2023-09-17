@@ -322,7 +322,7 @@ class _RoomDetailsState extends State<RoomDetails> {
                     children: [
                       TextFormField(
                         decoration: const InputDecoration(
-                          label: Text('Room name *'),
+                          label: Text('Room Name *'),
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.name,
@@ -391,6 +391,7 @@ class _RoomDetailsState extends State<RoomDetails> {
             )
           ],
           title: const Text('Sort Tasks'),
+          insetPadding: const EdgeInsets.all(8.0),
           content: StatefulBuilder(
             builder: (statefulContext, setState) {
               return SizedBox(

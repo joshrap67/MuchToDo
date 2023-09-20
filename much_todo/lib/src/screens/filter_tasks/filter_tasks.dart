@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
@@ -24,9 +25,8 @@ class FilterTasks extends StatefulWidget {
 
 class _FilterTasksState extends State<FilterTasks> {
   final List<DropdownMenuItem<TaskSortOption>> _sortEntries = <DropdownMenuItem<TaskSortOption>>[];
-  final List<DropdownMenuItem<EqualityComparison>> _equalityEntries = <DropdownMenuItem<EqualityComparison>>[];
-  final List<DropdownMenuItem<DateEqualityComparison>> _dateEqualityEntries =
-      <DropdownMenuItem<DateEqualityComparison>>[];
+  final List<DropdownMenuItem<EqualityType>> _equalityEntries = <DropdownMenuItem<EqualityType>>[];
+  final List<DropdownMenuItem<DateEqualityType>> _dateEqualityEntries = <DropdownMenuItem<DateEqualityType>>[];
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
   final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
   final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
@@ -34,18 +34,18 @@ class _FilterTasksState extends State<FilterTasks> {
   TaskSortOption _sortByValue = TaskSortOption.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
 
-  EqualityComparison _priorityEquality = EqualityComparison.equalTo;
+  EqualityType _priorityEquality = EqualityType.equalTo;
   PriorityFilter? _priorityFilter;
 
   EffortFilter? _effortFilter;
 
-  EqualityComparison _costEquality = EqualityComparison.equalTo;
-  double? _costFilter;
+  EqualityType _costEquality = EqualityType.equalTo;
+  double? _estimatedCostFilter;
 
-  DateEqualityComparison _completeByEquality = DateEqualityComparison.equalTo;
+  DateEqualityType _completeByEquality = DateEqualityType.equalTo;
   DateTime? _completeByFilter;
 
-  DateEqualityComparison _creationDateEquality = DateEqualityComparison.equalTo;
+  DateEqualityType _creationDateEquality = DateEqualityType.equalTo;
   DateTime? _creationDateFilter;
 
   bool _showOnlyInProgress = false;
@@ -62,14 +62,14 @@ class _FilterTasksState extends State<FilterTasks> {
         child: Text(value.label),
       ));
     }
-    for (var value in EqualityComparison.values) {
-      _equalityEntries.add(DropdownMenuItem<EqualityComparison>(
+    for (var value in EqualityType.values) {
+      _equalityEntries.add(DropdownMenuItem<EqualityType>(
         value: value,
         child: Text(value.label),
       ));
     }
-    for (var value in DateEqualityComparison.values) {
-      _dateEqualityEntries.add(DropdownMenuItem<DateEqualityComparison>(
+    for (var value in DateEqualityType.values) {
+      _dateEqualityEntries.add(DropdownMenuItem<DateEqualityType>(
         value: value,
         child: Text(value.label),
       ));
@@ -100,17 +100,17 @@ class _FilterTasksState extends State<FilterTasks> {
       FilterTaskOptions filters = context.read<TasksProvider>().filters;
       _sortByValue = filters.sortByValue;
       _sortDirectionValue = filters.sortDirectionValue;
-      _priorityFilter = filters.priorityFilter;
+      _priorityFilter = filters.priority;
       _priorityEquality = filters.priorityEquality;
-      _effortFilter = filters.effortFilter;
-      _roomIdFilter = filters.roomIdFilter;
+      _effortFilter = filters.effort;
+      _roomIdFilter = filters.roomId;
       _costEquality = filters.costEquality;
       _selectedContacts =
           context.read<UserProvider>().contacts.where((x) => filters.selectedContacts.any((y) => y == x.id)).toList();
       _selectedTags =
           context.read<UserProvider>().tags.where((x) => filters.selectedTags.any((y) => y == x.id)).toList();
       _showOnlyInProgress = filters.showOnlyInProgress;
-      _costFilter = filters.estimatedCost;
+      _estimatedCostFilter = filters.estimatedCost;
 
       _completeByFilter = filters.completeBy;
       _completeByEquality = filters.completeByEquality;
@@ -125,9 +125,25 @@ class _FilterTasksState extends State<FilterTasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Filter Tasks'),
+        title: const AutoSizeText(
+          'Filter Tasks',
+          minFontSize: 10,
+        ),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
+        actions: [
+          Visibility(
+            visible: getFilterCount() > 0,
+            child: TextButton.icon(
+              onPressed: clearFilters,
+              icon: Icon(Icons.clear, color: Theme.of(context).colorScheme.onSecondaryContainer),
+              label: Text(
+                'CLEAR ALL',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSecondaryContainer),
+              ),
+            ),
+          )
+        ],
       ),
       body: GestureDetector(
         onTap: () => hideKeyboard(),
@@ -374,11 +390,11 @@ class _FilterTasksState extends State<FilterTasks> {
                         padding: const EdgeInsets.all(8.0),
                         child: MoneyInput(
                           hintText: '\$',
-                          amount: _costFilter,
+                          amount: _estimatedCostFilter,
                           showClear: true,
                           onChange: (amount) {
                             setState(() {
-                              _costFilter = amount;
+                              _estimatedCostFilter = amount;
                             });
                           },
                         ),
@@ -450,6 +466,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         child: DatePicker(
                           key: ValueKey(_completeByFilter),
                           selectedDate: _completeByFilter,
+                          initialDate: _completeByFilter,
                           firstDate: DateTime(1000),
                           onChange: (date) {
                             setState(() {
@@ -500,6 +517,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         child: DatePicker(
                           key: ValueKey(_creationDateFilter),
                           selectedDate: _creationDateFilter,
+                          initialDate: _creationDateFilter,
                           firstDate: DateTime(1000),
                           onChange: (date) {
                             setState(() {
@@ -519,8 +537,8 @@ class _FilterTasksState extends State<FilterTasks> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 4),
         child: LoadingButton(
-          onSubmit: onSubmit,
-          label: 'APPLY FILTERS',
+          onSubmit: applyFilters,
+          label: getFilterCount() > 0 ? 'APPLY FILTERS (${getFilterCount()})' : 'APPLY FILTERS',
           icon: const Icon(Icons.check),
         ),
       ),
@@ -532,16 +550,16 @@ class _FilterTasksState extends State<FilterTasks> {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  Future<void> onSubmit() async {
+  Future<void> applyFilters() async {
     FilterTaskOptions options = FilterTaskOptions.named(
       sortByValue: _sortByValue,
       sortDirectionValue: _sortDirectionValue,
       priorityEquality: _priorityEquality,
-      priorityFilter: _priorityFilter,
-      effortFilter: _effortFilter,
-      roomIdFilter: _roomIdFilter,
+      priority: _priorityFilter,
+      effort: _effortFilter,
+      roomId: _roomIdFilter,
       costEquality: _costEquality,
-      estimatedCost: _costFilter,
+      estimatedCost: _estimatedCostFilter,
       selectedTags: _selectedTags.map((t) => t.id).toList(),
       selectedContacts: _selectedContacts.map((c) => c.id).toList(),
       showOnlyInProgress: _showOnlyInProgress,
@@ -552,5 +570,52 @@ class _FilterTasksState extends State<FilterTasks> {
     );
     context.read<TasksProvider>().setFilters(options);
     Navigator.pop(context, true);
+  }
+
+  void clearFilters() {
+    setState(() {
+      _priorityFilter = null;
+      _effortFilter = null;
+      _roomIdFilter = null;
+      _estimatedCostFilter = null;
+      _selectedTags = [];
+      _selectedContacts = [];
+      _showOnlyInProgress = false;
+      _completeByFilter = null;
+      _creationDateFilter = null;
+    });
+  }
+
+  int getFilterCount() {
+    int count = 0;
+    if (_priorityFilter != null) {
+      count++;
+    }
+    if (_effortFilter != null) {
+      count++;
+    }
+    if (_roomIdFilter != null) {
+      count++;
+    }
+    if (_estimatedCostFilter != null) {
+      count++;
+    }
+    if (_selectedTags.isNotEmpty) {
+      count++;
+    }
+    if (_selectedContacts.isNotEmpty) {
+      count++;
+    }
+    if (_showOnlyInProgress) {
+      count++;
+    }
+    if (_completeByFilter != null) {
+      count++;
+    }
+    if (_creationDateFilter != null) {
+      count++;
+    }
+
+    return count;
   }
 }

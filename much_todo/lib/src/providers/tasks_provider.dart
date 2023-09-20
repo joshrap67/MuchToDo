@@ -129,20 +129,21 @@ class TasksProvider with ChangeNotifier {
 
   void filterTasks() {
     var filtered = _allTasks.where((task) {
-      if (_filters.priorityFilter != null) {
-        bool match = equalityCheckNumber(_filters.priorityEquality, _filters.priorityFilter!.value, task.priority);
+      // assume this task is going to be included until finding conditions contrary
+      if (_filters.priority != null) {
+        bool match = equalityCheckNumber(_filters.priorityEquality, _filters.priority!.value, task.priority);
         if (!match) {
           return false;
         }
       }
-      if (_filters.effortFilter != null) {
-        bool match = equalityCheckNumber(EqualityComparison.equalTo, _filters.effortFilter!.value, task.effort);
+      if (_filters.effort != null) {
+        bool match = equalityCheckNumber(EqualityType.equalTo, _filters.effort!.value, task.effort);
         if (!match) {
           return false;
         }
       }
-      if (_filters.roomIdFilter != null) {
-        if (task.room.id != _filters.roomIdFilter!) {
+      if (_filters.roomId != null) {
+        if (task.room.id != _filters.roomId!) {
           return false;
         }
       }

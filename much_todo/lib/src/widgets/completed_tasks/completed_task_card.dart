@@ -43,7 +43,7 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
               ),
               title: Text(
                 widget.task.name,
-                style: const TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 18),
               ),
               subtitle: widget.showRoom
                   ? Text(

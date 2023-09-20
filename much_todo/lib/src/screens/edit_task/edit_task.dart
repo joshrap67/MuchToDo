@@ -199,6 +199,7 @@ class _EditTaskState extends State<EditTask> {
                         labelText: 'Complete By',
                         hintText: 'Complete By',
                         key: ValueKey(_completeBy),
+						initialDate: _completeBy,
                         selectedDate: _completeBy,
                         onChange: (date) {
                           setState(() {

@@ -4,51 +4,52 @@ class FilterTaskOptions {
   TaskSortOption sortByValue = TaskSortOption.creationDate;
   SortDirection sortDirectionValue = SortDirection.descending;
 
-  EqualityComparison priorityEquality = EqualityComparison.equalTo;
-  PriorityFilter? priorityFilter;
+  // this could be confusing since a lower number is a higher priority. Going to keep it though since i assume a power user who would be using this will understand
+  EqualityType priorityEquality = EqualityType.equalTo;
+  PriorityFilter? priority;
 
-  EffortFilter? effortFilter;
-  EqualityComparison costEquality = EqualityComparison.equalTo;
+  EffortFilter? effort;
+  EqualityType costEquality = EqualityType.equalTo;
 
-  DateEqualityComparison completeByEquality = DateEqualityComparison.equalTo;
+  DateEqualityType completeByEquality = DateEqualityType.equalTo;
   DateTime? completeBy;
 
-  DateEqualityComparison creationDateEquality = DateEqualityComparison.equalTo;
+  DateEqualityType creationDateEquality = DateEqualityType.equalTo;
   DateTime? creationDate;
 
   bool showOnlyInProgress = false;
   List<String> selectedTags = [];
   List<String> selectedContacts = [];
-  String? roomIdFilter;
+  String? roomId;
   double? estimatedCost;
 
   FilterTaskOptions.named({
     required this.sortByValue,
     required this.sortDirectionValue,
-    this.priorityEquality = EqualityComparison.equalTo,
-    this.priorityFilter,
-    this.effortFilter,
-    this.roomIdFilter,
-    this.costEquality = EqualityComparison.equalTo,
+    this.priorityEquality = EqualityType.equalTo,
+    this.priority,
+    this.effort,
+    this.roomId,
+    this.costEquality = EqualityType.equalTo,
     this.estimatedCost,
     this.selectedTags = const [],
     this.selectedContacts = const [],
     this.showOnlyInProgress = false,
-    this.completeByEquality = DateEqualityComparison.equalTo,
+    this.completeByEquality = DateEqualityType.equalTo,
     this.completeBy,
-    this.creationDateEquality = DateEqualityComparison.equalTo,
+    this.creationDateEquality = DateEqualityType.equalTo,
     this.creationDate,
   });
 
   int getFilterCount() {
     int count = 0;
-    if (priorityFilter != null) {
+    if (priority != null) {
       count++;
     }
-    if (effortFilter != null) {
+    if (effort != null) {
       count++;
     }
-    if (roomIdFilter != null) {
+    if (roomId != null) {
       count++;
     }
     if (estimatedCost != null) {

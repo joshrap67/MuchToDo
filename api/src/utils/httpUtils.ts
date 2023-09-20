@@ -4,6 +4,7 @@ import jwt, {JwtPayload} from 'jsonwebtoken';
 import {validationResult} from "express-validator";
 import {ErrorResponse} from "../errors/errorResponse";
 import crypto from "crypto";
+import {warn} from "firebase-functions/logger";
 
 const jwksClient = JwksRsa({
     jwksUri: 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'
@@ -27,7 +28,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
                 issuer: 'https://securetoken.google.com/muchtodo-42777' // no need to keep this secret as it's in the payload which is not encrypted
             }, function (error, decoded: JwtPayload) {
                 if (error) {
-                    console.log(error);
+                    warn(error);
                     return res.status(401).end();
                 }
 
@@ -45,7 +46,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
                 next();
             });
         } catch (error) {
-            console.log(error);
+            warn(error);
             return res.status(401).end();
         }
     } catch (error) {
@@ -53,7 +54,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
     }
 };
 
-export const checkError = (req: Request, res: Response, next: NextFunction) => {
+export const checkValidationError = (req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req).formatWith(({msg}) => msg);
 
     if (!error.isEmpty()) {

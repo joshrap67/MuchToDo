@@ -31,7 +31,7 @@ class UserService {
         Navigator.pushNamedAndRemoveUntil(context, CreateAccountScreen.routeName, (route) => false);
       }
     } on Exception catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       if (context.mounted) {
         showSnackbar('There was a problem loading user data', context);
       }
@@ -62,7 +62,7 @@ class UserService {
         await signOut(context);
       }
     } catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       result.setErrorMessage('There was a problem deleting the account');
     }
     return result;

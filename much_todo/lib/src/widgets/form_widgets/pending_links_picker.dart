@@ -142,7 +142,7 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: TextFormField(
                       decoration: const InputDecoration(
-                        label: Text('URL'),
+                        label: Text('URL *'),
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.url,

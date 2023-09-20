@@ -5,6 +5,7 @@ import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
+import 'package:much_todo/src/repositories/rooms/requests/set_room_favorite_request.dart';
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 import 'package:much_todo/src/repositories/rooms/room_repository.dart';
 import 'package:much_todo/src/utils/result.dart';
@@ -24,7 +25,7 @@ class RoomsService {
         context.read<RoomsProvider>().setSort(sort, sortDirection);
       }
     } on Exception catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       if (context.mounted) {
         showSnackbar('There was a problem loading rooms', context);
       }
@@ -63,6 +64,20 @@ class RoomsService {
     } catch (e, s) {
       FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem updating the room');
+    }
+    return result;
+  }
+
+  static Future<Result<void>> setFavorite(BuildContext context, String id, bool isFavorite) async {
+    var result = Result();
+
+    try {
+      // blind send
+      context.read<RoomsProvider>().setRoomIsFavorite(id, isFavorite);
+      await RoomRepository.setIsFavorite(id, SetRoomFavoriteRequest(isFavorite));
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
+      result.setErrorMessage('There was a problem favoriting the room');
     }
     return result;
   }

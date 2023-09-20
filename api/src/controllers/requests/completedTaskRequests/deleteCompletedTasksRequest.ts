@@ -6,8 +6,6 @@ export interface DeleteCompletedTasksRequest {
 
 export const deleteCompletedTasksSchema = () => {
     return checkSchema({
-        taskIds: {
-            isArray: true,
-        },
+        taskIds: {isArray: true},
     }, ['body']);
 }

@@ -280,7 +280,7 @@ class _MoreScreenState extends State<MoreScreen> {
   Future<void> launchTermsAndConditions() async {
     var uri = Uri.parse('https://storage.googleapis.com/much-to-do-sites/terms_and_conditions.html');
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await launchUrl(uri);
     } else {
       if (context.mounted) {
         showSnackbar('Could not launch terms & conditions.', context);

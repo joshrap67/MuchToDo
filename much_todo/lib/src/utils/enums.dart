@@ -52,25 +52,25 @@ enum SortDirection {
   final Widget widget;
 }
 
-enum EqualityComparison {
+enum EqualityType {
   greaterThan(0, '>'),
   greaterThanOrEqualTo(1, '≥'),
   equalTo(2, '='),
   lessThan(3, '<'),
   lessThanOrEqualTo(4, '≤');
 
-  const EqualityComparison(this.value, this.label);
+  const EqualityType(this.value, this.label);
 
   final int value;
   final String label;
 }
 
-enum DateEqualityComparison {
+enum DateEqualityType {
   after(0, '>'),
   equalTo(1, '='),
   before(2, '<');
 
-  const DateEqualityComparison(this.value, this.label);
+  const DateEqualityType(this.value, this.label);
 
   final int value;
   final String label;

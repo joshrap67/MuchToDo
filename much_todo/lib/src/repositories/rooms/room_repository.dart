@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/repositories/api_gateway.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
+import 'package:much_todo/src/repositories/rooms/requests/set_room_favorite_request.dart';
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 
 class RoomRepository {
@@ -34,6 +35,13 @@ class RoomRepository {
 
   static Future<void> updateRoom(String roomId, UpdateRoomRequest request) async {
     final apiResult = await ApiGateway.put('$basePath/$roomId', request);
+    if (!apiResult.success) {
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
+    }
+  }
+
+  static Future<void> setIsFavorite(String roomId, SetRoomFavoriteRequest request) async {
+    final apiResult = await ApiGateway.put('$basePath/$roomId/favorite', request);
     if (!apiResult.success) {
       throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }

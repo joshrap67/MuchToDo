@@ -20,7 +20,6 @@ app.use(authenticateJWT);
 app.use('/', router());
 app.use(errorHandler);
 
-setGlobalOptions({maxInstances: 1}); // todo
 const MONGO_URL = process.env.MUCHTODO_MONGO__CONNECTIONSTRING; // DB URI
 mongoose
     .connect(MONGO_URL)
@@ -37,6 +36,12 @@ mongoose
 admin.initializeApp({
     projectId: process.env.MUCHTODO_FIREBASE__PROJECTID,
     credential: credential.applicationDefault()
+});
+
+setGlobalOptions({
+    maxInstances: 5,
+    region: "us-east1",
+    timeoutSeconds: 60,
 });
 
 exports.expressApi = onRequest(app);

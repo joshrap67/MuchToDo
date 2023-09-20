@@ -4,6 +4,7 @@ import * as crypto from "crypto";
 export const defaultTags = [
     {id: crypto.randomUUID(), name: 'Decoration', tasks: []},
     {id: crypto.randomUUID(), name: 'Electrical', tasks: []},
+    {id: crypto.randomUUID(), name: 'Furniture', tasks: []},
     {id: crypto.randomUUID(), name: 'Maintenance', tasks: []},
     {id: crypto.randomUUID(), name: 'Outside', tasks: []},
     {id: crypto.randomUUID(), name: 'Painting', tasks: []},

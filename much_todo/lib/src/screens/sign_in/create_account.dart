@@ -28,7 +28,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   @override
   void initState() {
     super.initState();
-    _rooms.add(Room(const Uuid().v4(), 'Miscellaneous Room', null, []));
   }
 
   @override
@@ -44,7 +43,16 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       appBar: AppBar(
         title: const Text('Finish Account Setup'),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-		  scrolledUnderElevation: 0.0,
+        scrolledUnderElevation: 0.0,
+        actions: [
+          if (!_isSigningOut)
+            IconButton(
+              tooltip: 'Sign Out',
+              onPressed: signOut,
+              icon: const Icon(Icons.logout),
+            ),
+          if (_isSigningOut) const CircularProgressIndicator()
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -58,45 +66,51 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             ),
           ),
           const Divider(),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                  child: ElevatedButton.icon(
-                    onPressed: launchAddRoom,
-                    icon: const Icon(Icons.add),
-                    label: const Text('ADD ROOM'),
+          Expanded(
+            child: Stack(
+              children: [
+                if (_rooms.isNotEmpty)
+                  ListView.builder(
+                    itemCount: _rooms.length,
+                    padding: const EdgeInsets.only(bottom: 65),
+                    itemBuilder: (ctx, index) {
+                      var room = _rooms[index];
+                      return Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            ListTile(
+                              title: Text(room.name),
+                              subtitle: Text(
+                                getSubtitle(room),
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => deleteRoom(room),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                if (_rooms.isEmpty)
+                  const Center(
+                    child: Text('No rooms added. Click the button below to add some'),
+                  ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+                    child: FloatingActionButton.extended(
+                      onPressed: launchAddRoom,
+                      label: const Text('ADD ROOM'),
+                      icon: const Icon(Icons.add),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _rooms.length,
-              padding: const EdgeInsets.only(bottom: 65),
-              itemBuilder: (ctx, index) {
-                var room = _rooms[index];
-                return Card(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ListTile(
-                        title: Text(room.name),
-                        subtitle: Text(
-                          getSubtitle(room),
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => deleteRoom(room),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              ],
             ),
           ),
           Column(
@@ -113,44 +127,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           disabledBackgroundColor: Theme.of(context).colorScheme.primary,
                           disabledForegroundColor: Theme.of(context).colorScheme.onPrimary,
                         ),
-                        onPressed: createAccount,
+                        onPressed: _isCreatingAccount ? null : createAccount,
                         child: _isCreatingAccount
                             ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
                             : const Text('CREATE ACCOUNT'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 10.0, right: 20.0),
-                      child: const Divider(
-                        height: 36,
-                      ),
-                    ),
-                  ),
-                  const Text('OR'),
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 20.0, right: 10.0),
-                      child: const Divider(
-                        height: 36,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                      child: ElevatedButton(
-                        onPressed: signOut,
-                        child: _isSigningOut ? const CircularProgressIndicator() : const Text('SIGN OUT'),
                       ),
                     ),
                   ),
@@ -193,6 +173,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   Future<void> createAccount() async {
+    if (_rooms.isEmpty) {
+      showSnackbar('Please add at least one room', context);
+      return;
+    }
+
     setState(() {
       _isCreatingAccount = true;
     });

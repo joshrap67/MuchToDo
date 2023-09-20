@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/screens/room_details/room_details.dart';
+import 'package:much_todo/src/services/rooms_service.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class RoomInfoCard extends StatefulWidget {
   final Room room;
@@ -13,6 +15,14 @@ class RoomInfoCard extends StatefulWidget {
 }
 
 class _RoomInfoCardState extends State<RoomInfoCard> {
+  late bool _isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.room.isFavorite;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -21,6 +31,20 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
         children: <Widget>[
           ListTile(
             title: Text(widget.room.name),
+            leading: IconButton(
+              icon: _isFavorite ? const Icon(Icons.star) : const Icon(Icons.star_border_outlined),
+              tooltip: widget.room.isFavorite ? 'Unfavorite' : 'Favorite',
+              onPressed: () async {
+                setState(() {
+                  _isFavorite = !_isFavorite;
+                });
+                var result = await RoomsService.setFavorite(context, widget.room.id, !widget.room.isFavorite);
+                if (context.mounted && result.failure) {
+                  showSnackbar('There was a problem favoriting ${widget.room.name}', context);
+                }
+              },
+              color: widget.room.isFavorite ? const Color(0xFFe3a805) : Theme.of(context).iconTheme.color,
+            ),
             subtitle: Text(
               getSubtitle(),
               style: const TextStyle(fontSize: 11),

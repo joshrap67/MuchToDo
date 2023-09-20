@@ -66,9 +66,12 @@ class Dialogs {
                 width: MediaQuery.of(context).size.width,
                 child: TextFormField(
                   decoration: const InputDecoration(
-                    label: Text('Tag name'),
+                    label: Text('Tag Name *'),
                     border: OutlineInputBorder(),
+                    counterText: '',
                   ),
+                  maxLength: Constants.maxTagName,
+                  keyboardType: TextInputType.name,
                   validator: (val) => validNewTag(val, context.read<UserProvider>().tags),
                   controller: nameController,
                 ),
@@ -144,9 +147,11 @@ class Dialogs {
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: TextFormField(
                           decoration: const InputDecoration(
-                            label: Text('Name'),
+                            label: Text('Name *'),
                             border: OutlineInputBorder(),
+                            counterText: '',
                           ),
+                          maxLength: Constants.maxContactName,
                           keyboardType: TextInputType.name,
                           controller: nameController,
                           validator: validContactName,
@@ -158,7 +163,9 @@ class Dialogs {
                           decoration: const InputDecoration(
                             label: Text('Email'),
                             border: OutlineInputBorder(),
+                            counterText: '',
                           ),
+                          maxLength: Constants.maxEmailLength,
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           validator: validContactEmail,
@@ -170,7 +177,9 @@ class Dialogs {
                           decoration: const InputDecoration(
                             label: Text('Phone Number'),
                             border: OutlineInputBorder(),
+                            counterText: '',
                           ),
+                          maxLength: Constants.maxPhoneLength,
                           controller: phoneNumberController,
                           keyboardType: TextInputType.phone,
                           validator: validContactPhoneNumber,

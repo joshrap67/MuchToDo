@@ -20,6 +20,7 @@ import {CompletedTaskModel, CompletedTask} from "../domain/completedTask";
 import {CompletedTaskResponse} from "../controllers/responses/completedTaskResponse";
 import {mapCompletedTaskToResponse} from "./mappers/completedTaskMapper";
 import {BadRequestException} from "../errors/exceptions/badRequestException";
+import {ResourceNotFoundException} from "../errors/exceptions/resourceNotFoundException";
 
 export async function getTasksByUser(userId: string): Promise<TaskResponse[]> {
     const tasks = await TaskModel.find({'createdBy': userId});
@@ -109,6 +110,10 @@ export async function updateTask(taskId: string, request: UpdateTaskRequest, use
         await session.withTransaction(async () => {
             const user = await UserModel.findOne({'_id': userId}).session(session);
             const task = await TaskModel.findOne({'_id': taskId}).session(session);
+            if (!task) {
+                throw new ResourceNotFoundException('Task not found');
+            }
+
             const newRoom = await RoomModel.findOne({'_id': request.roomId}).session(session);
             const oldRoom = await RoomModel.findOne({'_id': task.room.id}).session(session);
             if (!(newRoom._id.equals(oldRoom.id))) {
@@ -184,6 +189,9 @@ export async function setPhotos(taskId: string, request: SetPhotosRequest, userI
     try {
         await session.withTransaction(async () => {
             const task = await TaskModel.findOne({'_id': taskId, 'createdBy': userId});
+            if (!task) {
+                throw new ResourceNotFoundException('Task not found');
+            }
             if (task.photos.length + request.photosToUpload.length - request.deletedPhotos.length > maxTaskPhotoCount) {
                 throw new BadRequestException(`Cannot have more than ${maxTaskPhotoCount} photos on a task.`);
             }
@@ -265,6 +273,10 @@ export async function completeTask(taskId: string, completionDate: Date, userId:
 async function deleteAndReturnTask(session: mongoose.mongo.ClientSession, taskId: string, userId: string): Promise<Task> {
     const user = await UserModel.findOne({'_id': userId}).session(session);
     const task = await TaskModel.findOneAndDelete({'_id': taskId, 'createdBy': userId}).session(session);
+    if (!task) {
+        throw new ResourceNotFoundException('Task not found');
+    }
+
     // remove task from its room
     await RoomModel.updateOne({'_id': task.room.id}, {$pull: {'tasks': {'id': taskId}}}).session(session);
     await deleteTaskPhotos(userId, [taskId]);

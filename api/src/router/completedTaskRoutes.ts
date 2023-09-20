@@ -6,7 +6,7 @@ import {
     getCompletedTask
 } from "../controllers/completedTasksController";
 import {deleteCompletedTasksSchema} from "../controllers/requests/completedTaskRequests/deleteCompletedTasksRequest";
-import {checkError} from "../utils/httpUtils";
+import {checkValidationError} from "../utils/httpUtils";
 
 export default (router: express.Router) => {
     router.get('/completed-tasks', (req: express.Request<{}, {}, {}, {roomId: string}>, res) => getAllCompletedTasksByUser(req, res));
@@ -15,6 +15,6 @@ export default (router: express.Router) => {
     router.delete('/completed-tasks/all', (req, res) => deleteAllCompletedTasks(req, res));
     router.post('/completed-tasks/delete-many',
         deleteCompletedTasksSchema(),
-        (req: Request, res: Response, next: NextFunction) => checkError(req, res, next),
+        (req: Request, res: Response, next: NextFunction) => checkValidationError(req, res, next),
         (req: Request, res: Response) => deleteManyCompletedTasks(req, res));
 };

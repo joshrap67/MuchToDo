@@ -128,7 +128,7 @@ class _UnverifiedScreenState extends State<UnverifiedScreen> with WidgetsBinding
     setState(() {
       _isReloading = false;
     });
-    if (user.emailVerified && context.mounted) {
+    if (FirebaseAuth.instance.currentUser!.emailVerified && context.mounted) {
       Navigator.pushNamedAndRemoveUntil(context, Home.routeName, (route) => false);
     }
   }

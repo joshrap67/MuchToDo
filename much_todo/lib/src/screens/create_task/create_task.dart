@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
 import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
@@ -89,7 +90,7 @@ class _CreateTaskState extends State<CreateTask> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('New Task'),
-		  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           scrolledUnderElevation: 0,
         ),
         body: GestureDetector(
@@ -201,6 +202,7 @@ class _CreateTaskState extends State<CreateTask> {
                         labelText: 'Complete By',
                         hintText: 'Complete By',
                         key: ValueKey(_completeBy),
+						initialDate: _completeBy,
                         selectedDate: _completeBy,
                         onChange: (date) {
                           setState(() {
@@ -293,6 +295,11 @@ class _CreateTaskState extends State<CreateTask> {
   Future<void> onSubmit() async {
     if (!_formKey.currentState!.validate()) {
       showSnackbar('Invalid input', context);
+      return;
+    }
+
+    if (context.read<TasksProvider>().allTasks.length >= Constants.maxTaskCount) {
+      showSnackbar('You have reached the maximum amount of tasks (${Constants.maxTaskCount})', context);
       return;
     }
 

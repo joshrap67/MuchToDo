@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/utils/enums.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class RoomsProvider with ChangeNotifier {
   List<Room> _rooms = [];
@@ -18,7 +19,7 @@ class RoomsProvider with ChangeNotifier {
 
   void setRooms(List<Room> rooms) {
     _rooms = rooms;
-    sortRoomsAndNotfiy();
+    sortRoomsAndNotify();
   }
 
   void setLoading(bool loading) {
@@ -28,7 +29,7 @@ class RoomsProvider with ChangeNotifier {
 
   void addRoom(Room room) {
     _rooms.add(room);
-	sortRoomsAndNotfiy();
+    notifyListeners();
   }
 
   void removeRoom(Room room) {
@@ -40,39 +41,62 @@ class RoomsProvider with ChangeNotifier {
     var index = _rooms.indexWhere((element) => element.id == id);
     if (index >= 0) {
       _rooms[index].update(name, note);
-	  sortRoomsAndNotfiy();
+      notifyListeners();
+    }
+  }
+
+  void setRoomIsFavorite(String id, bool isFavorite) {
+    var index = _rooms.indexWhere((element) => element.id == id);
+    if (index >= 0) {
+      _rooms[index].isFavorite = isFavorite;
     }
   }
 
   void setSort(RoomSortOption sort, SortDirection sortDirection) {
     _sort = sort;
     _sortDirection = sortDirection;
-    sortRoomsAndNotfiy();
+    sortRoomsAndNotify();
   }
 
-  void sortRoomsAndNotfiy() {
-    // initially ascending
+  void sortRoomsAndNotify() {
+    // first sort by favorites, then by option
     switch (_sort) {
       case RoomSortOption.name:
-        _rooms.sort((a, b) => a.name.compareTo(b.name));
+        _rooms.sort((a, b) {
+          var sortByFavorite = compareToBool(a.isFavorite, b.isFavorite);
+          if (sortByFavorite == 0) {
+            return a.name.compareTo(b.name) * (_sortDirection == SortDirection.descending ? -1 : 1);
+          }
+          return sortByFavorite;
+        });
         break;
       case RoomSortOption.taskCount:
-        _rooms.sort((a, b) => a.tasks.length.compareTo(b.tasks.length));
+        _rooms.sort((a, b) {
+          var sortByFavorite = compareToBool(a.isFavorite, b.isFavorite);
+          if (sortByFavorite == 0) {
+            return a.tasks.length.compareTo(b.tasks.length) * (_sortDirection == SortDirection.descending ? -1 : 1);
+          }
+          return sortByFavorite;
+        });
         break;
-
       case RoomSortOption.creationDate:
-        _rooms.sort((a, b) => a.creationDate.compareTo(b.creationDate));
+        _rooms.sort((a, b) {
+          var sortByFavorite = compareToBool(a.isFavorite, b.isFavorite);
+          if (sortByFavorite == 0) {
+            return a.creationDate.compareTo(b.creationDate) * (_sortDirection == SortDirection.descending ? -1 : 1);
+          }
+          return sortByFavorite;
+        });
         break;
       case RoomSortOption.totalCost:
-        _rooms.sort((a, b) => a.totalCost().compareTo(b.totalCost()));
+        _rooms.sort((a, b) {
+          var sortByFavorite = compareToBool(a.isFavorite, b.isFavorite);
+          if (sortByFavorite == 0) {
+            return a.totalCost().compareTo(b.totalCost()) * (_sortDirection == SortDirection.descending ? -1 : 1);
+          }
+          return sortByFavorite;
+        });
         break;
-    }
-    if (_sortDirection == SortDirection.descending) {
-      for (var i = 0; i < _rooms.length / 2; i++) {
-        var temp = _rooms[i];
-        _rooms[i] = _rooms[_rooms.length - 1 - i];
-        _rooms[_rooms.length - 1 - i] = temp;
-      }
     }
     notifyListeners();
   }

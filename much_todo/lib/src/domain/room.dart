@@ -4,6 +4,7 @@ class Room {
   late String id;
   late String name;
   String? note;
+  bool isFavorite = false;
   late DateTime creationDate;
   List<RoomTask> tasks = [];
 
@@ -13,6 +14,7 @@ class Room {
     id = json['id'];
     name = json['name'];
     note = json['note'];
+    isFavorite = json['isFavorite'];
     creationDate = json['creationDate'] != null ? DateTime.parse(json['creationDate']) : DateTime.now();
     tasks = <RoomTask>[];
     for (var task in json['tasks']) {

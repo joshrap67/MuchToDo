@@ -17,7 +17,7 @@ export const mapTagToResponse = (tag: Tag): TagResponse => {
         id: tag.id,
         name: tag.name,
         tasks: tag.tasks.map(x => x.toHexString())
-    };
+    } as TagResponse;
 }
 
 export const mapContactToResponse = (contact: Contact): ContactResponse => {
@@ -27,5 +27,5 @@ export const mapContactToResponse = (contact: Contact): ContactResponse => {
         email: contact.email,
         phoneNumber: contact.phoneNumber,
         tasks: contact.tasks.map(x => x.toHexString())
-    };
+    } as ContactResponse;
 }

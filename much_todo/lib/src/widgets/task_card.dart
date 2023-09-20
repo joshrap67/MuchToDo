@@ -34,7 +34,7 @@ class _TaskCardState extends State<TaskCard> {
             ),
             title: Text(
               widget.task.name,
-              style: const TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 18),
             ),
             leadingAndTrailingTextStyle: widget.task.completeBy != null
                 ? TextStyle(

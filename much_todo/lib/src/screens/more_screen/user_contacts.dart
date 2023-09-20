@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
@@ -242,9 +243,11 @@ class _UserContactsState extends State<UserContacts> {
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: TextFormField(
                         decoration: const InputDecoration(
-                          label: Text('Name'),
+                          label: Text('Name *'),
                           border: OutlineInputBorder(),
+                          counterText: '',
                         ),
+                        maxLength: Constants.maxContactName,
                         keyboardType: TextInputType.name,
                         controller: nameController,
                         validator: validContactName,
@@ -256,7 +259,9 @@ class _UserContactsState extends State<UserContacts> {
                         decoration: const InputDecoration(
                           label: Text('Email'),
                           border: OutlineInputBorder(),
+                          counterText: '',
                         ),
+                        maxLength: Constants.maxEmailLength,
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         validator: validContactEmail,
@@ -268,7 +273,9 @@ class _UserContactsState extends State<UserContacts> {
                         decoration: const InputDecoration(
                           label: Text('Phone Number'),
                           border: OutlineInputBorder(),
+                          counterText: '',
                         ),
+                        maxLength: Constants.maxPhoneLength,
                         controller: phoneNumberController,
                         keyboardType: TextInputType.phone,
                         validator: validContactPhoneNumber,

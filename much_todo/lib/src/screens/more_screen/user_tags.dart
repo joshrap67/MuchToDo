@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/user_service.dart';
+import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
@@ -260,9 +261,11 @@ class _UserTagsState extends State<UserTags> {
                   width: MediaQuery.of(dialogContext).size.width,
                   child: TextFormField(
                     decoration: const InputDecoration(
-                      label: Text('Tag name'),
+                      label: Text('Tag Name *'),
                       border: OutlineInputBorder(),
+                      counterText: '',
                     ),
+                    maxLength: Constants.maxTagName,
                     validator: (val) => validNewTag(val, dialogContext.read<UserProvider>().tags),
                     controller: nameController,
                   ),

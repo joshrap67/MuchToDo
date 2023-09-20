@@ -33,6 +33,7 @@ export async function createRoom(name: string, note: string, userId: string): Pr
                     name: name,
                     note: note,
                     createdBy: userId,
+                    isFavorite: false,
                     tasks: []
                 } as Room
             );
@@ -68,6 +69,10 @@ export async function updateRoom(roomId: string, name: string, note: string, use
     }
 }
 
+export async function setIsFavorite(roomId: string, userId: string, isFavorite: boolean): Promise<void> {
+    await RoomModel.updateOne({'_id': roomId, 'createdBy': userId}, {$set: {'isFavorite': isFavorite}});
+}
+
 export async function deleteRoom(roomId: string, userId: string): Promise<void> {
     const session = await mongoose.startSession();
     try {
@@ -83,10 +88,10 @@ export async function deleteRoom(roomId: string, userId: string): Promise<void> 
             user.rooms = user.rooms.filter(x => x.toHexString() !== roomId);
             // remove deleted tasks from tags/contacts
             for (const tag of user.tags) {
-                tag.tasks = tag.tasks.filter(t => !taskIds.some(deletedTag => deletedTag.equals(t)));
+                tag.tasks = tag.tasks.filter(t => !taskIds.some(deletedTaskId => deletedTaskId.equals(t)));
             }
             for (const contact of user.contacts) {
-                contact.tasks = contact.tasks.filter(c => !taskIds.some(deletedTag => deletedTag.equals(c)));
+                contact.tasks = contact.tasks.filter(c => !taskIds.some(deletedTaskId => deletedTaskId.equals(c)));
             }
             await user.save({session});
         });

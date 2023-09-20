@@ -21,7 +21,7 @@ class AuthService {
       await FirebaseAuth.instance.signInWithCredential(credential);
       result.setData(credential);
     } catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       result.setErrorMessage('Could not sign in with Google');
     }
 
@@ -33,7 +33,7 @@ class AuthService {
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       result.setErrorMessage('Could not sign in');
     }
     return result;
@@ -65,7 +65,7 @@ class AuthService {
     try {
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
     } catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       result.setErrorMessage('There was a problem trying to send the verification. Please try again later');
     }
     return result;

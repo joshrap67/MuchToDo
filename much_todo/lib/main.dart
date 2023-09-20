@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
@@ -13,8 +16,6 @@ import 'src/services/settings_service.dart';
 
 void main() async {
   final settingsProvider = SettingsProvider(SettingsService());
-  // todo need to set permissions in manifest
-
   /*
   	Load the user's preferred theme while the splash screen is displayed.
   	This prevents a sudden theme change when the app is first displayed.
@@ -24,14 +25,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // todo uncomment when prod ready
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  // // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-  // PlatformDispatcher.instance.onError = (error, stack) {
-  //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-  //   return true;
-  // };
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   if (FirebaseAuth.instance.currentUser != null) {
     // on off chance user's profile (e.g. email verified) was not properly updated
     var user = FirebaseAuth.instance.currentUser;

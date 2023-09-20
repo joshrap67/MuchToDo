@@ -64,135 +64,105 @@ double getEffortPercentage(int effort) {
   return effort / 3;
 }
 
-bool equalityCheckNumber(EqualityComparison equalityType, num filterValue, num taskValue) {
+bool equalityCheckNumber(EqualityType equalityType, num filterValue, num taskValue) {
   switch (equalityType) {
-    case EqualityComparison.equalTo:
-      if (taskValue != filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparison.greaterThan:
-      if (taskValue <= filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparison.greaterThanOrEqualTo:
-      if (taskValue < filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparison.lessThan:
-      if (taskValue >= filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case EqualityComparison.lessThanOrEqualTo:
-      if (taskValue > filterValue) {
-        return false;
-      } else {
-        return true;
-      }
+    case EqualityType.equalTo:
+      return taskValue == filterValue;
+    case EqualityType.greaterThan:
+      return taskValue > filterValue;
+    case EqualityType.greaterThanOrEqualTo:
+      return taskValue >= filterValue;
+    case EqualityType.lessThan:
+      return taskValue < filterValue;
+    case EqualityType.lessThanOrEqualTo:
+      return taskValue <= filterValue;
   }
 }
 
-bool equalityCheckDate(DateEqualityComparison equalityType, DateTime filterValue, DateTime taskValue) {
+bool equalityCheckDate(DateEqualityType equalityType, DateTime filterValue, DateTime taskValue) {
   switch (equalityType) {
-    case DateEqualityComparison.equalTo:
-      if (taskValue != filterValue) {
-        return false;
-      } else {
-        return true;
-      }
-    case DateEqualityComparison.after:
-      if (taskValue.isBefore(filterValue)) {
-        return false;
-      } else {
-        return true;
-      }
-    case DateEqualityComparison.before:
-      if (taskValue.isAfter(filterValue)) {
-        return false;
-      } else {
-        return true;
-      }
+    case DateEqualityType.equalTo:
+      return taskValue.isAtSameMomentAs(filterValue);
+    case DateEqualityType.after:
+      return taskValue.isAfter(filterValue);
+    case DateEqualityType.before:
+      return taskValue.isBefore(filterValue);
   }
+}
+
+int compareToBool(bool a, bool b) {
+  if (a == b) {
+    return 0;
+  } else if (a) {
+    return -1;
+  }
+  return 1;
 }
 
 void sortTasks(List<Task> tasks, TaskSortOption sortBy, SortDirection sortDirection) {
-  // initially ascending
   switch (sortBy) {
     case TaskSortOption.name:
-      tasks.sort((a, b) => a.name.compareTo(b.name));
+      tasks.sort((a, b) => a.name.compareTo(b.name) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.priority:
-      tasks.sort((a, b) => a.priority.compareTo(b.priority));
+      tasks.sort((a, b) => a.priority.compareTo(b.priority) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.effort:
-      tasks.sort((a, b) => a.effort.compareTo(b.effort));
+      tasks.sort((a, b) => a.effort.compareTo(b.effort) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.room:
-      tasks.sort((a, b) => a.room.name.compareTo(b.room.name));
+      tasks.sort((a, b) => a.room.name.compareTo(b.room.name) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.cost:
-      tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1);
-      break;
-    case TaskSortOption.creationDate:
-      tasks.sort((a, b) => a.creationDate.compareTo(b.creationDate));
-      break;
-    case TaskSortOption.completeBy:
-      tasks.sort((a, b) => a.completeBy?.compareTo(b.completeBy ?? DateTime(1970)) ?? -1);
-      break;
-    case TaskSortOption.inProgress:
       tasks.sort((a, b) {
-        if (b.inProgress) {
-          // ones that are in progress are on top in ascending
-          return 1;
-        }
-        return -1;
+        var estimatedCostA = a.estimatedCost ?? 0.0;
+        var estimatedCostB = b.estimatedCost ?? 0.0;
+        return estimatedCostA.compareTo(estimatedCostB) * (sortDirection == SortDirection.descending ? -1 : 1);
       });
       break;
-  }
-  if (sortDirection == SortDirection.descending) {
-    for (var i = 0; i < tasks.length / 2; i++) {
-      var temp = tasks[i];
-      tasks[i] = tasks[tasks.length - 1 - i];
-      tasks[tasks.length - 1 - i] = temp;
-    }
+    case TaskSortOption.creationDate:
+      tasks.sort(
+          (a, b) => a.creationDate.compareTo(b.creationDate) * (sortDirection == SortDirection.descending ? -1 : 1));
+      break;
+    case TaskSortOption.completeBy:
+      tasks.sort((a, b) {
+        var completeByA = a.completeBy ?? DateTime(1970);
+        var completeByB = b.completeBy ?? DateTime(1970);
+        return completeByA.compareTo(completeByB) * (sortDirection == SortDirection.descending ? -1 : 1);
+      });
+      break;
+    case TaskSortOption.inProgress:
+      tasks.sort(
+          (a, b) => compareToBool(a.inProgress, b.inProgress) * (sortDirection == SortDirection.descending ? -1 : 1));
+      break;
   }
 }
 
 void sortCompletedTasks(List<CompletedTask> tasks, CompletedTaskSortOption sortBy, SortDirection sortDirection) {
-  // initially ascending
   switch (sortBy) {
     case CompletedTaskSortOption.name:
-      tasks.sort((a, b) => a.name.compareTo(b.name));
+      tasks.sort((a, b) => a.name.compareTo(b.name) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.priority:
-      tasks.sort((a, b) => a.priority.compareTo(b.priority));
+      tasks.sort((a, b) => a.priority.compareTo(b.priority) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.effort:
-      tasks.sort((a, b) => a.effort.compareTo(b.effort));
+      tasks.sort((a, b) => a.effort.compareTo(b.effort) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.room:
-      tasks.sort((a, b) => a.roomName.compareTo(b.roomName));
+      tasks.sort((a, b) => a.roomName.compareTo(b.roomName) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.cost:
-      tasks.sort((a, b) => a.estimatedCost?.compareTo(b.estimatedCost ?? 0.0) ?? -1);
+      tasks.sort((a, b) {
+        var estimatedCostA = a.estimatedCost ?? 0.0;
+        var estimatedCostB = b.estimatedCost ?? 0.0;
+        return estimatedCostA.compareTo(estimatedCostB) * (sortDirection == SortDirection.descending ? -1 : 1);
+      });
       break;
     case CompletedTaskSortOption.completionDate:
-      tasks.sort((a, b) => a.completionDate.compareTo(b.completionDate));
+      tasks.sort((a, b) =>
+          a.completionDate.compareTo(b.completionDate) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
-  }
-  if (sortDirection == SortDirection.descending) {
-    for (var i = 0; i < tasks.length / 2; i++) {
-      var temp = tasks[i];
-      tasks[i] = tasks[tasks.length - 1 - i];
-      tasks[tasks.length - 1 - i] = temp;
-    }
   }
 }
 

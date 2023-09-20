@@ -1,7 +1,7 @@
 export const maxRoomCount = 50;
 export const maxContactName = 100;
 export const maxTaskName = 100;
-export const maxTaskNote = 200;
+export const maxTaskNote = 300;
 export const maxPriority = 5;
 export const minPriority = 1;
 export const maxEffort = 3;

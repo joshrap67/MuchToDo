@@ -55,7 +55,8 @@ class _HelpScreenState extends State<HelpScreen> {
                       child: const Scrollbar(
                         child: SingleChildScrollView(
                           child: Text(
-                              'At this time, rooms are only used for the purpose of separating tasks. Similar to tasks, rooms can be as generic as you want them to be. They can be inside or outside, small, or large.'),
+                              'The primary purpose of a room is for separating tasks. Similar to tasks, rooms can be as generic as you want them to be. They can be inside or outside, small, or large.\n\n'
+                              'You can favorite rooms to put them at the top of the list. This can be helpful if you are focusing on a couple of rooms to work on and don\'t want to worry about the other ones.'),
                         ),
                       ),
                     ),

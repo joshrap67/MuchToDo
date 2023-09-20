@@ -5,12 +5,19 @@ import 'package:much_todo/src/utils/utils.dart';
 class DatePicker extends StatefulWidget {
   final DateTime? selectedDate;
   final DateTime? firstDate;
+  final DateTime? initialDate;
   final ValueChanged<DateTime?> onChange;
   final String? hintText;
   final String? labelText;
 
   const DatePicker(
-      {super.key, this.selectedDate, this.firstDate, this.hintText, this.labelText, required this.onChange});
+      {super.key,
+      this.selectedDate,
+      this.firstDate,
+      this.initialDate,
+      this.hintText,
+      this.labelText,
+      required this.onChange});
 
   @override
   State<DatePicker> createState() => _DatePickerState();
@@ -59,13 +66,14 @@ class _DatePickerState extends State<DatePicker> {
         hideKeyboard();
         DateTime? pickDate = await showDatePicker(
             context: context,
-            initialDate: DateTime.now(),
+            initialDate: widget.initialDate ?? DateTime.now(),
             firstDate: widget.firstDate ?? DateTime.now(),
             lastDate: DateTime(9999));
         if (pickDate != null) {
+          pickDate = DateTime.utc(pickDate.year, pickDate.month, pickDate.day);
           setState(() {
             widget.onChange(pickDate);
-            _controller.text = DateFormat('yyyy-MM-dd').format(pickDate);
+            _controller.text = DateFormat('yyyy-MM-dd').format(pickDate!);
           });
         }
         hideKeyboard();

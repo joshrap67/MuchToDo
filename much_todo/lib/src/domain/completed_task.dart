@@ -70,7 +70,7 @@ class CompletedTask {
 
   @override
   String toString() {
-    return 'CompletedTaskContact{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
+    return 'CompletedTask{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
         'roomId: $roomId, roomName: $roomName, estimatedCost: $estimatedCost, note: $note, links: $links, '
         'contacts: $contacts, completionDate: $completionDate}';
   }

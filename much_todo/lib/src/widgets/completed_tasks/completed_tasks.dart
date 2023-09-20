@@ -282,6 +282,10 @@ class _CompletedTasksState extends State<CompletedTasks> {
   }
 
   void promptSortTasks() {
+    if (_loading) {
+      return;
+    }
+
     showDialog<void>(
       context: context,
       builder: (ctx) {

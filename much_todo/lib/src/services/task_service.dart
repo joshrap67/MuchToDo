@@ -26,7 +26,7 @@ class TaskService {
         context.read<TasksProvider>().setTasks(tasks);
       }
     } on Exception catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      FirebaseCrashlytics.instance.recordError(e, s, fatal: true);
       if (context.mounted) {
         showSnackbar('There was a problem loading tasks', context);
       }

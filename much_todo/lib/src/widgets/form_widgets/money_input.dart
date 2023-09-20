@@ -41,6 +41,10 @@ class _MoneyInputState extends State<MoneyInput> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.amount == null) {
+      // hack. But if the input is cleared from a parent, the controller will still have old value
+      _controller.text = '';
+    }
     return TextFormField(
       decoration: InputDecoration(
         border: const OutlineInputBorder(),

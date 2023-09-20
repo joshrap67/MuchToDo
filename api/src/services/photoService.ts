@@ -2,6 +2,7 @@ import {taskPhotoBucket} from "../utils/constants";
 import * as stream from "stream";
 import * as crypto from "crypto";
 import {getStorage} from "firebase-admin/storage";
+import {warn} from "firebase-functions/logger";
 
 export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -27,6 +28,7 @@ export const uploadTaskPhoto = (base64Data: string, userId: string, taskId: stri
 }
 
 export const getTotalUploadSize = async (userId: string): Promise<number> => {
+    // I will admit this is not the best solution. But I'm not a fan of trying to duplicate data from GCS since that opens up a lot of avenues for errors
     const [files] = await getStorage()
         .bucket(taskPhotoBucket)
         .getFiles({prefix: `${userId}/`});
@@ -53,7 +55,7 @@ export const deletePhotos = async (files: string[]): Promise<void> => {
                 .file(file)
                 .delete();
         } catch (e) {
-            console.log(`Could not delete ${file}. Error: ${e}`);
+            warn(`Could not delete ${file}. Error: ${e}`);
         }
     }
 }

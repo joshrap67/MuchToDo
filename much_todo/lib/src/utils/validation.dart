@@ -28,6 +28,8 @@ String? validTaskNote(String? note) {
 String? validRoomName(String? name) {
   if (name == null || name.isEmpty) {
     return 'Required';
+  } else if (name.length > Constants.maxRoomNameLength) {
+    return 'Name cannot be more than ${Constants.maxRoomNameLength} characters';
   }
   return null;
 }

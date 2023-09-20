@@ -49,111 +49,108 @@ class _PendingRoomSelectorState extends State<PendingRoomSelector> {
     var maxOptionsHeight = MediaQuery.sizeOf(context).height * .35;
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: LayoutBuilder(
-            builder: (context, BoxConstraints constraints) {
-              return RawAutocomplete<RoomOption>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  var rooms = getOptions();
+        LayoutBuilder(
+          builder: (context, BoxConstraints constraints) {
+            return RawAutocomplete<RoomOption>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                var rooms = getOptions();
 
-                  if (textEditingValue.text == '') {
-                    return rooms;
-                  }
+                if (textEditingValue.text == '') {
+                  return rooms;
+                }
 
-                  var filteredRooms = rooms.where(
-                      (r) => r.isFooter || r.room!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                  return filteredRooms;
-                },
-                textEditingController: _autoCompleteController,
-                focusNode: _focusNode,
-                displayStringForOption: (roomOption) => roomOption.room!.name,
-                fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                  return Focus(
-                    onFocusChange: (hasFocus) {
-                      if (!hasFocus) {
-                        if (_selectedRoom == null) {
-                          _autoCompleteController.clear();
-                        } else {
-                          _autoCompleteController.text = _selectedRoom!.name;
-                        }
+                var filteredRooms = rooms.where(
+                    (r) => r.isFooter || r.room!.name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                return filteredRooms;
+              },
+              textEditingController: _autoCompleteController,
+              focusNode: _focusNode,
+              displayStringForOption: (roomOption) => roomOption.room!.name,
+              fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
+                return Focus(
+                  onFocusChange: (hasFocus) {
+                    if (!hasFocus) {
+                      if (_selectedRoom == null) {
+                        _autoCompleteController.clear();
+                      } else {
+                        _autoCompleteController.text = _selectedRoom!.name;
+                      }
+                    }
+                  },
+                  child: TextFormField(
+                    scrollPadding: EdgeInsets.only(bottom: maxOptionsHeight + 50),
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.room),
+                        labelText: 'Room *',
+                        suffixIcon: _autoCompleteController.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedRoom = null;
+                                    widget.onRoomChange(_selectedRoom);
+                                    _autoCompleteController.clear();
+                                  });
+                                },
+                                icon: const Icon(Icons.clear),
+                              )
+                            : null),
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                    validator: (_) {
+                      if (_selectedRoom == null) {
+                        return 'Required';
+                      } else {
+                        return null;
                       }
                     },
-                    child: TextFormField(
-                      scrollPadding: EdgeInsets.only(bottom: maxOptionsHeight + 50),
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.room),
-                          labelText: 'Room *',
-                          suffixIcon: _autoCompleteController.text.isNotEmpty
-                              ? IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedRoom = null;
-                                      widget.onRoomChange(_selectedRoom);
-                                      _autoCompleteController.clear();
-                                    });
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                )
-                              : null),
-                      controller: fieldTextEditingController,
-                      focusNode: fieldFocusNode,
-                      validator: (_) {
-                        if (_selectedRoom == null) {
-                          return 'Required';
-                        } else {
-                          return null;
-                        }
-                      },
-                    ),
-                  );
-                },
-                optionsViewBuilder: (context, onSelected, options) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Material(
-                      elevation: 15,
-                      color: getDropdownColor(context),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth,
-                          // bug with flutter, without this there is overflow on right
-                          maxHeight: maxOptionsHeight,
-                        ),
-                        child: Scrollbar(
-                          child: ListView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: options.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              final RoomOption option = options.elementAt(index);
-                              if (!option.isFooter) {
-                                return ListTile(
-                                  title: Text(option.room!.name),
-                                  onTap: () => onSelected(option),
-                                );
-                              } else {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                  child: TextButton.icon(
-                                    label: const Text('NEW ROOM'),
-                                    onPressed: addRoom,
-                                    icon: const Icon(Icons.add),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
+                  ),
+                );
+              },
+              optionsViewBuilder: (context, onSelected, options) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 15,
+                    color: getDropdownColor(context),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth,
+                        // bug with flutter, without this there is overflow on right
+                        maxHeight: maxOptionsHeight,
+                      ),
+                      child: Scrollbar(
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: options.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            final RoomOption option = options.elementAt(index);
+                            if (!option.isFooter) {
+                              return ListTile(
+                                title: Text(option.room!.name),
+                                onTap: () => onSelected(option),
+                              );
+                            } else {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: TextButton.icon(
+                                  label: const Text('NEW ROOM'),
+                                  onPressed: addRoom,
+                                  icon: const Icon(Icons.add),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ),
                     ),
-                  );
-                },
-                onSelected: selectRoom,
-              );
-            },
-          ),
+                  ),
+                );
+              },
+              onSelected: selectRoom,
+            );
+          },
         ),
       ],
     );

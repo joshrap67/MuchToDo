@@ -56,7 +56,7 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
+            padding: const EdgeInsets.only(bottom: 2.0),
             child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
               return RawAutocomplete<ContactOption>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
@@ -148,27 +148,24 @@ class _PendingContactsCard1State extends State<PendingContactsSelector> {
             }),
           ),
           if (_selectedContacts.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-              child: Wrap(
-                spacing: 8.0, // gap between adjacent chips
-                runSpacing: 4.0, // gap between lines
-                children: [
-                  for (var i = 0; i < _selectedContacts.length; i++)
-                    Chip(
-                      label: Text(
-                        _selectedContacts[i].name,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      deleteIconColor: Theme.of(context).colorScheme.onTertiary,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      onDeleted: () {
-                        onDeleteContact(_selectedContacts[i]);
-                      },
+            Wrap(
+              spacing: 8.0, // gap between adjacent chips
+              runSpacing: 4.0, // gap between lines
+              children: [
+                for (var i = 0; i < _selectedContacts.length; i++)
+                  Chip(
+                    label: Text(
+                      _selectedContacts[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
                     ),
-                ],
-              ),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onDeleted: () {
+                      onDeleteContact(_selectedContacts[i]);
+                    },
+                  ),
+              ],
             )
         ],
       ),

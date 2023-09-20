@@ -15,6 +15,7 @@ import {CompletedTaskModel} from "../domain/completedTask";
 import admin from "firebase-admin";
 import {ResourceNotFoundException} from "../errors/exceptions/resourceNotFoundException";
 import {deleteTaskPhotos} from "./photoService";
+import {sortContactsAlpha, sortTagsAlpha} from "../utils/sorting";
 
 export async function getUserById(id: string): Promise<UserResponse> {
     const user = await UserModel.findOne({'_id': id});
@@ -45,6 +46,7 @@ export async function createUser(firebaseId: string, email: string, rooms: SetRo
                             name: room.name,
                             note: room.note,
                             createdBy: firebaseId,
+                            isFavorite: false,
                             tasks: []
                         }
                     );
@@ -79,6 +81,7 @@ export async function createTag(name: string, userId: string): Promise<TagRespon
 
     const tag = {id: crypto.randomUUID(), name: name, tasks: [] as Types.ObjectId[]} as Tag;
     user.tags.push(tag);
+    sortTagsAlpha(user.tags);
     await user.save();
     return mapTagToResponse(tag);
 }
@@ -94,6 +97,7 @@ export async function updateTag(tagId: string, request: SetTagRequest, userId: s
             }
 
             tag.name = request.name;
+            sortTagsAlpha(user.tags);
             await user.save({session});
 
             // update all tasks that this tag belongs to with the new name
@@ -141,6 +145,7 @@ export async function createContact(name: string, email: string, phoneNumber: st
         tasks: [] as Types.ObjectId[]
     } as Contact;
     user.contacts.push(contact);
+    sortContactsAlpha(user.contacts);
     await user.save();
     return mapContactToResponse(contact);
 }
@@ -157,6 +162,7 @@ export async function updateContact(contactId: string, request: SetContactReques
             contact.name = request.name;
             contact.phoneNumber = request.phoneNumber;
             contact.email = request.email;
+            sortContactsAlpha(user.contacts);
             await user.save({session});
 
             // update all tasks that this contact belongs to with the new fields

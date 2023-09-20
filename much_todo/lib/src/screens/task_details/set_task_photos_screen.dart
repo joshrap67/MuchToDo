@@ -101,7 +101,7 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
               child: FloatingActionButton.extended(
-                onPressed: addPhoto,
+                onPressed: promptAddPhoto,
                 icon: const Icon(Icons.add),
                 label: const Text('NEW PHOTO'),
                 heroTag: 'TaskFab',
@@ -134,6 +134,37 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
     }
   }
 
+  void promptAddPhoto() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              title: const Text('Existing Photo'),
+              leading: const Icon(Icons.photo_library),
+              onTap: () {
+                Navigator.pop(context);
+                addPhoto();
+              },
+            ),
+            ListTile(
+              title: const Text('New Photo'),
+              leading: const Icon(Icons.camera_alt),
+              onTap: () {
+                Navigator.pop(context);
+                takePhoto();
+              },
+            ),
+            const Padding(padding: EdgeInsets.all(16))
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> openPhoto(BuildContext context, PhotoWrapper photo) async {
     var deleted = await Navigator.push<bool?>(
       context,
@@ -160,6 +191,31 @@ class _SetTaskPhotosScreenState extends State<SetTaskPhotosScreen> {
 
     final XFile? image = await picker.pickImage(
       source: ImageSource.gallery,
+      imageQuality: 25,
+    );
+    if (image == null) {
+      return;
+    }
+
+    var bytes = await image.length();
+    if (bytes > 2000000 && context.mounted) {
+      showSnackbar('Image file size is too large. Please try a smaller image', context);
+      return;
+    }
+
+    setState(() {
+      _photos.add(PhotoWrapper(localPhoto: image));
+    });
+  }
+
+  Future<void> takePhoto() async {
+    if (_photos.length >= Constants.maxTaskPhotos) {
+      showSnackbar('Cannot have more than ${Constants.maxTaskPhotos} photos on a task', context);
+      return;
+    }
+
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.camera,
       imageQuality: 25,
     );
     if (image == null) {

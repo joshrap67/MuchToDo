@@ -305,6 +305,7 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
   }
 
   Future<void> filterTasks() async {
+    hideKeyboard();
     var filtered = await Navigator.push<bool?>(
       context,
       MaterialPageRoute(builder: (context) => const FilterTasks()),

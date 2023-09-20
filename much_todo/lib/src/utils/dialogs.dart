@@ -268,6 +268,7 @@ class Dialogs {
                           label: Text('Note'),
                           border: OutlineInputBorder(),
                         ),
+                        textCapitalization: TextCapitalization.sentences,
                         controller: noteController,
                         validator: validRoomNote,
                       ),

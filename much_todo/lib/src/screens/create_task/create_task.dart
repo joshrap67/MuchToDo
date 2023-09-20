@@ -111,31 +111,32 @@ class _CreateTaskState extends State<CreateTask> {
                             color: Theme.of(context).colorScheme.primary, fontSize: 18, fontWeight: FontWeight.w400),
                       ),
                     ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TaskNameInput(
-                          hintText: 'Name of Task',
-                          labelText: 'Name *',
-                          name: _name,
-                          nextFocus: _roomFocusNode,
-                          onChange: (name) {
-                            setState(() {
-                              _name = name;
-                            });
-                          },
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TaskNameInput(
+                        hintText: 'Name of Task',
+                        labelText: 'Name *',
+                        name: _name,
+                        nextFocus: _roomFocusNode,
+                        onChange: (name) {
+                          setState(() {
+                            _name = name;
+                          });
+                        },
                       ),
                     ),
-                    PendingRoomSelector(
-                      selectedRoom: _selectedRoom,
-                      key: ValueKey(_selectedRoom),
-                      focusNode: _roomFocusNode,
-                      onRoomChange: (room) {
-                        setState(() {
-                          _selectedRoom = room;
-                        });
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PendingRoomSelector(
+                        selectedRoom: _selectedRoom,
+                        key: ValueKey(_selectedRoom),
+                        focusNode: _roomFocusNode,
+                        onRoomChange: (room) {
+                          setState(() {
+                            _selectedRoom = room;
+                          });
+                        },
+                      ),
                     ),
                     PriorityPicker(
                       priority: _priority,
@@ -167,22 +168,28 @@ class _CreateTaskState extends State<CreateTask> {
                         ),
                       ),
                     ),
-                    PendingTagsSelector(
-                      tags: _tags,
-                      key: ValueKey(_tags),
-                      onChange: (tags) {
-                        _tags = [...tags];
-                      },
-                    ),
-                    PendingContactsSelector(
-                      contacts: _contacts,
-                      key: ValueKey(_contacts),
-                      onChange: (contacts) {
-                        _contacts = [...contacts];
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PendingTagsSelector(
+                        tags: _tags,
+                        key: ValueKey(_tags),
+                        onChange: (tags) {
+                          _tags = [...tags];
+                        },
+                      ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                      padding: const EdgeInsets.all(8.0),
+                      child: PendingContactsSelector(
+                        contacts: _contacts,
+                        key: ValueKey(_contacts),
+                        onChange: (contacts) {
+                          _contacts = [...contacts];
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: MoneyInput(
                         hintText: 'Estimated cost',
                         labelText: 'Cost',
@@ -196,7 +203,29 @@ class _CreateTaskState extends State<CreateTask> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                      padding: const EdgeInsets.all(8.0),
+                      child: TaskNoteInput(
+                        hint: 'Note',
+                        label: 'Note',
+                        note: _note,
+                        onChange: (note) {
+                          setState(() {
+                            _note = note;
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: PendingLinksPicker(
+                        links: _links,
+                        onChange: (links) {
+                          _links = [...links];
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: DatePicker(
                         labelText: 'Complete By',
                         hintText: 'Complete By',
@@ -209,27 +238,6 @@ class _CreateTaskState extends State<CreateTask> {
                           });
                         },
                       ),
-                    ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TaskNoteInput(
-                          hint: 'Note',
-                          label: 'Note',
-                          note: _note,
-                          onChange: (note) {
-                            setState(() {
-                              _note = note;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    PendingLinksPicker(
-                      links: _links,
-                      onChange: (links) {
-                        _links = [...links];
-                      },
                     ),
                   ],
                 ),

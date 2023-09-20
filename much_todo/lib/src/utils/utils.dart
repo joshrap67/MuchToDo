@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
+import 'package:much_todo/src/domain/contact.dart';
+import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -80,13 +82,16 @@ bool equalityCheckNumber(EqualityType equalityType, num filterValue, num taskVal
 }
 
 bool equalityCheckDate(DateEqualityType equalityType, DateTime filterValue, DateTime taskValue) {
+  // really annoying how there is no just pure compare dates ignore time...
+  var filterDate = DateTime.utc(filterValue.year, filterValue.month, filterValue.day);
+  var taskDate = DateTime.utc(taskValue.year, taskValue.month, taskValue.day);
   switch (equalityType) {
     case DateEqualityType.equalTo:
-      return taskValue.isAtSameMomentAs(filterValue);
+      return taskDate.isAtSameMomentAs(filterDate);
     case DateEqualityType.after:
-      return taskValue.isAfter(filterValue);
+      return taskDate.isAfter(filterDate);
     case DateEqualityType.before:
-      return taskValue.isBefore(filterValue);
+      return taskDate.isBefore(filterDate);
   }
 }
 
@@ -102,7 +107,8 @@ int compareToBool(bool a, bool b) {
 void sortTasks(List<Task> tasks, TaskSortOption sortBy, SortDirection sortDirection) {
   switch (sortBy) {
     case TaskSortOption.name:
-      tasks.sort((a, b) => a.name.compareTo(b.name) * (sortDirection == SortDirection.descending ? -1 : 1));
+      tasks.sort((a, b) =>
+          a.name.toLowerCase().compareTo(b.name.toLowerCase()) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.priority:
       tasks.sort((a, b) => a.priority.compareTo(b.priority) * (sortDirection == SortDirection.descending ? -1 : 1));
@@ -111,7 +117,9 @@ void sortTasks(List<Task> tasks, TaskSortOption sortBy, SortDirection sortDirect
       tasks.sort((a, b) => a.effort.compareTo(b.effort) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.room:
-      tasks.sort((a, b) => a.room.name.compareTo(b.room.name) * (sortDirection == SortDirection.descending ? -1 : 1));
+      tasks.sort((a, b) =>
+          a.room.name.toLowerCase().compareTo(b.room.name.toLowerCase()) *
+          (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case TaskSortOption.cost:
       tasks.sort((a, b) {
@@ -138,10 +146,19 @@ void sortTasks(List<Task> tasks, TaskSortOption sortBy, SortDirection sortDirect
   }
 }
 
+void sortTagsAlpha(List<Tag> tags) {
+  tags.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+}
+
+void sortContactsAlpha(List<Contact> contacts) {
+  contacts.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+}
+
 void sortCompletedTasks(List<CompletedTask> tasks, CompletedTaskSortOption sortBy, SortDirection sortDirection) {
   switch (sortBy) {
     case CompletedTaskSortOption.name:
-      tasks.sort((a, b) => a.name.compareTo(b.name) * (sortDirection == SortDirection.descending ? -1 : 1));
+      tasks.sort((a, b) =>
+          a.name.toLowerCase().compareTo(b.name.toLowerCase()) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.priority:
       tasks.sort((a, b) => a.priority.compareTo(b.priority) * (sortDirection == SortDirection.descending ? -1 : 1));
@@ -150,7 +167,9 @@ void sortCompletedTasks(List<CompletedTask> tasks, CompletedTaskSortOption sortB
       tasks.sort((a, b) => a.effort.compareTo(b.effort) * (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.room:
-      tasks.sort((a, b) => a.roomName.compareTo(b.roomName) * (sortDirection == SortDirection.descending ? -1 : 1));
+      tasks.sort((a, b) =>
+          a.roomName.toLowerCase().compareTo(b.roomName.toLowerCase()) *
+          (sortDirection == SortDirection.descending ? -1 : 1));
       break;
     case CompletedTaskSortOption.cost:
       tasks.sort((a, b) {

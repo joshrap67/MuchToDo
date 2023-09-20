@@ -65,7 +65,8 @@ class RoomsProvider with ChangeNotifier {
         _rooms.sort((a, b) {
           var sortByFavorite = compareToBool(a.isFavorite, b.isFavorite);
           if (sortByFavorite == 0) {
-            return a.name.compareTo(b.name) * (_sortDirection == SortDirection.descending ? -1 : 1);
+            return a.name.toLowerCase().compareTo(b.name.toLowerCase()) *
+                (_sortDirection == SortDirection.descending ? -1 : 1);
           }
           return sortByFavorite;
         });

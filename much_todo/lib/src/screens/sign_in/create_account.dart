@@ -253,6 +253,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         border: OutlineInputBorder(),
                       ),
                       validator: (val) => validRoomNote(val),
+                      textCapitalization: TextCapitalization.sentences,
                       controller: _noteController,
                     ),
                   ],

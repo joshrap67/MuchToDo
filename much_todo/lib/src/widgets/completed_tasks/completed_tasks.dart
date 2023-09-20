@@ -257,6 +257,8 @@ class _CompletedTasksState extends State<CompletedTasks> {
       setState(() {
         _completedTasks.removeWhere((element) => _tasksToDelete.contains(element.id));
         _tasksToDelete.clear();
+        _deleteMode = false;
+        _deleteAll = false;
         _loading = false;
       });
     } else if (context.mounted) {

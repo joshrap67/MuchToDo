@@ -12,7 +12,7 @@ class SettingsService {
 
     var darkTheme = prefs.getBool(darkThemeKey);
     if (darkTheme == null) {
-      return ThemeMode.system;
+      return ThemeMode.light;
     } else if (darkTheme) {
       return ThemeMode.dark;
     } else {

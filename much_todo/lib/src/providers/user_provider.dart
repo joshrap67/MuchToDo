@@ -4,6 +4,7 @@ import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/domain/user.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class UserProvider with ChangeNotifier {
   User? _user;
@@ -28,12 +29,14 @@ class UserProvider with ChangeNotifier {
   }
 
   void addTag(Tag tag) {
-    _user?.tags.add(tag);
+    _user!.tags.add(tag);
+    sortTagsAlpha(_user!.tags);
     notifyListeners();
   }
 
   void addContact(Contact contact) {
-    _user?.contacts.add(contact);
+    _user!.contacts.add(contact);
+    sortContactsAlpha(_user!.contacts);
     notifyListeners();
   }
 
@@ -41,6 +44,7 @@ class UserProvider with ChangeNotifier {
     var index = _user?.tags.indexWhere((t) => t.id == id) ?? -1;
     if (index >= 0) {
       _user?.tags[index].update(newName);
+      sortTagsAlpha(_user!.tags);
     }
     notifyListeners();
   }
@@ -49,6 +53,7 @@ class UserProvider with ChangeNotifier {
     var index = _user?.contacts.indexWhere((p) => p.id == id) ?? -1;
     if (index >= 0) {
       _user?.contacts[index].update(name, email, phoneNumber);
+      sortContactsAlpha(_user!.contacts);
     }
     notifyListeners();
   }

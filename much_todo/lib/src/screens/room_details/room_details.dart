@@ -335,6 +335,7 @@ class _RoomDetailsState extends State<RoomDetails> {
                           label: Text('Note'),
                           border: OutlineInputBorder(),
                         ),
+                        textCapitalization: TextCapitalization.sentences,
                         controller: noteController,
                         validator: validRoomNote,
                       ),

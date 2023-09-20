@@ -9,8 +9,10 @@ class PendingTagsSelector extends StatefulWidget {
   final List<Tag> tags;
   final ValueChanged<List<Tag>> onChange;
   final bool showAdd;
+  final FocusNode? focusNode;
 
-  const PendingTagsSelector({super.key, required this.tags, required this.onChange, this.showAdd = true});
+  const PendingTagsSelector(
+      {super.key, required this.tags, required this.onChange, this.focusNode, this.showAdd = true});
 
   @override
   State<PendingTagsSelector> createState() => _PendingTagsSelectorState();
@@ -24,8 +26,6 @@ class TagOption {
 }
 
 class _PendingTagsSelectorState extends State<PendingTagsSelector> {
-  // static const maxOptionsHeight = 300.0;
-
   final _autoCompleteController = TextEditingController();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
@@ -59,7 +59,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
+            padding: const EdgeInsets.only(bottom: 2.0),
             child: LayoutBuilder(builder: (context, BoxConstraints constraints) {
               return RawAutocomplete<TagOption>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
@@ -77,7 +77,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
                   return filteredTags;
                 },
                 textEditingController: _autoCompleteController,
-                focusNode: _focusNode,
+                focusNode: widget.focusNode ?? _focusNode,
                 fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
                   return TextFormField(
                     scrollPadding: EdgeInsets.only(bottom: maxOptionsHeight + 50),
@@ -151,27 +151,24 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
             }),
           ),
           if (_selectedTags.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-              child: Wrap(
-                spacing: 8.0, // gap between adjacent chips
-                runSpacing: 4.0, // gap between lines
-                children: [
-                  for (var i = 0; i < _selectedTags.length; i++)
-                    Chip(
-                      label: Text(
-                        _selectedTags[i].name,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      deleteIconColor: Theme.of(context).colorScheme.onTertiary,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      onDeleted: () {
-                        onDeleteTag(_selectedTags[i]);
-                      },
+            Wrap(
+              spacing: 8.0, // gap between adjacent chips
+              runSpacing: 4.0, // gap between lines
+              children: [
+                for (var i = 0; i < _selectedTags.length; i++)
+                  Chip(
+                    label: Text(
+                      _selectedTags[i].name,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
                     ),
-                ],
-              ),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onDeleted: () {
+                      onDeleteTag(_selectedTags[i]);
+                    },
+                  ),
+              ],
             )
         ],
       ),
@@ -213,6 +210,7 @@ class _PendingTagsSelectorState extends State<PendingTagsSelector> {
         // dumb hack, but if user did not have a text when creating the contact, options list isn't rebuild
         _autoCompleteController.text = 'a';
         _autoCompleteController.clear();
+        widget.onChange(_selectedTags);
       });
     }
   }

@@ -29,36 +29,54 @@ class _UploadedPhotoViewState extends State<UploadedPhotoView> {
           subtitle: Text('Uploaded ${DateFormat.yMd().format(widget.photo.uploadDate)}'),
           contentPadding: EdgeInsets.zero,
         ),
+        actions: [
+          TextButton.icon(
+            onPressed: promptDelete,
+            icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.onBackground),
+            label: Text(
+              'DELETE',
+              style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+            ),
+          )
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(color: Theme.of(context).colorScheme.background),
         constraints: BoxConstraints.expand(
           height: MediaQuery.of(context).size.height,
         ),
-        child: Stack(
-          children: <Widget>[
-            PhotoView(
-              heroAttributes: PhotoViewHeroAttributes(tag: widget.photo.hashCode),
-              backgroundDecoration: BoxDecoration(color: Theme.of(context).colorScheme.background),
-              imageProvider: NetworkImage(widget.photo.publicUrl),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                child: ElevatedButton.icon(
-                  onPressed: deletePhoto,
-                  icon: const Icon(Icons.delete),
-                  label: const Text('DELETE PHOTO'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                ),
-              ),
-            )
-          ],
+        child: PhotoView(
+          heroAttributes: PhotoViewHeroAttributes(tag: widget.photo.hashCode),
+          backgroundDecoration: BoxDecoration(color: Theme.of(context).colorScheme.background),
+          imageProvider: NetworkImage(widget.photo.publicUrl),
         ),
       ),
+    );
+  }
+
+  void promptDelete() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog.adaptive(
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                deletePhoto();
+              },
+              child: const Text('DELETE'),
+            )
+          ],
+          title: const Text('Delete Photo'),
+          content: const Text(
+              'Are you sure you wish to delete this photo?\n\nThis photo will be permanently removed and no longer visible on any tasks.'),
+        );
+      },
     );
   }
 

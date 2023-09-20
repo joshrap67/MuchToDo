@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
@@ -31,73 +30,63 @@ class _PendingLinksPickerState extends State<PendingLinksPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-      child: Column(
-        children: [
-          TextFormField(
-            readOnly: true,
-            showCursor: false,
-            canRequestFocus: false,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              prefixIcon: const Icon(Icons.link),
-              labelText: 'Add Links',
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  hideKeyboard();
-                  promptAddLink();
-                },
-              ),
-            ),
-            onTap: () {
-              hideKeyboard();
-              promptAddLink();
-            },
-          ),
-          Material(
-            elevation: 3,
-            color: getDropdownColor(context),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 300,
-              ),
-              child: Scrollbar(
-                thumbVisibility: true,
-                controller: _scrollController,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: EdgeInsets.zero,
-                  itemCount: _links.length,
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context, int index) {
-                    final String url = _links.elementAt(index);
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 8.0),
-                            child: ListTile(
-                              title: AutoSizeText(
-                                url,
-                                maxLines: 1,
-                                minFontSize: 12,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ),
-                        IconButton(onPressed: () => removeLink(index), icon: const Icon(Icons.delete))
-                      ],
-                    );
-                  },
-                ),
-              ),
+    return Column(
+      children: [
+        TextFormField(
+          readOnly: true,
+          showCursor: false,
+          canRequestFocus: false,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.link),
+            labelText: 'Add Links',
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                hideKeyboard();
+                promptAddLink();
+              },
             ),
           ),
-        ],
-      ),
+          onTap: () {
+            hideKeyboard();
+            promptAddLink();
+          },
+        ),
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxHeight: 300,
+          ),
+          child: Scrollbar(
+            thumbVisibility: true,
+            controller: _scrollController,
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: EdgeInsets.zero,
+              itemCount: _links.length,
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) {
+                final String url = _links.elementAt(index);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Chip(
+                    label: Text(
+                      url,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    deleteIconColor: Theme.of(context).colorScheme.onTertiary,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onDeleted: () {
+                      removeLink(index);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 

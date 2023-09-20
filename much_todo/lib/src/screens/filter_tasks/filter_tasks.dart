@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/tag.dart';
@@ -30,6 +31,7 @@ class _FilterTasksState extends State<FilterTasks> {
   final List<DropdownMenuItem<PriorityFilter>> _priorityEntries = <DropdownMenuItem<PriorityFilter>>[];
   final List<DropdownMenuItem<EffortFilter>> _effortEntries = <DropdownMenuItem<EffortFilter>>[];
   final List<DropdownMenuItem<String>> _roomEntries = <DropdownMenuItem<String>>[];
+  final _estimatedCostController = TextEditingController();
 
   TaskSortOption _sortByValue = TaskSortOption.creationDate;
   SortDirection _sortDirectionValue = SortDirection.descending;
@@ -87,38 +89,36 @@ class _FilterTasksState extends State<FilterTasks> {
       ));
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      var rooms = context.read<RoomsProvider>().rooms.toList();
-      rooms.sort((a, b) => a.name.compareTo(b.name));
-      for (var room in rooms) {
-        _roomEntries.add(DropdownMenuItem<String>(
-          value: room.id,
-          child: Text(room.name),
-        ));
-      }
+    var rooms = context.read<RoomsProvider>().rooms.toList();
+    for (var room in rooms) {
+      _roomEntries.add(DropdownMenuItem<String>(
+        value: room.id,
+        child: Text(room.name),
+      ));
+    }
 
-      FilterTaskOptions filters = context.read<TasksProvider>().filters;
-      _sortByValue = filters.sortByValue;
-      _sortDirectionValue = filters.sortDirectionValue;
-      _priorityFilter = filters.priority;
-      _priorityEquality = filters.priorityEquality;
-      _effortFilter = filters.effort;
-      _roomIdFilter = filters.roomId;
-      _costEquality = filters.costEquality;
-      _selectedContacts =
-          context.read<UserProvider>().contacts.where((x) => filters.selectedContacts.any((y) => y == x.id)).toList();
-      _selectedTags =
-          context.read<UserProvider>().tags.where((x) => filters.selectedTags.any((y) => y == x.id)).toList();
-      _showOnlyInProgress = filters.showOnlyInProgress;
-      _estimatedCostFilter = filters.estimatedCost;
+    FilterTaskOptions filters = context.read<TasksProvider>().filters;
+    _sortByValue = filters.sortByValue;
+    _sortDirectionValue = filters.sortDirectionValue;
+    _priorityFilter = filters.priority;
+    _priorityEquality = filters.priorityEquality;
+    _effortFilter = filters.effort;
+    _roomIdFilter = filters.roomId;
+    _costEquality = filters.costEquality;
+    _selectedContacts =
+        context.read<UserProvider>().contacts.where((x) => filters.selectedContacts.any((y) => y == x.id)).toList();
+    _selectedTags = context.read<UserProvider>().tags.where((x) => filters.selectedTags.any((y) => y == x.id)).toList();
+    _showOnlyInProgress = filters.showOnlyInProgress;
+    _estimatedCostFilter = filters.estimatedCost;
+    CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(symbol: '');
+    _estimatedCostController.text =
+        _estimatedCostFilter != null ? formatter.format(_estimatedCostFilter!.toStringAsFixed(2)) : '';
 
-      _completeByFilter = filters.completeBy;
-      _completeByEquality = filters.completeByEquality;
+    _completeByFilter = filters.completeBy;
+    _completeByEquality = filters.completeByEquality;
 
-      _creationDateFilter = filters.creationDate;
-      _creationDateEquality = filters.creationDateEquality;
-      setState(() {});
-    });
+    _creationDateFilter = filters.creationDate;
+    _creationDateEquality = filters.creationDateEquality;
   }
 
   @override
@@ -131,19 +131,6 @@ class _FilterTasksState extends State<FilterTasks> {
         ),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
-        actions: [
-          Visibility(
-            visible: getFilterCount() > 0,
-            child: TextButton.icon(
-              onPressed: clearFilters,
-              icon: Icon(Icons.clear, color: Theme.of(context).colorScheme.onSecondaryContainer),
-              label: Text(
-                'CLEAR ALL',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSecondaryContainer),
-              ),
-            ),
-          )
-        ],
       ),
       body: GestureDetector(
         onTap: () => hideKeyboard(),
@@ -402,30 +389,36 @@ class _FilterTasksState extends State<FilterTasks> {
                     ),
                   ],
                 ),
-                PendingTagsSelector(
-                  tags: _selectedTags,
-                  key: ValueKey(_selectedTags),
-                  showAdd: false,
-                  onChange: (tags) {
-                    _selectedTags = [...tags];
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PendingTagsSelector(
+                    tags: _selectedTags,
+                    key: ValueKey(_selectedTags),
+                    showAdd: false,
+                    onChange: (tags) {
+                      _selectedTags = [...tags];
+                    },
+                  ),
                 ),
-                PendingContactsSelector(
-                  contacts: _selectedContacts,
-                  key: ValueKey(_selectedContacts),
-                  showAdd: false,
-                  onChange: (contacts) {
-                    _selectedContacts = [...contacts];
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PendingContactsSelector(
+                    contacts: _selectedContacts,
+                    key: ValueKey(_selectedContacts),
+                    showAdd: false,
+                    onChange: (contacts) {
+                      _selectedContacts = [...contacts];
+                    },
+                  ),
                 ),
                 CheckboxListTile(
                   value: _showOnlyInProgress,
+                  title: const Text('Only Include In Progress Tasks'),
                   onChanged: (bool? value) {
                     setState(() {
                       _showOnlyInProgress = value ?? false;
                     });
                   },
-                  title: const Text('Only Include In Progress Tasks'),
                 ),
                 Row(
                   children: [
@@ -538,7 +531,7 @@ class _FilterTasksState extends State<FilterTasks> {
         padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 4),
         child: LoadingButton(
           onSubmit: applyFilters,
-          label: getFilterCount() > 0 ? 'APPLY FILTERS (${getFilterCount()})' : 'APPLY FILTERS',
+          label: 'APPLY FILTERS',
           icon: const Icon(Icons.check),
         ),
       ),
@@ -570,52 +563,5 @@ class _FilterTasksState extends State<FilterTasks> {
     );
     context.read<TasksProvider>().setFilters(options);
     Navigator.pop(context, true);
-  }
-
-  void clearFilters() {
-    setState(() {
-      _priorityFilter = null;
-      _effortFilter = null;
-      _roomIdFilter = null;
-      _estimatedCostFilter = null;
-      _selectedTags = [];
-      _selectedContacts = [];
-      _showOnlyInProgress = false;
-      _completeByFilter = null;
-      _creationDateFilter = null;
-    });
-  }
-
-  int getFilterCount() {
-    int count = 0;
-    if (_priorityFilter != null) {
-      count++;
-    }
-    if (_effortFilter != null) {
-      count++;
-    }
-    if (_roomIdFilter != null) {
-      count++;
-    }
-    if (_estimatedCostFilter != null) {
-      count++;
-    }
-    if (_selectedTags.isNotEmpty) {
-      count++;
-    }
-    if (_selectedContacts.isNotEmpty) {
-      count++;
-    }
-    if (_showOnlyInProgress) {
-      count++;
-    }
-    if (_completeByFilter != null) {
-      count++;
-    }
-    if (_creationDateFilter != null) {
-      count++;
-    }
-
-    return count;
   }
 }

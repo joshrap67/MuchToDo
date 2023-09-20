@@ -17,7 +17,18 @@ class _TaskPhotoViewState extends State<TaskPhotoView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          TextButton.icon(
+            onPressed: deletePhoto,
+            icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.onBackground),
+            label: Text(
+              'DELETE',
+              style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+            ),
+          )
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(color: Theme.of(context).colorScheme.background),
         constraints: BoxConstraints.expand(
@@ -36,20 +47,6 @@ class _TaskPhotoViewState extends State<TaskPhotoView> {
               const Center(
                 child: Icon(Icons.broken_image),
               ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                child: ElevatedButton.icon(
-                  onPressed: deletePhoto,
-                  icon: const Icon(Icons.delete),
-                  label: const Text('DELETE PHOTO'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                ),
-              ),
-            )
           ],
         ),
       ),

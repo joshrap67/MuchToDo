@@ -14,7 +14,6 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
-// todo need to put sha-1 when creating signed bundle for google sign in
 class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {

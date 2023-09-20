@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:much_todo/src/domain/completed_task.dart';
-import 'package:much_todo/src/repositories/completed_tasks/requests/delete_completed_tasks_request.dart';
 import 'package:much_todo/src/repositories/api_gateway.dart';
+import 'package:much_todo/src/repositories/completed_tasks/requests/delete_completed_tasks_request.dart';
 
 class CompletedTaskRepository {
   static const baseUrl = 'completed-tasks';

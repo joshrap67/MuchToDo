@@ -16,6 +16,6 @@ class UpdateRoomRequest implements ApiRequest {
 
   @override
   String toString() {
-	  return 'UpdateRoomRequest{name: $name, note: $note}';
+    return 'UpdateRoomRequest{name: $name, note: $note}';
   }
 }

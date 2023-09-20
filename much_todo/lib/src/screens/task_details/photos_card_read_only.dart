@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/domain/task_photo.dart';
-import 'package:much_todo/src/screens/task_details/task_photo_view_read_only.dart';
 import 'package:much_todo/src/screens/task_details/set_task_photos_screen.dart';
+import 'package:much_todo/src/screens/task_details/task_photo_view_read_only.dart';
 
 class PhotosCardReadOnly extends StatefulWidget {
   final String taskId;
@@ -45,7 +45,6 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
                             ? Image.network(
                                 widget.photos[index].publicUrl!,
                                 fit: BoxFit.cover,
-
                                 errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                                   return const Center(child: Icon(Icons.broken_image));
                                 },

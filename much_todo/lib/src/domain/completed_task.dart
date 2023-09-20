@@ -1,7 +1,6 @@
 import 'package:much_todo/src/domain/room.dart';
 
 class CompletedTask {
-
   late String id;
   late String createdBy;
   late String name;

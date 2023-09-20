@@ -9,7 +9,6 @@ import {
 } from "../controllers/roomsController";
 import {setRoomSchema} from "../controllers/requests/roomRequests/setRoomRequest";
 import {checkValidationError} from "../utils/httpUtils";
-import {setIsFavoriteSchema} from "../controllers/requests/roomRequests/setIsFavoriteRequest";
 
 export default (router: express.Router) => {
     router.get('/rooms', (req, res) => getAllRoomsByUser(req, res));
@@ -22,9 +21,7 @@ export default (router: express.Router) => {
         setRoomSchema(),
         (req: Request, res: Response, next: NextFunction) => checkValidationError(req, res, next),
         (req: Request<{ id: string }>, res: Response) => updateRoom(req, res));
-    router.put('/rooms/:id/favorite',
-        setIsFavoriteSchema(),
-        (req: Request, res: Response, next: NextFunction) => checkValidationError(req, res, next),
-        (req: Request<{ id: string }>, res: Response) => setIsFavorite(req, res));
+    router.put('/rooms/:id/favorite', (req: Request<{ id: string }>, res: Response) => setIsFavorite(req, res, true));
+    router.put('/rooms/:id/unfavorite', (req, res) => setIsFavorite(req, res, false));
     router.delete('/rooms/:id', (req, res) => deleteRoom(req, res));
 };

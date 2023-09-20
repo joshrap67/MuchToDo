@@ -36,7 +36,7 @@ class TaskRepository {
   }
 
   static Future<Task> updateTask(String taskId, UpdateTaskRequest request) async {
-    final apiResult = await ApiGateway.put('$baseUrl/$taskId', request);
+    final apiResult = await ApiGateway.put('$baseUrl/$taskId', body: request);
     if (apiResult.success) {
       var decodedJson = jsonDecode(apiResult.data);
       return Task.fromJson(decodedJson);
@@ -65,7 +65,7 @@ class TaskRepository {
   }
 
   static Future<bool> setTaskProgress(String taskId, SetTaskProgressRequest request) async {
-    final apiResult = await ApiGateway.put('$baseUrl/$taskId/progress', request);
+    final apiResult = await ApiGateway.put('$baseUrl/$taskId/progress', body: request);
     if (apiResult.success) {
       return true;
     } else {

@@ -1,5 +1,8 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/contact.dart';
+import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
@@ -13,9 +16,6 @@ import 'package:much_todo/src/repositories/tasks/task_repository.dart';
 import 'package:much_todo/src/utils/result.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-import 'package:much_todo/src/domain/contact.dart';
-import 'package:much_todo/src/domain/room.dart';
-import 'package:much_todo/src/domain/tag.dart';
 
 class TaskService {
   static Future<void> getAllTasksBlindSend(BuildContext context) async {

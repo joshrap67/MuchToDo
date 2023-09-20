@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/services/completed_tasks_service.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/result.dart';
-import 'package:much_todo/src/widgets/completed_tasks/selected_completed_task_card.dart';
-import 'package:much_todo/src/services/completed_tasks_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/completed_tasks/completed_task_card.dart';
+import 'package:much_todo/src/widgets/completed_tasks/selected_completed_task_card.dart';
 import 'package:much_todo/src/widgets/skeletons/completed_tasks_skeleton.dart';
 import 'package:much_todo/src/widgets/sort_direction_button.dart';
 

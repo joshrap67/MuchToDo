@@ -63,7 +63,7 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
                     padding: const EdgeInsets.only(bottom: 65),
                     itemBuilder: (ctx, index) {
                       var room = rooms[index];
-                      return RoomInfoCard(room: room);
+                      return RoomInfoCard(key: UniqueKey(), room: room);
                     },
                   ),
                 ),

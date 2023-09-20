@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:much_todo/src/services/settings_service.dart';
 import 'package:much_todo/src/utils/enums.dart';
 

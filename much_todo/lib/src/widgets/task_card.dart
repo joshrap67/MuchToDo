@@ -45,7 +45,8 @@ class _TaskCardState extends State<TaskCard> {
             contentPadding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
             trailing: widget.task.completeBy != null
                 ? Text(
-                    'Due ${DateFormat.yMd().format(widget.task.completeBy!)}',style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+                    'Due ${DateFormat.yMd().format(widget.task.completeBy!)}',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
                   )
                 : null,
             subtitle: widget.showRoom

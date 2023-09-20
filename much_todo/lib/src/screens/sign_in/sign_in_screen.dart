@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_with_email_screen.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/utils/themes.dart';
 
 class SignInScreen extends StatefulWidget {

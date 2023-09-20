@@ -32,7 +32,7 @@ class _UploadedPhotosScreenState extends State<UploadedPhotosScreen> {
       appBar: AppBar(
         title: const Text('Uploaded Photos'),
         scrolledUnderElevation: 0,
-		  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       ),
       body: Column(
         children: [

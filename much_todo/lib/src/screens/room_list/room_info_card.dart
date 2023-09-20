@@ -33,17 +33,17 @@ class _RoomInfoCardState extends State<RoomInfoCard> {
             title: Text(widget.room.name),
             leading: IconButton(
               icon: _isFavorite ? const Icon(Icons.star) : const Icon(Icons.star_border_outlined),
-              tooltip: widget.room.isFavorite ? 'Unfavorite' : 'Favorite',
+              tooltip: _isFavorite ? 'Unfavorite' : 'Favorite',
               onPressed: () async {
                 setState(() {
                   _isFavorite = !_isFavorite;
                 });
-                var result = await RoomsService.setFavorite(context, widget.room.id, !widget.room.isFavorite);
+                var result = await RoomsService.setFavorite(context, widget.room.id, _isFavorite);
                 if (context.mounted && result.failure) {
                   showSnackbar('There was a problem favoriting ${widget.room.name}', context);
                 }
               },
-              color: widget.room.isFavorite ? const Color(0xFFe3a805) : Theme.of(context).iconTheme.color,
+              color: _isFavorite ? const Color(0xFFe3a805) : Theme.of(context).iconTheme.color,
             ),
             subtitle: Text(
               getSubtitle(),

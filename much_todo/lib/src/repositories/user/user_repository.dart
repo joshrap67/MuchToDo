@@ -5,9 +5,9 @@ import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/user.dart';
 import 'package:much_todo/src/repositories/api_gateway.dart';
 import 'package:much_todo/src/repositories/exceptions/user_not_found_exception.dart';
+import 'package:much_todo/src/repositories/user/requests/create_user_request.dart';
 import 'package:much_todo/src/repositories/user/requests/set_contact_request.dart';
 import 'package:much_todo/src/repositories/user/requests/set_tag_request.dart';
-import 'package:much_todo/src/repositories/user/requests/create_user_request.dart';
 
 class UserRepository {
   static const basePath = 'users';
@@ -53,7 +53,7 @@ class UserRepository {
   }
 
   static Future<void> updateTag(String tagId, SetTagRequest request) async {
-    final apiResult = await ApiGateway.put('$basePath/tags/$tagId', request);
+    final apiResult = await ApiGateway.put('$basePath/tags/$tagId', body: request);
     if (!apiResult.success) {
       throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
@@ -77,7 +77,7 @@ class UserRepository {
   }
 
   static Future<void> updateContact(String contactId, SetContactRequest request) async {
-    final apiResult = await ApiGateway.put('$basePath/contacts/$contactId', request);
+    final apiResult = await ApiGateway.put('$basePath/contacts/$contactId', body: request);
     if (!apiResult.success) {
       throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }

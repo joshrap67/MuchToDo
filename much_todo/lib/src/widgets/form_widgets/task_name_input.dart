@@ -43,7 +43,7 @@ class _TaskNameInputState extends State<TaskNameInput> {
       controller: _controller,
       focusNode: _focusNode,
       maxLength: Constants.maxTaskNameLength,
-	  textCapitalization: TextCapitalization.sentences,
+      textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.next,
       onFieldSubmitted: (_) {
         if (widget.nextFocus != null) {

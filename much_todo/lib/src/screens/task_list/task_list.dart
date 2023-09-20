@@ -9,9 +9,9 @@ import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/screens/filter_tasks/filter_tasks.dart';
 import 'package:much_todo/src/screens/task_details/task_details.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/skeletons/task_list_skeleton.dart';
 import 'package:much_todo/src/widgets/task_card.dart';
-import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class TaskList extends StatefulWidget {

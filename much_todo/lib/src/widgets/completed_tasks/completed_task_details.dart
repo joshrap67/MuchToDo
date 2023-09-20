@@ -4,10 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/completed_task.dart';
 import 'package:much_todo/src/screens/task_details/links_card_read_only.dart';
 import 'package:much_todo/src/services/completed_tasks_service.dart';
-import 'package:much_todo/src/widgets/completed_tasks/contacts_card_completed_task.dart';
-import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/completed_tasks/contacts_card_completed_task.dart';
 import 'package:much_todo/src/widgets/completed_tasks/tags_card_completed_task.dart';
+import 'package:much_todo/src/widgets/priority_indicator.dart';
 
 class CompletedTaskDetails extends StatefulWidget {
   final CompletedTask task;

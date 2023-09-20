@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/unverified_screen.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/themes.dart';
 import 'package:much_todo/src/utils/utils.dart';

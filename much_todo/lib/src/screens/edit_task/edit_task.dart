@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/domain/contact.dart';
-import 'package:much_todo/src/domain/tag.dart';
-import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
-import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
-import 'package:much_todo/src/widgets/form_widgets/pending_room_selector.dart';
-import 'package:much_todo/src/services/task_service.dart';
-import 'package:much_todo/src/widgets/form_widgets/effort_picker.dart';
-import 'package:much_todo/src/widgets/form_widgets/pending_contacts_selector.dart';
-import 'package:much_todo/src/widgets/form_widgets/priority_picker.dart';
-import 'package:much_todo/src/widgets/form_widgets/pending_tags_selector.dart';
 import 'package:much_todo/src/domain/room.dart';
+import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
+import 'package:much_todo/src/services/task_service.dart';
 import 'package:much_todo/src/utils/constants.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/effort_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_contacts_selector.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_links_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_room_selector.dart';
+import 'package:much_todo/src/widgets/form_widgets/pending_tags_selector.dart';
+import 'package:much_todo/src/widgets/form_widgets/priority_picker.dart';
 import 'package:much_todo/src/widgets/form_widgets/task_name_input.dart';
 import 'package:much_todo/src/widgets/form_widgets/task_note_input.dart';
 import 'package:much_todo/src/widgets/loading_button.dart';
-import 'package:much_todo/src/widgets/form_widgets/pending_links_picker.dart';
 import 'package:provider/provider.dart';
 
 class EditTask extends StatefulWidget {
@@ -199,7 +199,7 @@ class _EditTaskState extends State<EditTask> {
                         labelText: 'Complete By',
                         hintText: 'Complete By',
                         key: ValueKey(_completeBy),
-						initialDate: _completeBy,
+                        initialDate: _completeBy,
                         selectedDate: _completeBy,
                         onChange: (date) {
                           setState(() {

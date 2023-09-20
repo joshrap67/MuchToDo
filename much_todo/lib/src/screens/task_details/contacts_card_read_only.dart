@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/utils/utils.dart';
 
 class ContactCardReadOnly extends StatefulWidget {
   final List<TaskContact> contacts;

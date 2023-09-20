@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/screens/home/home.dart';
 import 'package:much_todo/src/screens/sign_in/create_account.dart';
 import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
 import 'package:much_todo/src/screens/sign_in/unverified_screen.dart';
 import 'package:much_todo/src/utils/themes.dart';
 import 'package:provider/provider.dart';
-import 'package:much_todo/src/providers/settings_provider.dart';
 
 class MyApp extends StatelessWidget {
   final SettingsProvider settingsController;

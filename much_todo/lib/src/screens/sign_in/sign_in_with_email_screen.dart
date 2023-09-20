@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:much_todo/src/screens/home/home.dart';
-import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/screens/sign_in/login_header.dart';
 import 'package:much_todo/src/screens/sign_in/reset_password_screen.dart';
 import 'package:much_todo/src/screens/sign_in/sign_up_screen.dart';
+import 'package:much_todo/src/services/auth_service.dart';
 import 'package:much_todo/src/utils/themes.dart';
 import 'package:much_todo/src/utils/utils.dart';
 
@@ -258,7 +258,7 @@ class _SignInWithEmailScreenState extends State<SignInWithEmailScreen> {
       return;
     }
 
-	hideKeyboard();
+    hideKeyboard();
     setState(() {
       _isSigningIn = true;
     });

@@ -1,13 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:much_todo/src/screens/task_details/set_task_photos_screen.dart';
-import 'package:much_todo/src/screens/task_details/task_photo_view.dart';
-import 'package:much_todo/src/services/photo_service.dart';
-import 'package:much_todo/src/services/task_service.dart';
-import 'package:much_todo/src/utils/utils.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class UploadedPhotosSkeleton extends StatefulWidget {

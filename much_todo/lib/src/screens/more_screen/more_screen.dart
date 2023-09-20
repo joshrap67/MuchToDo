@@ -1,19 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/screens/more_screen/help_screen.dart';
 import 'package:much_todo/src/screens/more_screen/uploaded_photos_screen.dart';
-import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
-import 'package:much_todo/src/services/auth_service.dart';
-import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
-import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/screens/more_screen/user_contacts.dart';
 import 'package:much_todo/src/screens/more_screen/user_tags.dart';
+import 'package:much_todo/src/screens/sign_in/sign_in_screen.dart';
+import 'package:much_todo/src/services/auth_service.dart';
+import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/completed_tasks/completed_tasks.dart';
 import 'package:much_todo/src/widgets/skeletons/more_screen_skeleton.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MoreScreen extends StatefulWidget {

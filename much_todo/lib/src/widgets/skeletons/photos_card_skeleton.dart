@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:much_todo/src/screens/task_details/photos_card_read_only.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class PhotoCardSkeleton extends StatelessWidget {

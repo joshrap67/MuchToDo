@@ -12,8 +12,8 @@ import 'package:much_todo/src/screens/task_details/room_card_read_only.dart';
 import 'package:much_todo/src/screens/task_details/tags_card_read_only.dart';
 import 'package:much_todo/src/services/photo_service.dart';
 import 'package:much_todo/src/services/task_service.dart';
-import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/utils/utils.dart';
+import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/widgets/skeletons/photos_card_skeleton.dart';
 
 class TaskDetails extends StatefulWidget {

@@ -28,7 +28,7 @@ class ApiGateway {
     return handleResult(response);
   }
 
-  static Future<ApiResult> put(String route, ApiRequest body) async {
+  static Future<ApiResult> put(String route, {ApiRequest? body}) async {
     var url = Uri.https(baseUrl, '$functionName/$route');
     var token = await getToken();
     var response = await http.put(
@@ -37,7 +37,7 @@ class ApiGateway {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(body.toJson()),
+      body: body != null ? jsonEncode(body.toJson()) : null,
     );
     return handleResult(response);
   }

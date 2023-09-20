@@ -10,9 +10,9 @@ import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
 import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
-import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/form_widgets/pending_contacts_selector.dart';
 import 'package:much_todo/src/widgets/form_widgets/pending_tags_selector.dart';
+import 'package:much_todo/src/widgets/loading_button.dart';
 import 'package:much_todo/src/widgets/sort_direction_button.dart';
 import 'package:provider/provider.dart';
 

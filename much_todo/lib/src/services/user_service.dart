@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/providers/rooms_provider.dart';
@@ -16,7 +17,6 @@ import 'package:much_todo/src/screens/sign_in/create_account.dart';
 import 'package:much_todo/src/utils/result.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:provider/provider.dart';
-import 'package:much_todo/src/domain/contact.dart';
 
 class UserService {
   static Future<void> loadUserBlindSend(BuildContext context) async {

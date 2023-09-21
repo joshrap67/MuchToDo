@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/MuchToDo/static/css/main.e6c13ad2.css",
+    "main.js": "/MuchToDo/static/js/main.81a29f6c.js",
+    "index.html": "/MuchToDo/index.html",
+    "main.e6c13ad2.css.map": "/MuchToDo/static/css/main.e6c13ad2.css.map",
+    "main.81a29f6c.js.map": "/MuchToDo/static/js/main.81a29f6c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.81a29f6c.js"
+  ]
+}

@@ -1,4 +1,4 @@
-package com.joshrap.much_todo.much_todo
+package com.joshrap.much_todo
 
 import io.flutter.embedding.android.FlutterActivity
 

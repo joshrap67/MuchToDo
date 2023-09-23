@@ -7,20 +7,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:895180784965:android:b6109032242ee75dce2a2c",
+        "mobilesdk_app_id": "1:895180784965:android:cbe4630666c34982ce2a2c",
         "android_client_info": {
-          "package_name": "com.joshrap.much_todo.much_todo"
+          "package_name": "com.joshrap.much_todo"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "895180784965-be01i6092tau233il28bkdj0qo68p4h4.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.joshrap.much_todo.much_todo",
-            "certificate_hash": "c51760393bfa10d153a24907166ba27640969d7b"
-          }
-        },
         {
           "client_id": "895180784965-no3ri31smpvmojtkogvjqa7croml8kp7.apps.googleusercontent.com",
           "client_type": 3
@@ -37,13 +29,6 @@
             {
               "client_id": "895180784965-n66lprsapvhoieq4la0vmr10h35s4bca.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "895180784965-2t3q2pbuv67d319j150b4od2t829l3b3.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.joshrap.muchtodo.muchTodo.RunnerTests"
-              }
             }
           ]
         }

@@ -8,7 +8,7 @@
 PRODUCT_NAME = much_todo
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.joshrap.muchtodo.muchTodo
+PRODUCT_BUNDLE_IDENTIFIER = com.joshrap.muchtodo
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2023 com.joshrap.much_todo. All rights reserved.

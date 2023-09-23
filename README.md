@@ -4,11 +4,13 @@ Mobile application that allows for tasks needing to be done around the house to 
 
 The mobile application connects to a REST API running on Express that runs in a Google Cloud Function instance.
 
+Google Play Store requires a website to request for account deletion for GDPR compliance. I just did a quick and dirty react app to accomplish this. It is hosted on Github Pages and is accessible from [this link](https://joshrap67.github.io/MuchToDo/#/home).
+
 ## Prerequisites
 
 Flutter is needed to build and run the mobile application.
 
-Node.js is needed to run the API.
+Node.js is needed to run the API and deploy to GH Pages.
 
 Google cloud CLI is needed to run the API locally.
 
@@ -37,6 +39,8 @@ The express APIs can be run using the `npm run start-local` command. This will r
 
 To deploy to Google Cloud Functions run this command in the directory of the desired service:
 `firebase deploy --only functions`
+
+To publish the GH pages website run `npm run deploy` in the directory.
 
 
 ## Authors

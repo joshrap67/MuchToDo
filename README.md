@@ -6,6 +6,8 @@ The mobile application connects to a REST API running on Express that runs in a 
 
 Google Play Store requires a website to request for account deletion for GDPR compliance. I just did a quick and dirty react app to accomplish this. It is hosted on Github Pages and is accessible from [this link](https://joshrap67.github.io/MuchToDo/#/home).
 
+[1.0.0 Demo](https://www.youtube.com/watch?v=P6XNyjCfjeQ)
+
 ## Prerequisites
 
 Flutter is needed to build and run the mobile application.

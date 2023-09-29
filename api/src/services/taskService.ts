@@ -116,14 +116,12 @@ export async function updateTask(taskId: string, request: UpdateTaskRequest, use
 
             const newRoom = await RoomModel.findOne({'_id': request.roomId}).session(session);
             const oldRoom = await RoomModel.findOne({'_id': task.room.id}).session(session);
-            if (!(newRoom._id.equals(oldRoom.id))) {
-                // room changed, so we need to update old room to delete this task
-                oldRoom.tasks = oldRoom.tasks.filter(x => !x.id.equals(task.id));
-                await oldRoom.save({session});
-                // update new room with denormalized task data
-                newRoom.tasks.push(convertTaskToRoomTask(task));
-                await newRoom.save({session});
-            }
+            // update old room to delete this task (if room didn't change the purpose of this is to delete old data of task)
+            oldRoom.tasks = oldRoom.tasks.filter(x => !x.id.equals(task.id));
+            await oldRoom.save({session});
+            // update new room with denormalized task data
+            newRoom.tasks.push(convertTaskToRoomTask(task));
+            await newRoom.save({session});
 
             const tagLookup: Record<string, Tag> = {};
             const contactLookup: Record<string, Contact> = {};

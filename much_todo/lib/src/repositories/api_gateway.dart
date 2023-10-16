@@ -6,7 +6,7 @@ import 'package:much_todo/src/repositories/api_request.dart';
 import 'package:much_todo/src/repositories/api_result.dart';
 
 class ApiGateway {
-  static const String baseUrl = 'us-central1-muchtodo-42777.cloudfunctions.net';
+  static const String baseUrl = 'us-east1-muchtodo-42777.cloudfunctions.net';
   static const String functionName = '/expressApi';
 
   static Future<String> getToken({bool forceRefresh = false}) async {

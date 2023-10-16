@@ -40,7 +40,7 @@ admin.initializeApp({
 
 setGlobalOptions({
     maxInstances: 5,
-    region: "us-central1",
+    region: "us-east1",
     timeoutSeconds: 60,
 });
 exports.expressApi = onRequest(app);

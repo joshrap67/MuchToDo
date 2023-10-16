@@ -9,6 +9,7 @@ import 'package:much_todo/src/screens/create_task/create_task.dart';
 import 'package:much_todo/src/screens/filter_tasks/filter_tasks.dart';
 import 'package:much_todo/src/screens/task_details/task_details.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/skeletons/task_list_skeleton.dart';
 import 'package:much_todo/src/widgets/task_card.dart';
@@ -141,12 +142,12 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
                                   return true;
                                 } else {
                                   // swiping right
-                                  DateTime? completionDate = await promptCompleteTask(task);
-                                  if (completionDate == null) {
-                                    // user said no
+                                  var result =
+                                      await Dialogs.promptCompleteTask(context, initialCost: task.estimatedCost);
+                                  if (!result.shouldComplete) {
                                     return false;
                                   }
-                                  completeTask(task, completionDate);
+                                  completeTask(task, result.completionDate!, result.cost);
 
                                   return true;
                                 }
@@ -243,18 +244,8 @@ class _TaskListState extends State<TaskList> with TickerProviderStateMixin, Auto
     return shouldDelete ?? false;
   }
 
-  Future<DateTime?> promptCompleteTask(Task task) async {
-    var pickDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1800),
-        helpText: 'Select Completion Date',
-        lastDate: DateTime(9999));
-    return pickDate;
-  }
-
-  Future<void> completeTask(Task task, DateTime date) async {
-    var result = await TaskService.completeTask(context, task, date, notifyOnFailure: true);
+  Future<void> completeTask(Task task, DateTime date, double? cost) async {
+    var result = await TaskService.completeTask(context, task, date, cost, notifyOnFailure: true);
     if (context.mounted && result.failure) {
       showSnackbar(result.errorMessage!, context);
     }

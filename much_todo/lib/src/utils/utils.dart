@@ -173,8 +173,8 @@ void sortCompletedTasks(List<CompletedTask> tasks, CompletedTaskSortOption sortB
       break;
     case CompletedTaskSortOption.cost:
       tasks.sort((a, b) {
-        var estimatedCostA = a.estimatedCost ?? 0.0;
-        var estimatedCostB = b.estimatedCost ?? 0.0;
+        var estimatedCostA = a.cost ?? 0.0;
+        var estimatedCostB = b.cost ?? 0.0;
         return estimatedCostA.compareTo(estimatedCostB) * (sortDirection == SortDirection.descending ? -1 : 1);
       });
       break;

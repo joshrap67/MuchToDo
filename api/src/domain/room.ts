@@ -6,6 +6,8 @@ export interface Room {
     name: string;
     note: string;
     createdBy: string;
+    taskSort: number;
+    taskSortDirection: number;
     isFavorite: boolean
     tasks: RoomTask[];
 }
@@ -26,6 +28,8 @@ const RoomSchema = new Schema<Room>({
     name: {type: String, required: true},
     note: {type: String},
     isFavorite: {type: Boolean},
+    taskSort: {type: Number, default: 0},
+    taskSortDirection: {type: Number, default: 0},
     createdBy: {type: String, required: true, index: true},
     tasks: [TaskSchema],
 });

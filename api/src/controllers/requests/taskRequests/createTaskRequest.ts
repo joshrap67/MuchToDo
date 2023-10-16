@@ -55,7 +55,7 @@ export const createTaskSchema = () => {
         },
         estimatedCost: {
             optional: {options: {values: 'falsy'}},
-            isDecimal: {errorMessage: 'The estimated cost price must be a decimal'}
+            isDecimal: {errorMessage: 'Estimated cost must be a decimal'}
         },
         note: {
             optional: true,

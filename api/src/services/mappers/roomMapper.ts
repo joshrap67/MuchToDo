@@ -12,6 +12,8 @@ export const mapRoomToResponse = (room: Room): RoomResponse => {
         createdBy: room.createdBy,
         note: room.note,
         isFavorite: room.isFavorite,
+        taskSort: room.taskSort,
+        taskSortDirection: room.taskSortDirection,
         tasks: tasks,
         creationDate: room._id.getTimestamp()
     } as RoomResponse;

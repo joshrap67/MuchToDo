@@ -16,7 +16,7 @@ class CompletedTasksSkeleton extends StatelessWidget {
           const ListTile(
             title: Text('10 Total Tasks'),
             subtitle: Text(
-              '100.00 Total Estimated Cost',
+              '100.00 Total Cost',
               style: TextStyle(fontSize: 12),
             ),
           ),

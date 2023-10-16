@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/repositories/api_gateway.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
+import 'package:much_todo/src/repositories/rooms/requests/set_room_task_sort_request.dart';
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 
 class RoomRepository {
@@ -58,6 +59,13 @@ class RoomRepository {
     if (apiResult.success) {
       return true;
     } else {
+      throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
+    }
+  }
+
+  static Future<void> setTaskSort(String roomId, SetRoomTaskSortRequest request) async {
+    final apiResult = await ApiGateway.put('$basePath/$roomId/task-sort', body: request);
+    if (!apiResult.success) {
       throw Exception('Status ${apiResult.statusCode}, message: ${apiResult.data}');
     }
   }

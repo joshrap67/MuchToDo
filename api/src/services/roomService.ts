@@ -73,6 +73,10 @@ export async function setIsFavorite(roomId: string, userId: string, isFavorite: 
     await RoomModel.updateOne({'_id': roomId, 'createdBy': userId}, {$set: {'isFavorite': isFavorite}});
 }
 
+export async function setTaskSort(roomId: string, userId: string, taskSort: number, taskSortDirection: number): Promise<void> {
+    await RoomModel.updateOne({'_id': roomId, 'createdBy': userId}, {$set: {'taskSort': taskSort, 'taskSortDirection': taskSortDirection}});
+}
+
 export async function deleteRoom(roomId: string, userId: string): Promise<void> {
     const session = await mongoose.startSession();
     try {
@@ -91,7 +95,7 @@ export async function deleteRoom(roomId: string, userId: string): Promise<void> 
                 tag.tasks = tag.tasks.filter(t => !taskIds.some(deletedTaskId => deletedTaskId.equals(t)));
             }
             for (const contact of user.contacts) {
-                contact.tasks = contact.tasks.filter(c => !taskIds.some(deletedTaskId => deletedTaskId.equals(c)));
+                contact.tasks = contact.tasks.filter(t => !taskIds.some(deletedTaskId => deletedTaskId.equals(t)));
             }
             await user.save({session});
         });

@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
     "baseUrl": "src",
     "outDir": "lib",
     "sourceMap": true,
     "noImplicitAny": true,
-    "module": "NodeNext",
+    "target": "ESNext",
+    "module": "CommonJS",
+    "esModuleInterop": true,
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true
   },

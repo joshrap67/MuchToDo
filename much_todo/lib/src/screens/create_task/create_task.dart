@@ -3,6 +3,7 @@ import 'package:much_todo/src/domain/contact.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/tag.dart';
 import 'package:much_todo/src/domain/task.dart';
+import 'package:much_todo/src/providers/rooms_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/task_service.dart';
@@ -59,13 +60,14 @@ class _CreateTaskState extends State<CreateTask> {
       _estimatedCost = widget.task!.estimatedCost;
       _note = widget.task!.note;
       _completeBy = widget.task!.completeBy;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _contacts =
-            context.read<UserProvider>().contacts.where((x) => widget.task!.contacts.any((y) => y.id == x.id)).toList();
-        _tags = context.read<UserProvider>().tags.where((x) => widget.task!.tags.any((y) => y.id == x.id)).toList();
-        setState(() {});
-      });
+      _selectedRoom = context
+          .read<RoomsProvider>()
+          .rooms
+          .cast<Room?>()
+          .firstWhere((x) => x?.id == widget.task!.room.id, orElse: () => null);
+      _contacts =
+          context.read<UserProvider>().contacts.where((x) => widget.task!.contacts.any((y) => y.id == x.id)).toList();
+      _tags = context.read<UserProvider>().tags.where((x) => widget.task!.tags.any((y) => y.id == x.id)).toList();
     }
   }
 
@@ -115,7 +117,7 @@ class _CreateTaskState extends State<CreateTask> {
                       padding: const EdgeInsets.all(8.0),
                       child: TaskNameInput(
                         hintText: 'Name of Task',
-                        labelText: 'Name *',
+                        labelText: 'Task Name *',
                         name: _name,
                         nextFocus: _roomFocusNode,
                         onChange: (name) {
@@ -191,8 +193,8 @@ class _CreateTaskState extends State<CreateTask> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: MoneyInput(
-                        hintText: 'Estimated cost',
-                        labelText: 'Cost',
+                        hintText: 'Estimated cost of task',
+                        labelText: 'Estimated Cost',
                         prefixIcon: const Icon(Icons.attach_money),
                         amount: _estimatedCost,
                         onChange: (amount) {

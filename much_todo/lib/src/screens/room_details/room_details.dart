@@ -1,12 +1,17 @@
+import 'dart:math';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:much_todo/src/domain/room.dart';
 import 'package:much_todo/src/domain/task.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/screens/create_task/create_task.dart';
+import 'package:much_todo/src/screens/task_details/task_details.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/enums.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
@@ -24,7 +29,7 @@ class RoomDetails extends StatefulWidget {
   State<RoomDetails> createState() => _RoomDetailsState();
 }
 
-enum TaskOptions { edit, delete, showCompletedTasks }
+enum TaskOptions { delete, showCompletedTasks, randomTask }
 
 class _RoomDetailsState extends State<RoomDetails> {
   late Room _room;
@@ -44,6 +49,8 @@ class _RoomDetailsState extends State<RoomDetails> {
       ));
     }
     _room = widget.room;
+    _sortByValue = TaskSortOption.tryParse(_room.taskSort);
+    _sortDirectionValue = SortDirection.tryParse(_room.taskSortDirection);
   }
 
   @override
@@ -55,6 +62,10 @@ class _RoomDetailsState extends State<RoomDetails> {
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
         actions: [
+          IconButton(
+            onPressed: promptEditRoom,
+            icon: const Icon(Icons.edit),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             tooltip: 'More',
@@ -66,12 +77,17 @@ class _RoomDetailsState extends State<RoomDetails> {
             itemBuilder: (context) {
               hideKeyboard();
               return <PopupMenuEntry<TaskOptions>>[
-                const PopupMenuItem<TaskOptions>(
-                  value: TaskOptions.edit,
+                PopupMenuItem<TaskOptions>(
+                  value: TaskOptions.randomTask,
                   child: ListTile(
-                    title: Text('Edit'),
-                    leading: Icon(Icons.edit),
-                    contentPadding: EdgeInsets.all(0),
+                    title: const Text('Random Task'),
+                    leading: SvgPicture.asset(
+                      'assets/icons/dice.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(Theme.of(context).iconTheme.color!, BlendMode.srcIn),
+                    ),
+                    contentPadding: const EdgeInsets.all(0),
                   ),
                 ),
                 const PopupMenuItem<TaskOptions>(
@@ -147,12 +163,11 @@ class _RoomDetailsState extends State<RoomDetails> {
                                 return true;
                               } else {
                                 // swiping right
-                                DateTime? completionDate = await promptCompleteTask(task);
-                                if (completionDate == null) {
-                                  // user said no
+                                var result = await Dialogs.promptCompleteTask(context, initialCost: task.estimatedCost);
+                                if (!result.shouldComplete) {
                                   return false;
                                 }
-                                completeTask(task, completionDate);
+                                completeTask(task, result.completionDate!, result.cost);
 
                                 return true;
                               }
@@ -246,8 +261,8 @@ class _RoomDetailsState extends State<RoomDetails> {
     return pickDate;
   }
 
-  Future<void> completeTask(Task task, DateTime date) async {
-    var result = await TaskService.completeTask(context, task, date, notifyOnFailure: true);
+  Future<void> completeTask(Task task, DateTime date, double? cost) async {
+    var result = await TaskService.completeTask(context, task, date, cost, notifyOnFailure: true);
     if (context.mounted && result.failure) {
       showSnackbar(result.errorMessage!, context);
     }
@@ -262,8 +277,8 @@ class _RoomDetailsState extends State<RoomDetails> {
 
   onOptionSelected(TaskOptions result) {
     switch (result) {
-      case TaskOptions.edit:
-        promptEditRoom();
+      case TaskOptions.randomTask:
+        pickRandomTask();
         break;
       case TaskOptions.delete:
         promptDeleteRoom();
@@ -271,6 +286,22 @@ class _RoomDetailsState extends State<RoomDetails> {
       case TaskOptions.showCompletedTasks:
         showCompletedRooms();
         break;
+    }
+  }
+
+  Future<void> pickRandomTask() async {
+    if (_tasks.isEmpty) {
+      return;
+    }
+
+    var random = Random();
+    var index = random.nextInt(_tasks.length);
+
+    if (context.mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TaskDetails(task: _tasks[index])),
+      );
     }
   }
 
@@ -386,6 +417,7 @@ class _RoomDetailsState extends State<RoomDetails> {
               onPressed: () {
                 Navigator.pop(context, 'OK');
                 sortRoomTasks();
+                RoomsService.setRoomTaskSort(context, _room.id, _sortByValue.value, _sortDirectionValue.value);
                 setState(() {});
               },
               child: const Text('APPLY'),

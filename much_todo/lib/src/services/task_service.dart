@@ -147,11 +147,11 @@ class TaskService {
     }
   }
 
-  static Future<Result<void>> completeTask(BuildContext context, Task task, DateTime completionDate,
+  static Future<Result<void>> completeTask(BuildContext context, Task task, DateTime completionDate, double? cost,
       {bool notifyOnFailure = false}) async {
     var result = Result();
     try {
-      await TaskRepository.completeTask(task.id, CompleteTaskRequest(completeDate: completionDate));
+      await TaskRepository.completeTask(task.id, CompleteTaskRequest(completeDate: completionDate, cost: cost));
       if (context.mounted) {
         context.read<TasksProvider>().removeTask(task);
         context.read<RoomsProvider>().removeTask(task);

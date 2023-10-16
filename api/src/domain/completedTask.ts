@@ -9,7 +9,7 @@ export interface CompletedTask {
     effort: number;
     roomId: string;
     roomName: string;
-    estimatedCost: number;
+    cost: number;
     note: string;
     tags: string[];
     contacts: CompletedTaskContact[];
@@ -36,7 +36,7 @@ const CompletedTaskSchema = new Schema<CompletedTask>({
     effort: {type: Number, required: true},
     roomId: {type: String, required: true},
     roomName: {type: String, required: true},
-    estimatedCost: {type: Number},
+    cost: {type: Number},
     note: {type: String},
     tags: [{type: String}],
     contacts: [ContactSchema],

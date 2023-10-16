@@ -6,7 +6,7 @@ export interface CompletedTaskResponse {
     effort: number;
     roomId: string;
     roomName: string;
-    estimatedCost: number;
+    cost: number;
     note: string;
     tags: string[];
     contacts: CompletedTaskContactResponse[];

@@ -9,6 +9,8 @@ class DatePicker extends StatefulWidget {
   final ValueChanged<DateTime?> onChange;
   final String? hintText;
   final String? labelText;
+  final String? pickerHelpText;
+  final bool required;
 
   const DatePicker(
       {super.key,
@@ -17,6 +19,8 @@ class DatePicker extends StatefulWidget {
       this.initialDate,
       this.hintText,
       this.labelText,
+      this.pickerHelpText,
+      this.required = false,
       required this.onChange});
 
   @override
@@ -45,6 +49,15 @@ class _DatePickerState extends State<DatePicker> {
     return TextFormField(
       controller: _controller,
       readOnly: true,
+      validator: (date) {
+        if (!widget.required) {
+          return null;
+        }
+        if (_controller.text.isEmpty) {
+          return 'Required';
+        }
+        return null;
+      },
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.date_range),
         border: const OutlineInputBorder(),
@@ -68,6 +81,7 @@ class _DatePickerState extends State<DatePicker> {
             context: context,
             initialDate: widget.initialDate ?? DateTime.now(),
             firstDate: widget.firstDate ?? DateTime.now(),
+            helpText: widget.pickerHelpText,
             lastDate: DateTime(9999));
         if (pickDate != null) {
           pickDate = DateTime.utc(pickDate.year, pickDate.month, pickDate.day);

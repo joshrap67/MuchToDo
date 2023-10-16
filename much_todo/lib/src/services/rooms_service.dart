@@ -6,6 +6,7 @@ import 'package:much_todo/src/providers/settings_provider.dart';
 import 'package:much_todo/src/providers/tasks_provider.dart';
 import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/repositories/rooms/requests/create_room_request.dart';
+import 'package:much_todo/src/repositories/rooms/requests/set_room_task_sort_request.dart';
 import 'package:much_todo/src/repositories/rooms/requests/update_room_request.dart';
 import 'package:much_todo/src/repositories/rooms/room_repository.dart';
 import 'package:much_todo/src/utils/result.dart';
@@ -81,6 +82,21 @@ class RoomsService {
     } catch (e, s) {
       FirebaseCrashlytics.instance.recordError(e, s);
       result.setErrorMessage('There was a problem favoriting the room');
+    }
+    return result;
+  }
+
+  static Future<Result<void>> setRoomTaskSort(
+      BuildContext context, String id, int taskSort, int taskSortDirection) async {
+    var result = Result();
+
+    try {
+      // blind send
+      context.read<RoomsProvider>().setRoomTaskSort(id, taskSort, taskSortDirection);
+      await RoomRepository.setTaskSort(id, SetRoomTaskSortRequest(taskSort, taskSortDirection));
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
+      result.setErrorMessage('There was a problem setting the task sort');
     }
     return result;
   }

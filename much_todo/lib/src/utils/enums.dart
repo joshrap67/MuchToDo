@@ -12,6 +12,14 @@ enum TaskSortOption {
 
   const TaskSortOption(this.value, this.label);
 
+  static TaskSortOption tryParse(int value) {
+    var result = TaskSortOption.name;
+    try {
+      result = TaskSortOption.values[value];
+    } catch (_) {}
+    return result;
+  }
+
   final int value;
   final String label;
 }
@@ -47,6 +55,14 @@ enum SortDirection {
   ascending(1, Icon(Icons.arrow_upward));
 
   const SortDirection(this.value, this.widget);
+
+  static SortDirection tryParse(int value) {
+    var result = SortDirection.descending;
+    try {
+      result = SortDirection.values[value];
+    } catch (_) {}
+    return result;
+  }
 
   final int value;
   final Widget widget;

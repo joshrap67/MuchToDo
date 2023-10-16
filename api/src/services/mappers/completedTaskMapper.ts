@@ -14,7 +14,7 @@ export const mapCompletedTaskToResponse = (task: CompletedTask): CompletedTaskRe
         contacts: task.contacts,
         tags: task.tags,
         links: [...task.links],
-        estimatedCost: task.estimatedCost,
+        cost: task.cost,
         completionDate: task.completionDate,
     } as CompletedTaskResponse;
 }

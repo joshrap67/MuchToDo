@@ -48,7 +48,7 @@ export const deleteTask = async (req: express.Request<{ id: string }, {}, {}>, r
 
 export const completeTask = async (req: express.Request<{ id: string }, {}, CompleteTaskRequest>, res: express.Response) => {
     const userId = res.locals.userId;
-    const completedTask = await taskService.completeTask(req.params.id, req.body.completeDate, userId);
+    const completedTask = await taskService.completeTask(req.params.id, req.body.completeDate, req.body.cost, userId);
 
     return res.status(201).json(completedTask);
 }

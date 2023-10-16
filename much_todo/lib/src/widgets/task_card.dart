@@ -70,7 +70,7 @@ class _TaskCardState extends State<TaskCard> {
                         ),
                       )
                     : Text(
-                        '${getEffortTitle(widget.task.effort)} Effort',
+                        getEffortTitleAndCost(),
                         style: const TextStyle(
                           fontSize: 10,
                         ),
@@ -85,6 +85,14 @@ class _TaskCardState extends State<TaskCard> {
         ],
       ),
     );
+  }
+
+  String getEffortTitleAndCost() {
+    if (widget.task.estimatedCost != null) {
+      return '${getEffortTitle(widget.task.effort)} Effort • ${NumberFormat.currency(symbol: '\$').format(widget.task.estimatedCost)}';
+    } else {
+      return '${getEffortTitle(widget.task.effort)} Effort';
+    }
   }
 
   void openTask() {

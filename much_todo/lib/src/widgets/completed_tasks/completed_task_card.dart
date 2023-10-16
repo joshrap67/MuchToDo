@@ -60,7 +60,7 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    '${getEffortTitle(widget.task.effort)} Effort',
+                    getEffortTitleAndCost(),
                     style: const TextStyle(
                       fontSize: 10,
                     ),
@@ -76,6 +76,14 @@ class _CompletedTaskCardState extends State<CompletedTaskCard> {
         ),
       ),
     );
+  }
+
+  String getEffortTitleAndCost() {
+    if (widget.task.cost != null) {
+      return '${getEffortTitle(widget.task.effort)} Effort • ${NumberFormat.currency(symbol: '\$').format(widget.task.cost)}';
+    } else {
+      return '${getEffortTitle(widget.task.effort)} Effort';
+    }
   }
 
   Future<void> openTask() async {

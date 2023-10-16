@@ -3,6 +3,8 @@ export interface RoomResponse {
     name: string;
     note: string;
     isFavorite: boolean;
+    taskSort: number;
+    taskSortDirection: number;
     createdBy: string;
     creationDate: Date;
     tasks: RoomTaskResponse[];

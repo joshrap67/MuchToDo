@@ -56,18 +56,14 @@ class _EditTaskState extends State<EditTask> {
     _estimatedCost = widget.task.estimatedCost;
     _note = widget.task.note;
     _completeBy = widget.task.completeBy;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _selectedRoom = context
-          .read<RoomsProvider>()
-          .rooms
-          .cast<Room?>()
-          .firstWhere((element) => element?.id == widget.task.room.id, orElse: () => null);
-      _contacts =
-          context.read<UserProvider>().contacts.where((x) => widget.task.contacts.any((y) => y.id == x.id)).toList();
-      _tags = context.read<UserProvider>().tags.where((x) => widget.task.tags.any((y) => y.id == x.id)).toList();
-      setState(() {});
-    });
+    _selectedRoom = context
+        .read<RoomsProvider>()
+        .rooms
+        .cast<Room?>()
+        .firstWhere((element) => element?.id == widget.task.room.id, orElse: () => null);
+    _contacts =
+        context.read<UserProvider>().contacts.where((x) => widget.task.contacts.any((y) => y.id == x.id)).toList();
+    _tags = context.read<UserProvider>().tags.where((x) => widget.task.tags.any((y) => y.id == x.id)).toList();
   }
 
   @override
@@ -116,7 +112,7 @@ class _EditTaskState extends State<EditTask> {
                       padding: const EdgeInsets.all(8.0),
                       child: TaskNameInput(
                         hintText: 'Name of Task',
-                        labelText: 'Name *',
+                        labelText: 'Task Name *',
                         name: _name,
                         nextFocus: _roomFocusNode,
                         onChange: (name) {
@@ -189,8 +185,8 @@ class _EditTaskState extends State<EditTask> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: MoneyInput(
-                        hintText: 'Estimated cost',
-                        labelText: 'Cost',
+                        hintText: 'Estimated cost of task',
+                        labelText: 'Estimated Cost',
                         prefixIcon: const Icon(Icons.attach_money),
                         amount: _estimatedCost,
                         onChange: (amount) {

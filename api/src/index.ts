@@ -43,5 +43,4 @@ setGlobalOptions({
     region: "us-east1",
     timeoutSeconds: 60,
 });
-
 exports.expressApi = onRequest(app);

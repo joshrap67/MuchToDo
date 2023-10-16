@@ -7,8 +7,11 @@ import 'package:much_todo/src/providers/user_provider.dart';
 import 'package:much_todo/src/services/rooms_service.dart';
 import 'package:much_todo/src/services/user_service.dart';
 import 'package:much_todo/src/utils/constants.dart';
+import 'package:much_todo/src/utils/navigator_results.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/utils/validation.dart';
+import 'package:much_todo/src/widgets/form_widgets/date_picker.dart';
+import 'package:much_todo/src/widgets/form_widgets/money_input.dart';
 import 'package:provider/provider.dart';
 
 class Dialogs {
@@ -282,5 +285,75 @@ class Dialogs {
       },
     );
     return room;
+  }
+
+  static Future<CompleteTaskResult> promptCompleteTask(BuildContext context,
+      {double? initialCost, bool blindSend = false}) async {
+    DateTime? date = DateTime.now();
+    var cost = initialCost;
+    final formKey = GlobalKey<FormState>();
+
+    var shouldComplete = await showDialog<bool?>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(builder: (dialogContext, setState) {
+          return AlertDialog.adaptive(
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    Navigator.pop(dialogContext, true);
+                  }
+                },
+                child: const Text('COMPLETE TASK'),
+              )
+            ],
+            insetPadding: const EdgeInsets.all(8.0),
+            title: const Text('Complete Task'),
+            content: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: SizedBox(
+                  width: MediaQuery.of(dialogContext).size.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DatePicker(
+                        initialDate: date,
+                        firstDate: DateTime(1800),
+                        pickerHelpText: 'Select Task Completion Date',
+                        labelText: 'Completion Date',
+                        required: true,
+                        selectedDate: date,
+                        key: ValueKey(date),
+                        onChange: (newDate) {
+                          date = newDate;
+                        },
+                      ),
+                      const Padding(padding: EdgeInsets.all(8)),
+                      MoneyInput(
+                        showClear: true,
+                        labelText: 'Cost',
+                        hintText: 'Total Cost of Task',
+                        amount: cost,
+                        prefixIcon: const Icon(Icons.attach_money),
+                        onChange: (newCost) {
+                          cost = newCost;
+                        },
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+      },
+    );
+    return CompleteTaskResult(completionDate: date, shouldComplete: shouldComplete ?? false, cost: cost);
   }
 }

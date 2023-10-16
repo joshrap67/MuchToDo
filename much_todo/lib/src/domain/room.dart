@@ -5,6 +5,8 @@ class Room {
   late String name;
   String? note;
   bool isFavorite = false;
+  int taskSort = 0;
+  int taskSortDirection = 0;
   late DateTime creationDate;
   List<RoomTask> tasks = [];
 
@@ -15,6 +17,8 @@ class Room {
     name = json['name'];
     note = json['note'];
     isFavorite = json['isFavorite'];
+    taskSort = json['taskSort'];
+    taskSortDirection = json['taskSortDirection'];
     creationDate = json['creationDate'] != null ? DateTime.parse(json['creationDate']) : DateTime.now();
     tasks = <RoomTask>[];
     for (var task in json['tasks']) {
@@ -29,7 +33,7 @@ class Room {
 
   @override
   String toString() {
-    return 'Room{Id: $id, name: $name, note: $note, creationDate: $creationDate, tasks: $tasks}';
+    return 'Room{Id: $id, name: $name, note: $note, creationDate: $creationDate, isFavorite: $isFavorite, taskSort:$taskSort, taskSortDirection: $taskSortDirection, tasks: $tasks}';
   }
 
   TaskRoom convert() {

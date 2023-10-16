@@ -236,7 +236,7 @@ export async function setProgress(taskId: string, inProgress: boolean, userId: s
     await TaskModel.updateOne({'_id': taskId, 'createdBy': userId}, {$set: {'inProgress': inProgress}});
 }
 
-export async function completeTask(taskId: string, completionDate: Date, userId: string): Promise<CompletedTaskResponse> {
+export async function completeTask(taskId: string, completionDate: Date, cost: number, userId: string): Promise<CompletedTaskResponse> {
     // completing a task is for all intents and purposes a soft delete, so perform much of the same delete steps
     const session = await mongoose.startSession();
     let completedTaskResponse;
@@ -255,7 +255,7 @@ export async function completeTask(taskId: string, completionDate: Date, userId:
                 contacts: task.contacts.map((e) => convertTaskContactToCompletedTaskContact(e)),
                 links: task.links,
                 note: task.note,
-                estimatedCost: task.estimatedCost,
+                cost: cost,
                 completionDate: completionDate
             } as CompletedTask);
             await completedTask.save({session});

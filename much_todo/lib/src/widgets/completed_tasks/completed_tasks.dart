@@ -111,7 +111,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
                         child: ListTile(
                           title: Text('${_completedTasks.length} Total Tasks'),
                           subtitle: Text(
-                            '${NumberFormat.currency(symbol: '\$').format(totalCost())} Total Estimated Cost',
+                            '${NumberFormat.currency(symbol: '\$').format(totalCost())} Total Cost',
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
@@ -278,7 +278,7 @@ class _CompletedTasksState extends State<CompletedTasks> {
   double totalCost() {
     var cost = 0.0;
     for (final task in _completedTasks) {
-      cost += task.estimatedCost ?? 0.0;
+      cost += task.cost ?? 0.0;
     }
     return cost;
   }

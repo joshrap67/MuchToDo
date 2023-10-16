@@ -53,7 +53,6 @@ class _PhotosCardReadOnlyState extends State<PhotosCardReadOnly> {
                       ),
                     ),
                   ),
-                if (widget.photos.isEmpty) const Text('No photos')
               ],
             ),
           ),

@@ -52,6 +52,14 @@ class RoomsProvider with ChangeNotifier {
     }
   }
 
+  void setRoomTaskSort(String id, int taskSort, int taskSortDirection) {
+    var index = _rooms.indexWhere((element) => element.id == id);
+    if (index >= 0) {
+      _rooms[index].taskSort = taskSort;
+      _rooms[index].taskSortDirection = taskSortDirection;
+    }
+  }
+
   void setSort(RoomSortOption sort, SortDirection sortDirection) {
     _sort = sort;
     _sortDirection = sortDirection;

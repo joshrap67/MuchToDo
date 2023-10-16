@@ -107,13 +107,13 @@ class _CompletedTaskDetailsState extends State<CompletedTaskDetails> {
                         ),
                         Row(
                           children: [
-                            if (widget.task.estimatedCost != null)
+                            if (widget.task.cost != null)
                               Flexible(
                                 child: Card(
                                   child: ListTile(
-                                    title: Text(NumberFormat.currency(symbol: '\$').format(widget.task.estimatedCost)),
+                                    title: Text(NumberFormat.currency(symbol: '\$').format(widget.task.cost)),
                                     subtitle: const Text(
-                                      'Estimated Cost',
+                                      'Cost',
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ),

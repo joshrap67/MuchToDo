@@ -12,6 +12,7 @@ import 'package:much_todo/src/screens/task_details/room_card_read_only.dart';
 import 'package:much_todo/src/screens/task_details/tags_card_read_only.dart';
 import 'package:much_todo/src/services/photo_service.dart';
 import 'package:much_todo/src/services/task_service.dart';
+import 'package:much_todo/src/utils/dialogs.dart';
 import 'package:much_todo/src/utils/utils.dart';
 import 'package:much_todo/src/widgets/priority_indicator.dart';
 import 'package:much_todo/src/widgets/skeletons/photos_card_skeleton.dart';
@@ -25,7 +26,7 @@ class TaskDetails extends StatefulWidget {
   State<TaskDetails> createState() => _TaskDetailsState();
 }
 
-enum TaskOptions { edit, duplicate, delete }
+enum TaskOptions { duplicate, delete }
 
 enum StatusOptions {
   notStarted(1, 'Not Started'),
@@ -60,6 +61,10 @@ class _TaskDetailsState extends State<TaskDetails> {
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         scrolledUnderElevation: 0,
         actions: [
+          IconButton(
+            onPressed: editTask,
+            icon: const Icon(Icons.edit),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             tooltip: 'More',
@@ -71,14 +76,6 @@ class _TaskDetailsState extends State<TaskDetails> {
             itemBuilder: (context) {
               hideKeyboard();
               return <PopupMenuEntry<TaskOptions>>[
-                const PopupMenuItem<TaskOptions>(
-                  value: TaskOptions.edit,
-                  child: ListTile(
-                    title: Text('Edit'),
-                    leading: Icon(Icons.edit),
-                    contentPadding: EdgeInsets.all(0),
-                  ),
-                ),
                 const PopupMenuItem<TaskOptions>(
                   value: TaskOptions.duplicate,
                   child: ListTile(
@@ -278,9 +275,6 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   onOptionSelected(TaskOptions result) {
     switch (result) {
-      case TaskOptions.edit:
-        editTask();
-        break;
       case TaskOptions.duplicate:
         duplicateTask();
         break;
@@ -316,25 +310,22 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<void> promptCompleteTask() async {
-    DateTime? pickDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1900),
-        helpText: 'Select Completion Date',
-        lastDate: DateTime(9999));
-    if (pickDate != null) {
-      if (context.mounted) {
-        showLoadingDialog(context, msg: 'Completing...');
-        var result = await TaskService.completeTask(context, _task, pickDate);
-        if (context.mounted) {
-          closePopup(context);
-        }
+    var completeResult = await Dialogs.promptCompleteTask(context, initialCost: _task.estimatedCost);
+    if (!completeResult.shouldComplete) {
+      return;
+    }
 
-        if (context.mounted && result.success) {
-          Navigator.of(context).pop();
-        } else if (context.mounted && result.failure) {
-          showSnackbar(result.errorMessage!, context);
-        }
+    if (context.mounted) {
+      showLoadingDialog(context, msg: 'Completing...');
+      var result = await TaskService.completeTask(context, _task, completeResult.completionDate!, completeResult.cost);
+      if (context.mounted) {
+        closePopup(context);
+      }
+
+      if (context.mounted && result.success) {
+        Navigator.of(context).pop();
+      } else if (context.mounted && result.failure) {
+        showSnackbar(result.errorMessage!, context);
       }
     }
   }

@@ -8,7 +8,7 @@ class CompletedTask {
   late int effort;
   late String roomId;
   late String roomName;
-  double? estimatedCost;
+  double? cost;
   String? note;
   List<String> tags = [];
   List<String> links = [];
@@ -16,7 +16,7 @@ class CompletedTask {
   late DateTime completionDate;
 
   CompletedTask(this.id, this.createdBy, this.name, this.tags, this.priority, this.effort, this.roomId, this.roomName,
-      this.estimatedCost, this.note, this.links, this.contacts, this.completionDate);
+      this.cost, this.note, this.links, this.contacts, this.completionDate);
 
   CompletedTask.named({
     required this.id,
@@ -28,7 +28,7 @@ class CompletedTask {
     required this.roomName,
     required this.completionDate,
     this.tags = const [],
-    this.estimatedCost,
+    this.cost,
     this.note,
     this.links = const [],
     this.contacts = const [],
@@ -57,7 +57,7 @@ class CompletedTask {
     }
     this.contacts = contacts;
 
-    estimatedCost = json['estimatedCost']?.toDouble();
+    cost = json['cost']?.toDouble();
     note = json['note'];
 
     var links = <String>[];
@@ -70,12 +70,12 @@ class CompletedTask {
   @override
   String toString() {
     return 'CompletedTask{id: $id, name: $name, priority: $priority, effort: $effort, createdBy: $createdBy, tags: $tags, '
-        'roomId: $roomId, roomName: $roomName, estimatedCost: $estimatedCost, note: $note, links: $links, '
+        'roomId: $roomId, roomName: $roomName, cost: $cost, note: $note, links: $links, '
         'contacts: $contacts, completionDate: $completionDate}';
   }
 
   RoomTask convert() {
-    return RoomTask(id, name, estimatedCost);
+    return RoomTask(id, name, cost);
   }
 }
 

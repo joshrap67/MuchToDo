@@ -24,10 +24,8 @@ class _RoomListState extends State<RoomList> with AutomaticKeepAliveClientMixin 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _sortByValue = context.read<RoomsProvider>().sort;
-      _sortDirectionValue = context.read<RoomsProvider>().sortDirection;
-    });
+	_sortByValue = context.read<RoomsProvider>().sort;
+	_sortDirectionValue = context.read<RoomsProvider>().sortDirection;
   }
 
   @override

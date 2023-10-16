@@ -58,6 +58,12 @@ class MoreScreenSkeleton extends StatelessWidget {
               leading: Icon(Icons.check),
             ),
           ),
+          const Card(
+            child: ListTile(
+              title: Text('Uploaded Photos'),
+              leading: Icon(Icons.camera_alt),
+            ),
+          ),
           Card(
             child: ListTile(
               title: const Text('Theme'),
@@ -83,6 +89,13 @@ class MoreScreenSkeleton extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+          ),
+          const Divider(),
+          const Card(
+            child: ListTile(
+              title: Text('Help'),
+              leading: Icon(Icons.help),
             ),
           ),
           const Card(

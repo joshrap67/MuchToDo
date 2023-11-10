@@ -210,7 +210,11 @@ class _TaskDetailsState extends State<TaskDetails> {
                       ),
                     if (_task.tags.isNotEmpty) TagsCardReadOnly(tags: _task.tags),
                     if (_task.contacts.isNotEmpty) ContactCardReadOnly(contacts: _task.contacts),
-                    if (_task.links.isNotEmpty) LinksCardReadOnly(links: _task.links),
+                    if (_task.links.isNotEmpty)
+                      LinksCardReadOnly(
+                        key: ValueKey(_task.links),
+                        links: _task.links,
+                      ),
                     FutureBuilder(
                       future: _photos,
                       builder: (BuildContext context, AsyncSnapshot<List<TaskPhoto>> photos) {

@@ -326,7 +326,7 @@ class Dialogs {
                         initialDate: date,
                         firstDate: DateTime(1800),
                         pickerHelpText: 'Select Task Completion Date',
-                        labelText: 'Completion Date',
+                        labelText: 'Completion Date *',
                         required: true,
                         selectedDate: date,
                         key: ValueKey(date),

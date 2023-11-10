@@ -4,10 +4,6 @@ Mobile application that allows for tasks needing to be done around the house to 
 
 The mobile application connects to a REST API running on Express that runs in a Google Cloud Function instance.
 
-Google Play Store requires a website to request for account deletion for GDPR compliance. I just did a quick and dirty react app to accomplish this. It is hosted on Github Pages and is accessible from [this link](https://joshrap67.github.io/MuchToDo/#/home).
-
-[Google Play Link](https://play.google.com/store/apps/details?id=com.joshrap.much_todo)
-
 [1.0.0 Demo](https://www.youtube.com/watch?v=P6XNyjCfjeQ)
 
 ## Prerequisites
